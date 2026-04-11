@@ -1,6 +1,39 @@
 import path from "node:path";
 
-export const ROOT_URL = "https://judgmentkit.com";
+export const CANONICAL_SITE_URL = "https://judgmentkit.ai";
+export const DEFAULT_LOCAL_SITE_URL = "http://localhost:3000";
+
+function normalizeSiteUrl(value: string) {
+  const trimmed = value.trim();
+  const withProtocol = /^https?:\/\//i.test(trimmed)
+    ? trimmed
+    : `https://${trimmed}`;
+
+  return new URL(withProtocol).origin;
+}
+
+export function resolveSiteUrl(env: NodeJS.ProcessEnv = process.env) {
+  const explicitUrl = env.JUDGMENTKIT_SITE_URL;
+  if (explicitUrl?.trim()) {
+    return normalizeSiteUrl(explicitUrl);
+  }
+
+  const productionHost =
+    env.VERCEL_PROJECT_PRODUCTION_URL ??
+    (env.VERCEL_ENV === "production" ? env.VERCEL_URL : undefined);
+  if (productionHost?.trim()) {
+    return normalizeSiteUrl(productionHost);
+  }
+
+  const previewHost = env.VERCEL_BRANCH_URL ?? env.VERCEL_URL;
+  if (previewHost?.trim()) {
+    return normalizeSiteUrl(previewHost);
+  }
+
+  return DEFAULT_LOCAL_SITE_URL;
+}
+
+export const ROOT_URL = resolveSiteUrl();
 export const CONTENT_DIR = path.join(process.cwd(), "content");
 export const DOCS_DIR = path.join(CONTENT_DIR, "docs");
 export const RESOURCES_DIR = path.join(CONTENT_DIR, "resources");

@@ -28,7 +28,14 @@ import type {
   SearchDocument,
 } from "@/lib/types";
 import { createAjv, formatAjvErrors } from "@/lib/validation";
-import { absoluteUrl, ensureDirectory, resetDirectory, sha256, unique } from "@/lib/utils";
+import {
+  absoluteUrl,
+  ensureDirectory,
+  resetDirectory,
+  rewriteInternalSiteUrls,
+  sha256,
+  unique,
+} from "@/lib/utils";
 
 type LoadedResource = Awaited<ReturnType<typeof loadResources>>[number];
 type LoadedSchema = Awaited<ReturnType<typeof loadSchemas>>[number];
@@ -229,11 +236,12 @@ function createMcpInventory(resourceIndex: ResourceIndex) {
 }
 
 function createPublicResourceData(resource: LoadedResource) {
-  const id = String(resource.data.id);
-  const links = (resource.data.links ?? {}) as Record<string, unknown>;
+  const data = rewriteInternalSiteUrls(resource.data);
+  const id = String(data.id);
+  const links = (data.links ?? {}) as Record<string, unknown>;
 
   return {
-    ...resource.data,
+    ...data,
     links: {
       ...links,
       docs_url: getInspectResourceAnchor(id),
@@ -417,7 +425,10 @@ async function writePublicSchemas(schemas: LoadedSchema[]) {
       path.relative(SCHEMAS_DIR, schema.filePath),
     );
     await ensureDirectory(path.dirname(target));
-    await fs.writeFile(target, JSON.stringify(schema.data, null, 2));
+    await fs.writeFile(
+      target,
+      JSON.stringify(rewriteInternalSiteUrls(schema.data), null, 2),
+    );
   }
 }
 

@@ -1,5 +1,6 @@
 import { ROOT_URL } from "@/lib/constants";
 import { loadResources } from "@/lib/content";
+import { stripSiteOrigin } from "@/lib/utils";
 
 const INSPECT_PATH = "/inspect";
 let legacyDocsRedirectMapPromise: Promise<Map<string, string>> | undefined;
@@ -16,9 +17,7 @@ async function loadLegacyDocsRedirectMap() {
           continue;
         }
 
-        const pathname = docsUrl.startsWith(ROOT_URL)
-          ? docsUrl.replace(ROOT_URL, "")
-          : docsUrl;
+        const pathname = stripSiteOrigin(docsUrl, ROOT_URL);
         redirects.set(pathname, `${INSPECT_PATH}#resource-${String(resource.data.id)}`);
       }
 

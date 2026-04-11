@@ -9,6 +9,10 @@ describe("site build data", () => {
     expect(site.pages).toHaveLength(21);
     expect(site.resourceIndex.resources).toHaveLength(16);
     expect(site.resourceIndex.schemas).toHaveLength(5);
+    expect(site.resourceIndex.resources[0]?.url).toMatch(/^https:\/\/judgmentkit\.ai\//);
+    expect(site.resourceIndex.schemas[0]?.url).toMatch(/^https:\/\/judgmentkit\.ai\//);
+    expect(site.llms).toContain("https://judgmentkit.ai/");
+    expect(site.mcpInventory.endpoint).toBe("https://judgmentkit.ai/mcp");
   });
 
   it("keeps every guardrail page attached to workflows and resources", async () => {

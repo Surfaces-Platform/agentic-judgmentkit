@@ -24,10 +24,10 @@ describe("legacy docs compatibility", () => {
 
   it("repoints generated docs_url values to inspect anchors while keeping markdown mirrors", () => {
     expect(publicWorkflowResource.links.docs_url).toBe(
-      "https://judgmentkit.com/inspect#resource-workflow.ai-ui-generation",
+      "https://judgmentkit.ai/inspect#resource-workflow.ai-ui-generation",
     );
     expect(publicWorkflowResource.links.markdown_url).toBe(
-      "https://judgmentkit.com/docs/workflows/ai-ui-generation.md",
+      "https://judgmentkit.ai/docs/workflows/ai-ui-generation.md",
     );
   });
 });
