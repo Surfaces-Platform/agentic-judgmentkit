@@ -1,0 +1,143 @@
+{
+  "product_name": "JudgmentKit",
+  "surface_label": "MCP operator surface",
+  "utility_sentence": "Connect the MCP. Paste the first message. Run the first pass.",
+  "run_sequence": ["Connect", "Paste", "Run"],
+  "workbench_label": "Run the first pass",
+  "workbench_support": "Pick the client, wire in JudgmentKit using the right transport, paste the canonical message, and let the agent start inside the published workflow.",
+  "proof_heading": "Generated UI proof",
+  "proof_support": "Same brief. One uncontrolled pass and one JudgmentKit-guided pass.",
+  "proof_notes": [
+    "approved primitives first",
+    "bounded runtime",
+    "review questions surfaced early"
+  ],
+  "context_heading": "Loaded context",
+  "context_support": "JudgmentKit loads the workflow, linked guardrails, and the calibration example before generation starts.",
+  "install_targets": [
+    {
+      "id": "codex",
+      "label": "Codex",
+      "transport": "stdio",
+      "connection_label": "Transport",
+      "connection_value": "npm --prefix <ABSOLUTE_PATH_TO_JUDGMENTKIT_REPO> run mcp:stdio",
+      "config_path": "~/.codex/config.toml",
+      "install_note": "Run JudgmentKit directly from a local repo checkout. Replace the placeholder path and restart Codex.",
+      "config_snippet": "[mcp_servers.judgmentkit]\ncommand = \"npm\"\nargs = [\"--prefix\", \"<ABSOLUTE_PATH_TO_JUDGMENTKIT_REPO>\", \"run\", \"mcp:stdio\"]",
+      "starter_call": "get_workflow_bundle({ workflow_id: \"workflow.ai-ui-generation\" })"
+    },
+    {
+      "id": "claude",
+      "label": "Claude",
+      "transport": "stdio",
+      "connection_label": "Command",
+      "connection_value": "npm --prefix <ABSOLUTE_PATH_TO_JUDGMENTKIT_REPO> run mcp:stdio",
+      "config_path": ".mcp.json",
+      "install_note": "Run JudgmentKit directly from a local repo checkout. Replace the placeholder path and restart Claude after adding the server.",
+      "config_snippet": "{\n  \"mcpServers\": {\n    \"judgmentkit\": {\n      \"command\": \"npm\",\n      \"args\": [\"--prefix\", \"<ABSOLUTE_PATH_TO_JUDGMENTKIT_REPO>\", \"run\", \"mcp:stdio\"],\n      \"env\": {}\n    }\n  }\n}",
+      "starter_call": "get_workflow_bundle({ workflow_id: \"workflow.ai-ui-generation\" })"
+    },
+    {
+      "id": "cursor",
+      "label": "Cursor",
+      "transport": "stdio",
+      "connection_label": "Command",
+      "connection_value": "npm --prefix <ABSOLUTE_PATH_TO_JUDGMENTKIT_REPO> run mcp:stdio",
+      "config_path": "~/.cursor/mcp.json",
+      "install_note": "Run JudgmentKit directly from a local repo checkout. Replace the placeholder path and reopen the workspace if needed.",
+      "config_snippet": "{\n  \"mcpServers\": {\n    \"judgmentkit\": {\n      \"command\": \"npm\",\n      \"args\": [\"--prefix\", \"<ABSOLUTE_PATH_TO_JUDGMENTKIT_REPO>\", \"run\", \"mcp:stdio\"]\n    }\n  }\n}",
+      "starter_call": "get_workflow_bundle({ workflow_id: \"workflow.ai-ui-generation\" })"
+    }
+  ],
+  "inspect": {
+    "href": "/inspect",
+    "label": "Browse raw references",
+    "description": "Use the published endpoint, indexes, mirrors, and schema files when you need to verify what is deployed or read the machine-facing artifacts outside the inline browser."
+  },
+  "reference_links": [
+    {
+      "group": "Live MCP",
+      "label": "Raw MCP endpoint",
+      "url": "/mcp",
+      "kind": "endpoint"
+    },
+    {
+      "group": "Live MCP",
+      "label": "MCP inventory",
+      "url": "/mcp-inventory.json",
+      "kind": "index"
+    },
+    {
+      "group": "Live MCP",
+      "label": "llms.txt",
+      "url": "/llms.txt",
+      "kind": "discovery"
+    },
+    {
+      "group": "Live MCP",
+      "label": "Resource index",
+      "url": "/resources/index.json",
+      "kind": "index"
+    },
+    {
+      "group": "Core artifacts",
+      "label": "Workflow resource",
+      "url": "/resources/workflows/ai-ui-generation.v1.json",
+      "kind": "resource"
+    },
+    {
+      "group": "Core artifacts",
+      "label": "Design system integrity",
+      "url": "/resources/guardrails/design-system-integrity.v1.json",
+      "kind": "resource"
+    },
+    {
+      "group": "Core artifacts",
+      "label": "Runtime and cost",
+      "url": "/resources/guardrails/runtime-cost.v1.json",
+      "kind": "resource"
+    },
+    {
+      "group": "Core artifacts",
+      "label": "Provenance and escalation",
+      "url": "/resources/guardrails/provenance-and-escalation.v1.json",
+      "kind": "resource"
+    },
+    {
+      "group": "Core artifacts",
+      "label": "Example resource",
+      "url": "/resources/examples/ui-generation-drift.v1.json",
+      "kind": "resource"
+    },
+    {
+      "group": "Docs mirrors",
+      "label": "Workflow mirror",
+      "url": "/docs/workflows/ai-ui-generation.md",
+      "kind": "markdown"
+    },
+    {
+      "group": "Docs mirrors",
+      "label": "Example mirror",
+      "url": "/docs/examples/ui-generation-drift.md",
+      "kind": "markdown"
+    },
+    {
+      "group": "Schemas",
+      "label": "Workflow schema",
+      "url": "/schemas/workflow.schema.json",
+      "kind": "schema"
+    },
+    {
+      "group": "Schemas",
+      "label": "Guardrail schema",
+      "url": "/schemas/guardrail.schema.json",
+      "kind": "schema"
+    },
+    {
+      "group": "Schemas",
+      "label": "Example schema",
+      "url": "/schemas/example.schema.json",
+      "kind": "schema"
+    }
+  ]
+}
