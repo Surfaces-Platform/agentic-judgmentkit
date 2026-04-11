@@ -1,0 +1,87 @@
+---
+title: Provenance and escalation
+slug: /docs/guardrails/provenance-and-escalation
+page_type: guardrail
+summary: Require traceable evidence, clear ownership, and explicit handoff when a workflow cannot safely self-serve.
+agent_summary: >
+  This page explains how JudgmentKit keeps evidence and escalation paths visible
+  so that blocked decisions produce useful handoffs instead of silent failure.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - trust-safety-legal-and-governance
+workflows:
+  - workflow.support-assistant
+  - workflow.ai-ui-generation
+guardrails:
+  - guardrail.provenance-escalation
+owners:
+  primary: Product
+  risk: Operations
+  operational: Platform Engineering
+status: active
+last_reviewed: 2026-04-09
+related_pages:
+  - /docs/workflows/support-assistant
+  - /docs/workflows/ai-ui-generation
+  - /docs/examples/privacy-escalation
+related_resources:
+  - /resources/guardrails/provenance-and-escalation.v1.json
+related_schemas:
+  - /schemas/guardrail.schema.json
+  - /schemas/decision-record.schema.json
+  - /schemas/verdict.schema.json
+toc: true
+---
+
+## Why this matters
+
+When an AI workflow hits a boundary, the next failure mode is usually not the block itself. It is the missing explanation. Reviewers receive too little evidence, users receive too little clarity, or the system quietly keeps going.
+
+## What decision is being governed
+
+This guardrail governs whether the system can answer on its own, what evidence it can cite, and how it hands work to the next owner when it should stop.
+
+## What good judgment looks like
+
+- name what is known and what is not
+- attach the source or toolchain context that supports the answer
+- route blocked decisions with enough context for the next actor to continue
+
+## What drift looks like
+
+1. Unsupported claims presented as verified
+2. A blocked decision with no owner attached
+3. An escalation event with too little context to act on
+4. A workflow that keeps going because “someone will look at it later”
+
+## Example in practice
+
+The privacy escalation example demonstrates the right behavior: stop the assistant, avoid repeating sensitive details, and create a payload that a secure human workflow can continue from.
+
+## Boundaries
+
+Allowed variation includes lighter provenance summaries in low-risk flows and richer packets in high-risk ones.
+
+Hard stops include silent overrides, unsupported verification claims, and escalation events with no documented owner or context.
+
+## How JudgmentKit responds
+
+Missing trace data gets attached when possible. Ambiguous ownership pauses the workflow. High-risk failures create a structured escalation payload and stop self-serve.
+
+## Ownership and review
+
+Product owns the decision shape. Operations owns the escalation risk. Platform Engineering owns the runtime path that preserves evidence and routes the handoff.
+
+## Technical reference
+
+- Resource: `/resources/guardrails/provenance-and-escalation.v1.json`
+- Schema: `/schemas/guardrail.schema.json`
+- Supporting schemas: `/schemas/decision-record.schema.json`, `/schemas/verdict.schema.json`
+
+## Related pages
+
+- /docs/workflows/support-assistant
+- /docs/workflows/ai-ui-generation
+- /docs/examples/privacy-escalation

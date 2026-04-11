@@ -1,0 +1,72 @@
+---
+title: Embellishment drift
+slug: /docs/examples/embellishment-drift
+page_type: example
+summary: A zero-shot UI pass ignores design-system restraint, adds ornamental chrome, and assumes a single theme, then gets rewritten into restrained, dual-theme output.
+agent_summary: >
+  This example shows a first-pass interface drifting toward ornamental styling
+  and missing dark/light readiness before JudgmentKit rewrites it into a
+  restrained, design-system-first, theme-complete output.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+workflows:
+  - workflow.ai-ui-generation
+guardrails:
+  - guardrail.design-system-integrity
+owners:
+  primary: Design Systems
+  risk: Accessibility
+  operational: Frontend Platform
+status: active
+last_reviewed: 2026-04-11
+related_pages:
+  - /docs/workflows/ai-ui-generation
+  - /docs/guardrails/design-system-integrity
+  - /docs/examples/ui-generation-drift
+related_resources:
+  - /resources/examples/embellishment-drift.v1.json
+related_schemas:
+  - /schemas/example.schema.json
+  - /schemas/verdict.schema.json
+toc: true
+---
+
+## Scenario
+
+A product team asks for a first-pass analytics workbench, points to an existing design system, and leaves the style direction mostly open.
+
+## Raw decision or output
+
+`Create a premium analytics console using our design system but give it glass cards, oversized rounded corners, layered gradients, heavy drop shadows, pill buttons, and light mode only.`
+
+## What JudgmentKit detected
+
+- ornamental chrome is replacing structural hierarchy in a zero-shot pass
+- the request is overriding the design system instead of following it
+- the output assumes a single theme when light and dark mode are expected by default
+- the styling language is drifting away from approved system primitives
+
+## What action was taken
+
+The workflow first asks whether the referenced design system is accessibility-reviewed. Once that is confirmed, it rewrites the request into a restrained first pass that stays inside approved surfaces, typography, spacing, radius, elevation, and theme tokens.
+
+## Corrected result
+
+`Confirm the referenced design system is accessibility-reviewed, then generate a restrained first-pass analytics workbench using the system's approved surfaces, typography, spacing, radius, and elevation tokens. Keep decorative styling out of the zero-shot pass, and provide light and dark theme variants unless the brief or the system explicitly scopes otherwise.`
+
+## Why the correction matters
+
+The goal is not to ban style. It is to keep the first pass useful and accountable. Designers can ask for art direction later, but the zero-shot output should not spend trust on gradients, shadows, or giant radii before it proves the structure works, and it should not treat an unreviewed design system as automatically safe.
+
+## Related workflow and guardrails
+
+- Workflow: `/docs/workflows/ai-ui-generation`
+- Guardrail: `/docs/guardrails/design-system-integrity`
+
+## JSON artifact links
+
+- Example resource: `/resources/examples/embellishment-drift.v1.json`
+- Schema: `/schemas/example.schema.json`

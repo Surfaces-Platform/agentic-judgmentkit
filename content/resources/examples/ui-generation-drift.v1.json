@@ -1,0 +1,47 @@
+{
+  "id": "example.ui-generation.component-drift",
+  "type": "example",
+  "version": "1.0.0",
+  "title": "UI generation request rewritten to system-safe output",
+  "summary": "An interface generation workflow proposes custom components and a costly multi-pass build, then gets normalized to approved primitives and budgets.",
+  "status": "active",
+  "workflow_id": "workflow.ai-ui-generation",
+  "guardrail_ids": [
+    "guardrail.design-system-integrity",
+    "guardrail.runtime-cost"
+  ],
+  "scenario": "A product designer asks for a premium settings page concept for mobile and desktop in one pass.",
+  "raw_output": "Create a floating glassmorphism account shell with six custom widgets, animated neon status bars, and an unlimited reasoning pass to refine the layout until it feels premium.",
+  "verdict": {
+    "verdict_id": "ver_003",
+    "decision_id": "dec_003",
+    "evaluated_at": "2026-04-09T00:00:00Z",
+    "status": "warn",
+    "severity": "medium",
+    "guardrails_triggered": [
+      "guardrail.design-system-integrity",
+      "guardrail.runtime-cost"
+    ],
+    "reasons": [
+      "proposal introduces unapproved visual primitives",
+      "generation path exceeds documented complexity budget"
+    ],
+    "drift_score": 0.42,
+    "recommended_action": "review",
+    "rewrite_hint": "Map the request to approved components and limit generation to a scoped first pass with explicit follow-up review.",
+    "ownership": {
+      "decision_owner": "Design Systems",
+      "risk_owner": "Accessibility",
+      "operational_owner": "Frontend Platform"
+    },
+    "incident_required": false
+  },
+  "corrected_output": "Generate a first-pass settings page using approved form, card, and navigation primitives, then flag open design questions for a second reviewed pass if the team wants to go beyond the system.",
+  "lesson": "High-quality UI generation should stay inside approved primitives first, then escalate novelty through a deliberate review path instead of spending unlimited runtime on speculative variation.",
+  "links": {
+    "docs_url": "https://judgmentkit.com/docs/examples/ui-generation-drift",
+    "markdown_url": "https://judgmentkit.com/docs/examples/ui-generation-drift.md",
+    "schema_url": "https://judgmentkit.com/schemas/example.schema.json"
+  },
+  "last_reviewed": "2026-04-09"
+}

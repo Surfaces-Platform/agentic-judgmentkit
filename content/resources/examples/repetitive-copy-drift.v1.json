@@ -1,0 +1,41 @@
+{
+  "id": "example.ui-generation.repetitive-copy-drift",
+  "type": "example",
+  "version": "1.0.0",
+  "title": "Repetitive UI copy rewritten into distinct control language",
+  "summary": "A resource browser draft repeats the same words across nearby headings, helper text, and controls until the actions blur together, then gets rewritten into clearer UI copy roles.",
+  "status": "active",
+  "workflow_id": "workflow.ai-ui-generation",
+  "guardrail_ids": ["guardrail.ui-copy-clarity"],
+  "scenario": "A generated resource browser detail view places a heading, helper copy, view toggle, and utility actions in one cluster, but repeats terms like Inspect, JSON, and Open until the user cannot quickly tell what each element does.",
+  "raw_output": "Title the section Inspect JSON. Add helper text that says Inspect the JSON and open the JSON from the JSON tools below. Label the view toggle Inspect JSON and Inspect Schema, then add actions named Open JSON and JSON details next to it.",
+  "verdict": {
+    "verdict_id": "ver_007",
+    "decision_id": "dec_007",
+    "evaluated_at": "2026-04-11T00:00:00Z",
+    "status": "warn",
+    "severity": "medium",
+    "guardrails_triggered": ["guardrail.ui-copy-clarity"],
+    "reasons": [
+      "nearby headings, helper text, and controls repeat the same action words",
+      "different UI elements sound interchangeable instead of role-specific"
+    ],
+    "drift_score": 0.41,
+    "recommended_action": "review",
+    "rewrite_hint": "Give the section heading, helper text, view toggle, and utility action distinct jobs. Keep labels short and use support text to clarify, not repeat.",
+    "ownership": {
+      "decision_owner": "Design Systems",
+      "risk_owner": "Product",
+      "operational_owner": "Frontend Platform"
+    },
+    "incident_required": false
+  },
+  "corrected_output": "Use Resource details as the section heading. Keep the view toggle labels as JSON and Schema. Replace the helper text with View the structured artifact in place, or open the raw file separately. Keep a single utility action labeled Open raw JSON.",
+  "lesson": "Generated UI copy should separate description from action and keep adjacent controls semantically distinct, especially when a user is choosing the next step from a dense cluster.",
+  "links": {
+    "docs_url": "https://judgmentkit.com/docs/examples/repetitive-copy-drift",
+    "markdown_url": "https://judgmentkit.com/docs/examples/repetitive-copy-drift.md",
+    "schema_url": "https://judgmentkit.com/schemas/example.schema.json"
+  },
+  "last_reviewed": "2026-04-11"
+}

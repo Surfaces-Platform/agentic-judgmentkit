@@ -1,0 +1,47 @@
+{
+  "id": "example.ui-generation.onboarding-clarity-drift",
+  "type": "example",
+  "version": "1.0.0",
+  "title": "Landing page first pass rewritten for clearer onboarding",
+  "summary": "A homepage first pass over-exposes inspect surfaces and raw artifacts, then gets rewritten into a clearer connect-and-start story for the human team evaluating JudgmentKit.",
+  "status": "active",
+  "workflow_id": "workflow.ai-ui-generation",
+  "guardrail_ids": [
+    "guardrail.brand-tone",
+    "guardrail.provenance-escalation"
+  ],
+  "scenario": "A first-pass landing page for JudgmentKit leads with internal artifacts and proof machinery before it makes the product and start path obvious to the people deciding whether to use it.",
+  "raw_output": "Open the homepage with the inspect surface, bundle call details, resource ids, and raw references above the fold so the page proves JudgmentKit is real before it explains what it is or how to start.",
+  "verdict": {
+    "verdict_id": "ver_004",
+    "decision_id": "dec_004",
+    "evaluated_at": "2026-04-10T00:00:00Z",
+    "status": "warn",
+    "severity": "medium",
+    "guardrails_triggered": [
+      "guardrail.brand-tone",
+      "guardrail.provenance-escalation"
+    ],
+    "reasons": [
+      "page over-indexes on internal artifact proof before onboarding clarity",
+      "start path is obscured by self-referential system detail"
+    ],
+    "drift_score": 0.39,
+    "recommended_action": "review",
+    "rewrite_hint": "Lead with what JudgmentKit is, why it matters, and how to connect it. Keep raw artifacts and inspect references secondary until the human start path is clear.",
+    "ownership": {
+      "decision_owner": "Design Systems",
+      "risk_owner": "Brand",
+      "operational_owner": "Frontend Platform"
+    },
+    "incident_required": false
+  },
+  "corrected_output": "Lead with what JudgmentKit is, why it improves the first pass, and how to connect it in one screen. Keep inspect links and raw artifacts below the primary onboarding path, and only surface them once the team already knows the next step.",
+  "lesson": "JudgmentKit-guided refinement should reduce self-referential artifact density when it obscures onboarding. Prove the product after the page makes the product and next action obvious to the human decision-maker.",
+  "links": {
+    "docs_url": "https://judgmentkit.com/docs/examples/onboarding-clarity-drift",
+    "markdown_url": "https://judgmentkit.com/docs/examples/onboarding-clarity-drift.md",
+    "schema_url": "https://judgmentkit.com/schemas/example.schema.json"
+  },
+  "last_reviewed": "2026-04-10"
+}

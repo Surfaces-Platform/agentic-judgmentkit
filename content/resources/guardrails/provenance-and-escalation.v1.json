@@ -1,0 +1,76 @@
+{
+  "id": "guardrail.provenance-escalation",
+  "type": "guardrail",
+  "version": "1.0.0",
+  "title": "Provenance and escalation",
+  "summary": "Require traceable evidence, clear ownership, and explicit handoff when a workflow cannot safely self-serve.",
+  "status": "active",
+  "audiences": [
+    "design-leaders",
+    "product-managers",
+    "platform-engineering",
+    "trust-safety-legal-and-governance"
+  ],
+  "applies_to": {
+    "workflows": ["workflow.support-assistant", "workflow.ai-ui-generation"],
+    "surfaces": ["web", "mobile", "internal-tools"]
+  },
+  "decision": "Whether the system can answer on its own, what evidence it can cite, and when it must escalate.",
+  "intent": {
+    "purpose": "Make every high-risk decision traceable and every blocked workflow handoff explicit.",
+    "who_it_protects": ["end users", "operators", "reviewers"],
+    "failure_mode": "The system invents confidence, skips handoff, or leaves reviewers without the context needed to understand what happened.",
+    "good_judgment": "Name what is known, cite the source or toolchain when relevant, and escalate with enough context for a human or downstream system to act.",
+    "acceptable_variation": [
+      "brief provenance summaries in low-risk flows",
+      "richer handoff packets in high-risk flows",
+      "workflow-specific ownership labels"
+    ],
+    "non_negotiables": [
+      "no silent override of a blocked decision",
+      "no escalation without context",
+      "no unsupported claim presented as verified"
+    ]
+  },
+  "detection": {
+    "decision_question": "Can this response show where it came from and who should act next if it cannot proceed safely?",
+    "signals": [
+      "missing actor metadata",
+      "missing evidence trail",
+      "low confidence with no escalation",
+      "blocked decision without owner"
+    ],
+    "thresholds": {
+      "pass": "trace present and ownership clear",
+      "warn": "partial provenance or ambiguous owner",
+      "fail": "unsafe self-serve with no valid escalation path"
+    }
+  },
+  "response": {
+    "low": {
+      "action": "attach_trace",
+      "description": "Attach missing provenance detail and continue."
+    },
+    "medium": {
+      "action": "pause_for_review",
+      "description": "Pause the workflow and request human confirmation."
+    },
+    "high": {
+      "action": "escalate_with_payload",
+      "description": "Create a structured handoff and route it to the documented owner."
+    }
+  },
+  "ownership": {
+    "decision_owner": "Product",
+    "risk_owner": "Operations",
+    "operational_owner": "Platform Engineering",
+    "review_cadence": "monthly"
+  },
+  "links": {
+    "docs_url": "https://judgmentkit.com/docs/guardrails/provenance-and-escalation",
+    "markdown_url": "https://judgmentkit.com/docs/guardrails/provenance-and-escalation.md",
+    "schema_url": "https://judgmentkit.com/schemas/guardrail.schema.json",
+    "example_ids": ["example.privacy.support-escalation"]
+  },
+  "last_reviewed": "2026-04-09"
+}

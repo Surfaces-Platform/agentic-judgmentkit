@@ -1,0 +1,17 @@
+.next
+node_modules
+coverage
+dist
+.DS_Store
+.playwright-cli
+.tmp
+judgmentkit-product-spec-package.zip
+output/playwright
+public/resources
+public/schemas
+public/docs
+public/changelog.json
+public/llms.txt
+public/search-index.json
+public/graph.json
+public/mcp-inventory.json

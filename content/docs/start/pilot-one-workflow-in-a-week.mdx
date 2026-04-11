@@ -1,0 +1,78 @@
+---
+title: Pilot one workflow in a week
+slug: /docs/start/pilot-one-workflow-in-a-week
+page_type: start
+summary: Start with one workflow, one example, and one review loop rather than trying to govern every AI decision at once.
+agent_summary: >
+  This page describes a one-week pilot plan for adopting JudgmentKit using a
+  single workflow, a seed guardrail set, and a concrete example review loop.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+owners:
+  primary: Product
+  operational: Platform Engineering
+status: active
+last_reviewed: 2026-04-09
+related_pages:
+  - /docs/workflows/support-assistant
+  - /docs/workflows/ai-ui-generation
+  - /docs/roles/design-leaders
+related_resources:
+  - /resources/workflows/support-assistant.v1.json
+  - /resources/workflows/ai-ui-generation.v1.json
+related_schemas:
+  - /schemas/workflow.schema.json
+toc: true
+---
+
+## Why start small
+
+Most AI governance efforts stall because teams try to define a full policy universe before proving that the operating model is useful. A better pilot starts with a workflow people already care about and a failure mode they already recognize.
+
+## Recommended pilot scope
+
+Pick one workflow with all of these characteristics:
+
+- users already depend on it
+- the team can name the risky decisions inside it
+- there is at least one recent example of drift
+- a cross-functional group can review changes within a week
+
+Support assistant and AI UI generation both fit that shape.
+
+## Week plan
+
+### Day 1: define the workflow
+
+Write down the decisions inside the workflow, the inputs it needs, and the guardrails you know already apply.
+
+### Day 2: publish the first guardrails
+
+Start with the minimum set that explains the failure modes you already see. For a support assistant, that is usually brand and tone, safety and privacy, runtime and cost, plus provenance and escalation.
+
+### Day 3: add one example
+
+Choose a concrete output that drifted. Capture the raw output, the verdict, the corrected output, and the lesson.
+
+### Day 4: review ownership
+
+Name the decision owner, risk owner, and operational owner. If you cannot do that, the pilot is not actually ready.
+
+### Day 5: walk the retrieval path
+
+Fetch the docs page, the Markdown mirror, the resource, and the schema. If a builder or agent cannot find the same truth through all four paths, fix the publishing flow before expanding scope.
+
+## Exit criteria
+
+- the workflow is understandable in one reading session
+- at least one example makes the system tangible
+- a builder can find the resource and schema without searching the repo
+- the team agrees on who reviews changes next
+
+## Related pages
+
+- /docs/workflows/support-assistant
+- /docs/workflows/ai-ui-generation
+- /docs/roles/design-leaders

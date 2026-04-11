@@ -1,0 +1,85 @@
+---
+title: Safety and privacy
+slug: /docs/guardrails/safety-and-privacy
+page_type: guardrail
+summary: Prevent assistants from revealing, inferring, or acting on sensitive data outside allowed boundaries.
+agent_summary: >
+  This page explains how JudgmentKit keeps sensitive data handling explicit and
+  forces escalation when a workflow cannot safely self-serve.
+audiences:
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+  - trust-safety-legal-and-governance
+workflows:
+  - workflow.support-assistant
+  - workflow.ai-ui-generation
+guardrails:
+  - guardrail.safety-privacy
+owners:
+  primary: Trust and Safety
+  risk: Legal and Privacy
+  operational: Platform Engineering
+status: active
+last_reviewed: 2026-04-09
+related_pages:
+  - /docs/workflows/support-assistant
+  - /docs/examples/privacy-escalation
+  - /docs/guardrails/provenance-and-escalation
+related_resources:
+  - /resources/guardrails/safety-privacy.v1.json
+related_schemas:
+  - /schemas/guardrail.schema.json
+toc: true
+---
+
+## Why this matters
+
+Helpful assistants often fail by being too willing. They use more context than the workflow allows, imply permissions they do not have, or expose details that were never safe to show.
+
+## What decision is being governed
+
+This guardrail governs what user, account, or proprietary information may be used, shown, or retained in a response.
+
+## What good judgment looks like
+
+- use the minimum necessary data
+- confirm permissions before acting
+- summarize sensitive context without repeating it
+- stop early when a secure handoff is required
+
+## What drift looks like
+
+1. The assistant repeats restricted data.
+2. The system uses context that the user did not authorize.
+3. The answer implies account action is possible when it is not.
+4. A secure human path exists, but the system continues anyway.
+
+## Example in practice
+
+The privacy escalation example shows the correct move in a high-risk support scenario: do not improvise, do not expose context, and do not bury the escalation step.
+
+## Boundaries
+
+Allowed variation includes redacted summaries, coarse personalization when consent is present, and workflow-specific confirmation steps.
+
+Hard stops include revealing secrets, exposing identifiers, unverified account changes, and silent use of restricted context.
+
+## How JudgmentKit responds
+
+Low-risk issues get masked and logged. Ambiguous cases require confirmation. Clear violations block the response and create a privacy or trust review path.
+
+## Ownership and review
+
+Trust and Safety owns the decision. Legal and Privacy own the main risk. Platform Engineering owns the runtime enforcement path.
+
+## Technical reference
+
+- Resource: `/resources/guardrails/safety-privacy.v1.json`
+- Schema: `/schemas/guardrail.schema.json`
+
+## Related pages
+
+- /docs/workflows/support-assistant
+- /docs/examples/privacy-escalation
+- /docs/guardrails/provenance-and-escalation

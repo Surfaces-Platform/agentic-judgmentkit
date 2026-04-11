@@ -1,0 +1,92 @@
+---
+title: Design system integrity
+slug: /docs/guardrails/design-system-integrity
+page_type: guardrail
+summary: Keep generated UI aligned with approved tokens, expected themes, components, and accessibility rules, with the design system treated as primary authority.
+agent_summary: >
+  This page explains how JudgmentKit governs component, token, and accessibility
+  decisions inside UI generation workflows.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+workflows:
+  - workflow.ai-ui-generation
+guardrails:
+  - guardrail.design-system-integrity
+owners:
+  primary: Design Systems
+  risk: Accessibility
+  operational: Frontend Platform
+status: active
+last_reviewed: 2026-04-11
+related_pages:
+  - /docs/workflows/ai-ui-generation
+  - /docs/examples/ui-generation-drift
+  - /docs/examples/embellishment-drift
+  - /docs/guardrails/runtime-and-cost
+related_resources:
+  - /resources/guardrails/design-system-integrity.v1.json
+related_schemas:
+  - /schemas/guardrail.schema.json
+toc: true
+---
+
+## Why this matters
+
+Generated UI is persuasive. It can look production-ready even when it quietly overrides the design system, breaks the expected theme model, misses the accessibility baseline, or does all three at once.
+
+## What decision is being governed
+
+This guardrail governs which components, tokens, themes, semantics, and interaction patterns generated UI may use or modify.
+
+## What good judgment looks like
+
+- compose from approved primitives
+- treat the design system as the source of truth for radius, elevation, surfaces, and theme behavior
+- confirm the referenced design system has an accessibility baseline or owner-approved review status before using it as authority
+- preserve semantics and focus behavior
+- default to restrained surfaces only when the design system and the brief are both silent
+- assume light and dark mode when the system expects both unless the brief explicitly scopes otherwise
+- keep variation inside documented token ranges
+- escalate novelty instead of hiding it as “just design polish”
+
+## What drift looks like
+
+1. The model invents new primitives instead of recombining approved ones.
+2. Semantics disappear in the push for visual flair.
+3. Token usage widens until accessibility defects become normal.
+4. Decorative gradients, gratuitous shadows, and oversized radii become the default visual language of a first pass.
+5. The output silently assumes a single theme even though light and dark mode are expected.
+6. The system is referenced, but nobody confirms whether it has an accessibility baseline before generation starts.
+
+## Example in practice
+
+The UI generation examples show three common drift modes: invented primitives, ornamental zero-shot chrome, and using a design system without first confirming whether it is accessibility-reviewed. All three get rewritten into a scoped, system-safe first pass that leaves room for deliberate review.
+
+## Boundaries
+
+Allowed variation includes layout recomposition, token-respecting density changes, device-aware adaptation, paired light/dark theming when the system expects it, and restrained fallback defaults only when the design system and the brief are both silent.
+
+Hard stops include arbitrary colors, inaccessible interaction states, custom interaction patterns without approval, silent overrides of design-system definitions, decorative chrome without explicit art direction, unknown accessibility status for a referenced design system, and single-theme output when the product expects dual themes.
+
+## How JudgmentKit responds
+
+Small drift gets normalized automatically. Unknown accessibility status pauses the flow until the system can be confirmed. Structural drift gets rewritten into approved system language. Severe drift blocks generation until a design-system owner decides the new pattern is worth formalizing.
+
+## Ownership and review
+
+Design Systems owns the decision. Accessibility owns the risk signal. Frontend Platform owns the implementation path that turns design rules into runtime checks.
+
+## Technical reference
+
+- Resource: `/resources/guardrails/design-system-integrity.v1.json`
+- Schema: `/schemas/guardrail.schema.json`
+
+## Related pages
+
+- /docs/workflows/ai-ui-generation
+- /docs/examples/ui-generation-drift
+- /docs/examples/embellishment-drift
+- /docs/guardrails/runtime-and-cost

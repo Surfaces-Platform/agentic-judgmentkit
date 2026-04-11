@@ -1,0 +1,76 @@
+{
+  "id": "guardrail.brand-tone",
+  "type": "guardrail",
+  "version": "1.0.0",
+  "title": "Brand and tone",
+  "summary": "Keep AI-generated communication aligned with trust, clarity, and voice.",
+  "status": "active",
+  "audiences": [
+    "design-leaders",
+    "product-managers",
+    "platform-engineering",
+    "ai-application-developers"
+  ],
+  "applies_to": {
+    "workflows": ["workflow.support-assistant", "workflow.ai-ui-generation"],
+    "surfaces": ["web", "mobile", "email"]
+  },
+  "decision": "How the system speaks to users when generating or rewriting text.",
+  "intent": {
+    "purpose": "Ensure AI-generated content feels consistent with how the company communicates while still adapting to context and user needs.",
+    "who_it_protects": ["end users", "brand trust", "support teams"],
+    "failure_mode": "Content becomes manipulative, overly confident, or inconsistent across surfaces, eroding trust and increasing support burden.",
+    "good_judgment": "Clear, direct language that matches the situation. Confident when evidence is strong. Careful when uncertainty exists. Never coercive.",
+    "acceptable_variation": [
+      "adapt reading level by audience",
+      "shorten or expand copy for surface constraints",
+      "shift tone slightly between support, product, and UI generation contexts"
+    ],
+    "non_negotiables": [
+      "no deceptive urgency",
+      "no unsupported guarantees",
+      "no fear-based persuasion"
+    ]
+  },
+  "detection": {
+    "decision_question": "Is this output speaking to the user in a way that aligns with how we want to treat them?",
+    "signals": [
+      "tone similarity",
+      "coercive phrasing",
+      "unsupported certainty",
+      "reading level"
+    ],
+    "thresholds": {
+      "pass": "< 0.18",
+      "warn": "0.18 - 0.35",
+      "fail": "> 0.35"
+    }
+  },
+  "response": {
+    "low": {
+      "action": "auto_adjust",
+      "description": "Rewrite the text and log the event."
+    },
+    "medium": {
+      "action": "auto_adjust_and_review",
+      "description": "Rewrite, log, and route to review."
+    },
+    "high": {
+      "action": "block_or_escalate",
+      "description": "Block the output and escalate to the owner."
+    }
+  },
+  "ownership": {
+    "decision_owner": "Design Systems",
+    "risk_owner": "Brand",
+    "operational_owner": "Platform Engineering",
+    "review_cadence": "monthly"
+  },
+  "links": {
+    "docs_url": "https://judgmentkit.com/docs/guardrails/brand-and-tone",
+    "markdown_url": "https://judgmentkit.com/docs/guardrails/brand-and-tone.md",
+    "schema_url": "https://judgmentkit.com/schemas/guardrail.schema.json",
+    "example_ids": ["example.brand-tone.support-coercive-copy"]
+  },
+  "last_reviewed": "2026-04-09"
+}

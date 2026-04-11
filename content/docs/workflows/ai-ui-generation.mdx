@@ -1,0 +1,113 @@
+---
+title: AI UI generation
+slug: /docs/workflows/ai-ui-generation
+page_type: workflow
+summary: A builder workflow that turns product intent into interface proposals while staying inside design-system, accessibility, and budget constraints.
+agent_summary: >
+  This workflow explains how JudgmentKit governs AI-generated interface output
+  so that component choices, accessibility, and runtime budgets remain explicit.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+workflows:
+  - workflow.ai-ui-generation
+owners:
+  primary: Design Systems
+  operational: Frontend Platform
+status: active
+last_reviewed: 2026-04-11
+related_pages:
+  - /docs/guardrails/design-system-integrity
+  - /docs/guardrails/ui-copy-clarity
+  - /docs/guardrails/control-proximity
+  - /docs/guardrails/runtime-and-cost
+  - /docs/guardrails/provenance-and-escalation
+  - /docs/examples/ui-generation-drift
+  - /docs/examples/embellishment-drift
+  - /docs/examples/onboarding-clarity-drift
+  - /docs/examples/repetitive-copy-drift
+  - /docs/examples/control-proximity-drift
+related_resources:
+  - /resources/workflows/ai-ui-generation.v1.json
+related_schemas:
+  - /schemas/workflow.schema.json
+  - /schemas/decision-record.schema.json
+  - /schemas/verdict.schema.json
+toc: true
+---
+
+## Why this workflow matters
+
+Generated UI can look impressive and still create downstream cleanup. The main risk is not only visual quality. It is unapproved primitives, silent overrides of the design system, ornamental zero-shot styling, missing theme support, unclear provenance, and unnecessary runtime spend hiding inside a “creative” result.
+
+## What decisions exist inside the workflow
+
+- which components and tokens may be used
+- whether the referenced design system is authoritative for the requested surface
+- whether that design system has an accessibility baseline or owner-approved review status
+- how much variation is acceptable before review
+- when local controls are too detached from the surface they govern
+- when a first pass is too ornamental for zero-shot generation
+- when light and dark mode should be assumed by default
+- what accessibility baseline must hold
+- how much runtime complexity is justified
+- what evidence should travel with the implementation handoff
+
+## Which guardrails apply
+
+- `guardrail.design-system-integrity`
+- `guardrail.ui-copy-clarity`
+- `guardrail.control-proximity`
+- `guardrail.runtime-cost`
+- `guardrail.provenance-escalation`
+
+## Inputs and evidence required
+
+- feature intent
+- target surface and breakpoint expectations
+- approved component and token inventory
+- accessibility rules or confirmed design-system review status
+- budget and latency target
+
+## Examples in practice
+
+The workflow now includes five calibration patterns. One example shows an over-scoped request that asks for novelty, custom primitives, and unlimited reasoning in one pass. Another shows a zero-shot UI pass drifting toward decorative chrome and single-theme output while ignoring a referenced design system. A third shows a landing-page draft that over-exposes internals and proof before it makes onboarding obvious. A fourth shows a dense control cluster where headings, helper copy, and actions repeat the same words until the next step is unclear. The fifth shows local viewer controls drifting into a separate details zone, making it harder to tell what surface they govern. In each case JudgmentKit rewrites the request into a clearer, system-safe pass plus explicit review questions.
+
+## Common drift patterns
+
+1. The model invents new visual primitives instead of recombining approved ones.
+2. Decorative gradients, gratuitous shadows, and oversized radii become the default language of a first pass.
+3. The output assumes a single theme when dark and light mode should be present by default.
+4. A referenced design system is treated as authority without confirming whether it is accessibility-reviewed.
+5. Accessibility semantics disappear in the pursuit of style.
+6. Headings, helper text, and CTA labels reuse the same words until different UI elements sound interchangeable.
+7. Local controls drift into a separate header or metadata zone from the viewer, panel, or artifact they change.
+8. Runtime cost grows because the prompt asks for open-ended refinement.
+9. The output leaves implementation teams guessing what is fixed versus exploratory.
+10. The page explains internal artifacts before it explains what the product is or how to start.
+
+## Escalation points
+
+Escalate when the requested pattern cannot be expressed with approved primitives, when the brief conflicts with the design system, when the design system's accessibility status is unknown, when accessibility tradeoffs are unclear, or when the workflow is being used as a substitute for design review.
+
+## Related resources and schemas
+
+- Resource: `/resources/workflows/ai-ui-generation.v1.json`
+- Schema: `/schemas/workflow.schema.json`
+- Decision schema: `/schemas/decision-record.schema.json`
+- Verdict schema: `/schemas/verdict.schema.json`
+
+## Related pages
+
+- /docs/guardrails/design-system-integrity
+- /docs/guardrails/ui-copy-clarity
+- /docs/guardrails/control-proximity
+- /docs/guardrails/runtime-and-cost
+- /docs/guardrails/provenance-and-escalation
+- /docs/examples/ui-generation-drift
+- /docs/examples/embellishment-drift
+- /docs/examples/onboarding-clarity-drift
+- /docs/examples/repetitive-copy-drift
+- /docs/examples/control-proximity-drift

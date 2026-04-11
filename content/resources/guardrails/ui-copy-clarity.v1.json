@@ -1,0 +1,79 @@
+{
+  "id": "guardrail.ui-copy-clarity",
+  "type": "guardrail",
+  "version": "1.0.0",
+  "title": "UI copy clarity",
+  "summary": "Keep UI headings, labels, helper text, and CTAs distinct enough that users can tell what each element means and which action to take.",
+  "status": "active",
+  "audiences": [
+    "design-leaders",
+    "product-managers",
+    "platform-engineering",
+    "ai-application-developers"
+  ],
+  "applies_to": {
+    "workflows": ["workflow.ai-ui-generation"],
+    "surfaces": ["web", "mobile"]
+  },
+  "decision": "Whether headings, labels, helper text, and CTA copy are distinct enough for a first-time user to understand hierarchy and next action.",
+  "intent": {
+    "purpose": "Prevent generated interfaces from sounding internally consistent while still making distinct controls and hierarchy hard to understand.",
+    "who_it_protects": ["end users", "product teams", "frontend teams"],
+    "failure_mode": "Generated UI repeats or semantically overlaps copy across headings, support text, and controls until different elements sound interchangeable and the next action becomes ambiguous.",
+    "good_judgment": "Give each UI copy element one clear role, keep adjacent actions semantically distinct, and use helper text to clarify rather than restate the label beside it.",
+    "acceptable_variation": [
+      "reuse approved product terminology when the element role stays clear",
+      "shorten labels for surface constraints without collapsing distinct actions",
+      "adapt helper text by device or density while keeping the same intent",
+      "align with design-system naming conventions when they preserve action clarity"
+    ],
+    "non_negotiables": [
+      "no semantically overlapping action labels for different controls in the same decision cluster",
+      "no helper text that merely repeats the adjacent CTA or heading",
+      "no repeated section, control, and support copy that obscures primary versus secondary emphasis",
+      "no copy reuse that makes different actions or destinations sound interchangeable"
+    ]
+  },
+  "detection": {
+    "decision_question": "Do the headings, labels, helper text, and CTA copy each have a distinct role, or does repeated language make the interface harder to understand or act on?",
+    "signals": [
+      "repeated CTA nouns or verbs in one cluster",
+      "near-duplicate labels for different UI elements",
+      "helper text restating the CTA instead of clarifying it",
+      "section labels, headlines, and button text collapsing into the same phrase",
+      "copy reuse that hides primary versus secondary emphasis"
+    ],
+    "thresholds": {
+      "pass": "each visible copy element has a distinct role and the next action is easy to identify",
+      "warn": "copy overlap is present but can be fixed by rewriting labels or support text without changing information architecture",
+      "fail": "different UI elements or actions are effectively synonymous and the next action becomes ambiguous"
+    }
+  },
+  "response": {
+    "low": {
+      "action": "auto_rewrite",
+      "description": "Rewrite the overlapping copy into clearer, role-specific labels and support text."
+    },
+    "medium": {
+      "action": "auto_rewrite_and_review",
+      "description": "Rewrite the copy and route the result through design review for clarity confirmation."
+    },
+    "high": {
+      "action": "block_and_escalate_to_design_review",
+      "description": "Block the output and require design review because the interface actions are no longer clearly distinguishable."
+    }
+  },
+  "ownership": {
+    "decision_owner": "Design Systems",
+    "risk_owner": "Product",
+    "operational_owner": "Frontend Platform",
+    "review_cadence": "monthly"
+  },
+  "links": {
+    "docs_url": "https://judgmentkit.com/docs/guardrails/ui-copy-clarity",
+    "markdown_url": "https://judgmentkit.com/docs/guardrails/ui-copy-clarity.md",
+    "schema_url": "https://judgmentkit.com/schemas/guardrail.schema.json",
+    "example_ids": ["example.ui-generation.repetitive-copy-drift"]
+  },
+  "last_reviewed": "2026-04-11"
+}

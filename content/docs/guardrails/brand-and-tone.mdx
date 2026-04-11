@@ -1,0 +1,85 @@
+---
+title: Brand and tone
+slug: /docs/guardrails/brand-and-tone
+page_type: guardrail
+summary: Keep AI-generated communication aligned with trust, clarity, and voice.
+agent_summary: >
+  This page explains the brand and tone guardrail, the decision it governs,
+  what drift looks like, and how the system responds.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+workflows:
+  - workflow.support-assistant
+  - workflow.ai-ui-generation
+guardrails:
+  - guardrail.brand-tone
+owners:
+  primary: Design Systems
+  risk: Brand
+  operational: Platform Engineering
+status: active
+last_reviewed: 2026-04-09
+related_pages:
+  - /docs/workflows/support-assistant
+  - /docs/examples/brand-tone-support-coercion
+  - /docs/guardrails/safety-and-privacy
+related_resources:
+  - /resources/guardrails/brand-tone.v1.json
+related_schemas:
+  - /schemas/guardrail.schema.json
+toc: true
+---
+
+## Why this matters
+
+AI can stay technically correct and still feel wrong. It can sound too certain, too casual, too urgent, or simply unlike the product people trust.
+
+## What decision is being governed
+
+This guardrail governs how the system speaks when it generates or rewrites language for users.
+
+## What good judgment looks like
+
+- clear, grounded language
+- confidence that matches evidence
+- reassurance in support contexts
+- concise product copy that still sounds human
+
+## What drift looks like
+
+1. Unsupported certainty
+2. Deceptive urgency
+3. Voice inconsistency across surfaces
+4. Over-simplification in sensitive flows
+
+## Example in practice
+
+The launch example shows a support assistant turning a billing response into an urgent, coercive instruction. The fix is not just softer language. It is confidence that matches the evidence and next steps that reduce anxiety instead of increasing it.
+
+## Boundaries
+
+Allowed variation includes reading-level changes, surface-aware concision, and small tone shifts between support and builder contexts.
+
+Hard stops include deceptive urgency, unsupported guarantees, fear-based persuasion, and humor in sensitive flows.
+
+## How JudgmentKit responds
+
+Low drift gets normalized and logged. Medium drift gets rewritten and reviewed. High drift gets blocked or escalated because the main risk is trust loss, not only cosmetic inconsistency.
+
+## Ownership and review
+
+Design Systems owns the decision. Brand owns the risk. Platform Engineering owns the runtime behavior that turns drift signals into action.
+
+## Technical reference
+
+- Resource: `/resources/guardrails/brand-tone.v1.json`
+- Schema: `/schemas/guardrail.schema.json`
+
+## Related pages
+
+- /docs/workflows/support-assistant
+- /docs/examples/brand-tone-support-coercion
+- /docs/guardrails/safety-and-privacy

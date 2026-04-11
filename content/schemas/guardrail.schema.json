@@ -1,0 +1,212 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://judgmentkit.com/schemas/guardrail.schema.json",
+  "title": "JudgmentKit Guardrail Resource",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "type",
+    "version",
+    "title",
+    "summary",
+    "status",
+    "audiences",
+    "applies_to",
+    "decision",
+    "intent",
+    "detection",
+    "response",
+    "ownership",
+    "links",
+    "last_reviewed"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "type": {
+      "const": "guardrail"
+    },
+    "version": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "deprecated", "draft"]
+    },
+    "audiences": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "applies_to": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["workflows", "surfaces"],
+      "properties": {
+        "workflows": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "surfaces": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "decision": {
+      "type": "string"
+    },
+    "intent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "purpose",
+        "who_it_protects",
+        "failure_mode",
+        "good_judgment",
+        "acceptable_variation",
+        "non_negotiables"
+      ],
+      "properties": {
+        "purpose": {
+          "type": "string"
+        },
+        "who_it_protects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "failure_mode": {
+          "type": "string"
+        },
+        "good_judgment": {
+          "type": "string"
+        },
+        "acceptable_variation": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "non_negotiables": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "detection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision_question", "signals", "thresholds"],
+      "properties": {
+        "decision_question": {
+          "type": "string"
+        },
+        "signals": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "thresholds": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["pass", "warn", "fail"],
+          "properties": {
+            "pass": {
+              "type": "string"
+            },
+            "warn": {
+              "type": "string"
+            },
+            "fail": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "response": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["low", "medium", "high"],
+      "properties": {
+        "low": {
+          "type": "object"
+        },
+        "medium": {
+          "type": "object"
+        },
+        "high": {
+          "type": "object"
+        }
+      }
+    },
+    "ownership": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "decision_owner",
+        "risk_owner",
+        "operational_owner",
+        "review_cadence"
+      ],
+      "properties": {
+        "decision_owner": {
+          "type": "string"
+        },
+        "risk_owner": {
+          "type": "string"
+        },
+        "operational_owner": {
+          "type": "string"
+        },
+        "review_cadence": {
+          "type": "string"
+        }
+      }
+    },
+    "links": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["docs_url", "markdown_url", "schema_url"],
+      "properties": {
+        "docs_url": {
+          "type": "string"
+        },
+        "markdown_url": {
+          "type": "string"
+        },
+        "schema_url": {
+          "type": "string"
+        },
+        "example_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "last_reviewed": {
+      "type": "string",
+      "format": "date"
+    }
+  }
+}

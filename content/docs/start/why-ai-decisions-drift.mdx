@@ -1,0 +1,74 @@
+---
+title: Why AI decisions drift
+slug: /docs/start/why-ai-decisions-drift
+page_type: start
+summary: AI systems drift when they keep making decisions after the original intent, evidence, and boundaries have become implicit.
+agent_summary: >
+  This page explains the major sources of AI decision drift and how JudgmentKit
+  responds by making workflow decisions, evidence, and ownership explicit.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+owners:
+  primary: Product
+  operational: Platform Engineering
+status: active
+last_reviewed: 2026-04-09
+related_pages:
+  - /docs/start/what-is-judgmentkit
+  - /docs/how-it-works/decision-lifecycle
+  - /docs/guardrails/brand-and-tone
+related_resources: []
+related_schemas:
+  - /schemas/decision-record.schema.json
+  - /schemas/verdict.schema.json
+toc: true
+---
+
+## Problem in human terms
+
+An AI system can look stable in a demo and still drift in production. The model changes, prompts accrete, retrieval sources get noisier, or a new surface changes what “good” should mean. The output still feels locally plausible, so teams miss the real problem: the system no longer knows which decision it is making.
+
+## The main sources of drift
+
+### Intent drift
+
+The workflow started with one purpose, but the live system now optimizes for another. This often shows up as assistants sounding too sales-like in support contexts or generation tools over-indexing on novelty instead of system safety.
+
+### Evidence drift
+
+The system uses stale or mismatched evidence. It may cite the wrong account context, apply a generic pattern to a high-risk flow, or answer without the trace needed to justify the result.
+
+### Boundary drift
+
+Allowed variation widens over time until hard stops are no longer obvious. A team keeps shipping “small exceptions” until the exception becomes the norm.
+
+### Ownership drift
+
+No one can tell who owns the decision, the risk, or the runtime behavior. When incidents happen, the handoff path is incomplete.
+
+## What JudgmentKit does about it
+
+JudgmentKit reduces drift by forcing the system to answer five questions:
+
+1. What decision is being made?
+2. What does good judgment look like?
+3. What evidence is allowed?
+4. What are the hard stops?
+5. Who owns the response when the system should not continue?
+
+## Practical signal that drift is happening
+
+- outputs sound more confident than the evidence supports
+- generated UI no longer maps to system primitives
+- users see inconsistent answers across surfaces
+- latency and cost rise without a product reason
+- escalation happens too late or without enough context
+
+## Related pages
+
+- /docs/start/what-is-judgmentkit
+- /docs/how-it-works/decision-lifecycle
+- /docs/guardrails/brand-and-tone

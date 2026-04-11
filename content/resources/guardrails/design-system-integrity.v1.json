@@ -1,0 +1,90 @@
+{
+  "id": "guardrail.design-system-integrity",
+  "type": "guardrail",
+  "version": "1.0.0",
+  "title": "Design system integrity",
+  "summary": "Keep generated UI aligned with design-system definitions, expected themes, accessibility rules, and approved interaction patterns.",
+  "status": "active",
+  "audiences": [
+    "design-leaders",
+    "product-managers",
+    "platform-engineering",
+    "ai-application-developers"
+  ],
+  "applies_to": {
+    "workflows": ["workflow.ai-ui-generation"],
+    "surfaces": ["web", "mobile"]
+  },
+  "decision": "Which components, tokens, and interaction patterns a generated interface may use or modify.",
+  "intent": {
+    "purpose": "Protect coherence between generated UI output and the product's design system.",
+    "who_it_protects": ["end users", "design systems", "frontend teams"],
+    "failure_mode": "Generated UI looks plausible but breaks accessibility, token usage, theme expectations, or component contracts, or it overrides the design system instead of working with it.",
+    "good_judgment": "Compose from approved primitives, preserve semantics, treat the design system as the source of truth for restrained aspects, confirm the system has an accessibility baseline before using it as authority, and call out when the requested UI falls outside the system.",
+    "acceptable_variation": [
+      "recombine approved patterns",
+      "adapt spacing within token constraints",
+      "vary information density by device",
+      "shift emphasis through typography or layout rather than decorative chrome",
+      "use fallback restraint defaults only when the design system and the brief are both silent"
+    ],
+    "non_negotiables": [
+      "no arbitrary hex colors outside tokens",
+      "no inaccessible color-only states",
+      "no custom interaction patterns without explicit approval",
+      "design-system definitions for radius, elevation, surfaces, and theme behavior take precedence over generic fallback defaults",
+      "if the brief conflicts with the design system, escalate instead of silently overriding the system",
+      "if a design system is present but its accessibility baseline or review status is unknown, pause and ask before generating UI",
+      "no decorative gradients, gratuitous shadows, or oversized radii without explicit art direction",
+      "no single-theme output when the system expects light and dark modes unless the brief explicitly scopes it"
+    ]
+  },
+  "detection": {
+    "decision_question": "Does the proposed UI stay inside approved components, token ranges, theme expectations, and accessibility baselines, and is the referenced design system safe to treat as authority?",
+    "signals": [
+      "token mismatch",
+      "unauthorized component structure",
+      "brief conflicts with approved design-system treatment",
+      "unknown design-system accessibility status at prompt start",
+      "a11y contrast and focus failures",
+      "semantic role mismatch",
+      "gratuitous ornamental chrome in a zero-shot pass",
+      "light-only or dark-only output despite dual-theme expectation"
+    ],
+    "thresholds": {
+      "pass": "all primitives map to approved system assets and any referenced design system has a confirmed accessibility baseline or review status",
+      "warn": "minor token drift, ornamental embellishment, incomplete theme support, or unresolved accessibility status that needs confirmation before generation",
+      "fail": "structural component drift, accessibility breakage, explicit theme expectation failure, or a brief that overrides the design system without review"
+    }
+  },
+  "response": {
+    "low": {
+      "action": "auto_normalize",
+      "description": "Normalize to the nearest approved token or component variant."
+    },
+    "medium": {
+      "action": "confirm_accessibility_then_rewrite_to_system",
+      "description": "Pause for accessibility confirmation when needed, then rewrite the UI plan and route to design review."
+    },
+    "high": {
+      "action": "block_generation",
+      "description": "Block the change and require a design-system owner decision."
+    }
+  },
+  "ownership": {
+    "decision_owner": "Design Systems",
+    "risk_owner": "Accessibility",
+    "operational_owner": "Frontend Platform",
+    "review_cadence": "monthly"
+  },
+  "links": {
+    "docs_url": "https://judgmentkit.com/docs/guardrails/design-system-integrity",
+    "markdown_url": "https://judgmentkit.com/docs/guardrails/design-system-integrity.md",
+    "schema_url": "https://judgmentkit.com/schemas/guardrail.schema.json",
+    "example_ids": [
+      "example.ui-generation.component-drift",
+      "example.ui-generation.embellishment-drift"
+    ]
+  },
+  "last_reviewed": "2026-04-11"
+}

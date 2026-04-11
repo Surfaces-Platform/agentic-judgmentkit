@@ -1,0 +1,76 @@
+{
+  "id": "guardrail.safety-privacy",
+  "type": "guardrail",
+  "version": "1.0.0",
+  "title": "Safety and privacy",
+  "summary": "Prevent assistants from revealing, inferring, or acting on sensitive data outside allowed boundaries.",
+  "status": "active",
+  "audiences": [
+    "product-managers",
+    "platform-engineering",
+    "ai-application-developers",
+    "trust-safety-legal-and-governance"
+  ],
+  "applies_to": {
+    "workflows": ["workflow.support-assistant", "workflow.ai-ui-generation"],
+    "surfaces": ["web", "mobile", "internal-tools"]
+  },
+  "decision": "What user, account, or proprietary information may be used, shown, or retained in a response.",
+  "intent": {
+    "purpose": "Keep helpfulness inside explicit safety, privacy, and data handling boundaries.",
+    "who_it_protects": ["end users", "account owners", "regulated data", "internal systems"],
+    "failure_mode": "The assistant exposes data, uses the wrong context, or gives a user confidence that it can act when it cannot.",
+    "good_judgment": "Use the minimum necessary data, confirm consent or permissions, and refuse or escalate when data boundaries are unclear.",
+    "acceptable_variation": [
+      "use coarse account state when consent is present",
+      "summarize sensitive context without repeating secrets",
+      "personalize only when the workflow explicitly allows it"
+    ],
+    "non_negotiables": [
+      "no sharing secrets or full identifiers",
+      "no unverified account changes",
+      "no silent use of restricted context"
+    ]
+  },
+  "detection": {
+    "decision_question": "Does this output expose, infer, or rely on restricted data in a way the workflow does not permit?",
+    "signals": [
+      "policy classified entities",
+      "consent state mismatch",
+      "redaction failures",
+      "actionability without authorization"
+    ],
+    "thresholds": {
+      "pass": "no restricted entity exposure",
+      "warn": "context use requires confirmation",
+      "fail": "restricted data is present or an unsafe action is implied"
+    }
+  },
+  "response": {
+    "low": {
+      "action": "mask_and_log",
+      "description": "Mask low-risk details, continue, and log the event."
+    },
+    "medium": {
+      "action": "require_confirmation",
+      "description": "Stop the response path until user state or permissions are re-verified."
+    },
+    "high": {
+      "action": "block_and_escalate",
+      "description": "Block the response and escalate to privacy or trust review."
+    }
+  },
+  "ownership": {
+    "decision_owner": "Trust and Safety",
+    "risk_owner": "Legal and Privacy",
+    "operational_owner": "Platform Engineering",
+    "review_cadence": "monthly"
+  },
+  "links": {
+    "docs_url": "https://judgmentkit.com/docs/guardrails/safety-and-privacy",
+    "markdown_url": "https://judgmentkit.com/docs/guardrails/safety-and-privacy.md",
+    "schema_url": "https://judgmentkit.com/schemas/guardrail.schema.json",
+    "example_ids": ["example.privacy.support-escalation"]
+  },
+  "last_reviewed": "2026-04-09"
+}

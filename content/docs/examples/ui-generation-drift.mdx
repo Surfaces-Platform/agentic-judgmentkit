@@ -1,0 +1,71 @@
+---
+title: UI generation drift
+slug: /docs/examples/ui-generation-drift
+page_type: example
+summary: An interface generation workflow proposes custom primitives and unlimited reasoning, then gets normalized to the design system and budgeted runtime.
+agent_summary: >
+  This example shows a UI generation request drifting across design-system and
+  runtime-cost boundaries before it is rewritten into a system-safe first pass.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+workflows:
+  - workflow.ai-ui-generation
+guardrails:
+  - guardrail.design-system-integrity
+  - guardrail.runtime-cost
+owners:
+  primary: Design Systems
+  risk: Accessibility
+  operational: Frontend Platform
+status: active
+last_reviewed: 2026-04-09
+related_pages:
+  - /docs/workflows/ai-ui-generation
+  - /docs/guardrails/design-system-integrity
+  - /docs/guardrails/runtime-and-cost
+related_resources:
+  - /resources/examples/ui-generation-drift.v1.json
+related_schemas:
+  - /schemas/example.schema.json
+  - /schemas/verdict.schema.json
+toc: true
+---
+
+## Scenario
+
+A designer asks for a premium settings page concept across mobile and desktop in one pass.
+
+## Raw decision or output
+
+`Create a floating glassmorphism account shell with six custom widgets, animated neon status bars, and an unlimited reasoning pass to refine the layout until it feels premium.`
+
+## What JudgmentKit detected
+
+- custom primitives outside the approved design system
+- interaction and contrast risk
+- an open-ended runtime request with no budget stop
+
+## What action was taken
+
+The workflow rewrote the request into a scoped first pass that uses approved primitives and leaves any novelty for a second, reviewed step.
+
+## Corrected result
+
+`Generate a first-pass settings page using approved form, card, and navigation primitives, then flag open design questions for a second reviewed pass if the team wants to go beyond the system.`
+
+## Why the correction matters
+
+The goal is not to suppress creativity. It is to make novelty deliberate. A good first pass proves value inside the system before the team spends time and money on unreviewed divergence.
+
+## Related workflow and guardrails
+
+- Workflow: `/docs/workflows/ai-ui-generation`
+- Guardrails: `/docs/guardrails/design-system-integrity`, `/docs/guardrails/runtime-and-cost`
+
+## JSON artifact links
+
+- Example resource: `/resources/examples/ui-generation-drift.v1.json`
+- Schema: `/schemas/example.schema.json`

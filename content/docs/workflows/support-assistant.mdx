@@ -1,0 +1,96 @@
+---
+title: Support assistant
+slug: /docs/workflows/support-assistant
+page_type: workflow
+summary: A customer-facing support workflow that explains issues, next steps, and safe escalation paths.
+agent_summary: >
+  This workflow describes a support assistant that helps users resolve product,
+  billing, and account issues while balancing trust, privacy, speed, and escalation.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+workflows:
+  - workflow.support-assistant
+owners:
+  primary: Product
+  operational: Platform Engineering
+status: active
+last_reviewed: 2026-04-09
+related_pages:
+  - /docs/guardrails/brand-and-tone
+  - /docs/guardrails/safety-and-privacy
+  - /docs/guardrails/runtime-and-cost
+  - /docs/examples/brand-tone-support-coercion
+  - /docs/examples/privacy-escalation
+related_resources:
+  - /resources/workflows/support-assistant.v1.json
+related_schemas:
+  - /schemas/workflow.schema.json
+  - /schemas/decision-record.schema.json
+  - /schemas/verdict.schema.json
+toc: true
+---
+
+## Why this workflow matters
+
+Support is one of the fastest places for trust to erode. A technically plausible answer that is too vague, too forceful, too slow, or too revealing can turn a solvable issue into a trust issue.
+
+## What decisions exist inside the workflow
+
+- what information to include or omit
+- how confident to sound
+- whether to escalate or self-serve
+- how to structure next steps
+- how much user context to use
+- how fast and cheaply the system should respond
+
+## Which guardrails apply
+
+- `guardrail.brand-tone`
+- `guardrail.safety-privacy`
+- `guardrail.runtime-cost`
+- `guardrail.provenance-escalation`
+
+## Inputs and evidence required
+
+- user request
+- account or case context, if permitted
+- consent and data classification state
+- workflow surface
+- locale
+- traceable actor and toolchain metadata
+
+## Example in practice
+
+The two launch examples show the most common support failure modes:
+
+- language that becomes pushy or unsupported even when the intent is helpful
+- account workflows that need a secure handoff instead of a heroic assistant answer
+
+## Common drift patterns
+
+1. Tone becomes pushy or overconfident.
+2. Sensitive data appears in the response.
+3. The workflow hides uncertainty.
+4. Runtime loops or retries degrade the experience.
+5. Escalation is skipped even when the system lacks confidence.
+
+## Escalation points
+
+Escalate when the response involves sensitive account action, the system cannot verify the claim, a boundary is hit, or the user needs a human to intervene.
+
+## Related resources and schemas
+
+- Resource: `/resources/workflows/support-assistant.v1.json`
+- Schema: `/schemas/workflow.schema.json`
+- Decision schema: `/schemas/decision-record.schema.json`
+- Verdict schema: `/schemas/verdict.schema.json`
+
+## Related pages
+
+- /docs/guardrails/brand-and-tone
+- /docs/guardrails/safety-and-privacy
+- /docs/examples/brand-tone-support-coercion
+- /docs/examples/privacy-escalation

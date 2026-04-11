@@ -1,0 +1,11 @@
+{
+  "id": "2026-04-09-initial-launch",
+  "title": "Initial JudgmentKit MVP surface",
+  "published_at": "2026-04-09T17:00:00Z",
+  "summary": "Launches the first public MCP-first JudgmentKit surface and artifact set.",
+  "changes": [
+    "Published the first ten narrative docs pages plus workflow and example pages.",
+    "Published versioned guardrail, workflow, and example resources.",
+    "Published JSON Schemas, llms.txt, search index, changelog JSON, and read-only MCP."
+  ]
+}

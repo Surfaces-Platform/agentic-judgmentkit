@@ -1,0 +1,46 @@
+{
+  "id": "example.ui-generation.embellishment-drift",
+  "type": "example",
+  "version": "1.0.0",
+  "title": "Zero-shot UI generation rewritten to design-system-first restrained output",
+  "summary": "A zero-shot UI pass ignores design-system restraint, adds ornamental chrome, and assumes a single theme, then gets rewritten into restrained output with accessibility-aware preflight and dual-theme support.",
+  "status": "active",
+  "workflow_id": "workflow.ai-ui-generation",
+  "guardrail_ids": [
+    "guardrail.design-system-integrity"
+  ],
+  "scenario": "A product team asks for a first-pass analytics workbench, points to an existing design system, and leaves style direction mostly open.",
+  "raw_output": "Create a premium analytics console using our design system but give it glass cards, oversized rounded corners, layered gradients, heavy drop shadows, pill buttons, and light mode only.",
+  "verdict": {
+    "verdict_id": "ver_006",
+    "decision_id": "dec_006",
+    "evaluated_at": "2026-04-11T00:00:00Z",
+    "status": "warn",
+    "severity": "medium",
+    "guardrails_triggered": [
+      "guardrail.design-system-integrity"
+    ],
+    "reasons": [
+      "the pass overrides design-system restraint instead of following the published system",
+      "zero-shot output is using ornamental chrome instead of structural hierarchy",
+      "the pass assumes a single theme even though dark and light mode are expected by default"
+    ],
+    "drift_score": 0.46,
+    "recommended_action": "review",
+    "rewrite_hint": "First confirm the referenced design system has an accessibility baseline or owner-approved review status. Then remove decorative chrome, follow the published system for restrained aspects, and produce tokenized light/dark output unless the brief explicitly scopes a single theme.",
+    "ownership": {
+      "decision_owner": "Design Systems",
+      "risk_owner": "Accessibility",
+      "operational_owner": "Frontend Platform"
+    },
+    "incident_required": false
+  },
+  "corrected_output": "Confirm the referenced design system is accessibility-reviewed, then generate a restrained first-pass analytics workbench using the system's approved surfaces, typography, spacing, radius, and elevation tokens. Keep decorative styling out of the zero-shot pass, and provide light and dark theme variants unless the brief or the system explicitly scopes otherwise.",
+  "lesson": "Zero-shot UI generation should work with design systems, not around them. If a system exists, confirm its accessibility status before treating it as authority. Ornament belongs in an explicit art-direction request, not in the first pass.",
+  "links": {
+    "docs_url": "https://judgmentkit.com/docs/examples/embellishment-drift",
+    "markdown_url": "https://judgmentkit.com/docs/examples/embellishment-drift.md",
+    "schema_url": "https://judgmentkit.com/schemas/example.schema.json"
+  },
+  "last_reviewed": "2026-04-11"
+}

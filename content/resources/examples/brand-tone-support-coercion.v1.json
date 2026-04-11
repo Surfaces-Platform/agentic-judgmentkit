@@ -1,0 +1,41 @@
+{
+  "id": "example.brand-tone.support-coercive-copy",
+  "type": "example",
+  "version": "1.0.0",
+  "title": "Support copy with coercive tone drift",
+  "summary": "An example where a support assistant drifts into urgency and unsupported certainty, then gets corrected.",
+  "status": "active",
+  "workflow_id": "workflow.support-assistant",
+  "guardrail_ids": ["guardrail.brand-tone"],
+  "scenario": "A support assistant helps a user understand a billing issue.",
+  "raw_output": "Act now before it is too late. We guarantee this will solve your billing problem.",
+  "verdict": {
+    "verdict_id": "ver_001",
+    "decision_id": "dec_001",
+    "evaluated_at": "2026-04-09T00:00:00Z",
+    "status": "fail",
+    "severity": "high",
+    "guardrails_triggered": ["guardrail.brand-tone"],
+    "reasons": [
+      "coercive phrasing detected",
+      "confidence exceeds available evidence"
+    ],
+    "drift_score": 0.61,
+    "recommended_action": "rewrite",
+    "rewrite_hint": "Use clear, calm support language without urgency or unsupported guarantees.",
+    "ownership": {
+      "decision_owner": "Design Systems",
+      "risk_owner": "Brand",
+      "operational_owner": "Platform Engineering"
+    },
+    "incident_required": false
+  },
+  "corrected_output": "We found a billing issue on your account. Review the next steps below to resolve it. If anything looks off, contact support and we will help you.",
+  "lesson": "Support language should reduce anxiety and explain the next step without pressure or unsupported certainty.",
+  "links": {
+    "docs_url": "https://judgmentkit.com/docs/examples/brand-tone-support-coercion",
+    "markdown_url": "https://judgmentkit.com/docs/examples/brand-tone-support-coercion.md",
+    "schema_url": "https://judgmentkit.com/schemas/example.schema.json"
+  },
+  "last_reviewed": "2026-04-09"
+}

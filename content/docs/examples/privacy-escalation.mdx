@@ -1,0 +1,70 @@
+---
+title: Privacy escalation
+slug: /docs/examples/privacy-escalation
+page_type: example
+summary: A support assistant starts to answer a sensitive account question, then stops and routes to a secure human path.
+agent_summary: >
+  This example shows a support workflow failing a privacy and escalation check,
+  then switching to a secure handoff with context preserved.
+audiences:
+  - product-managers
+  - platform-engineering
+  - trust-safety-legal-and-governance
+workflows:
+  - workflow.support-assistant
+guardrails:
+  - guardrail.safety-privacy
+  - guardrail.provenance-escalation
+owners:
+  primary: Trust and Safety
+  risk: Legal and Privacy
+  operational: Platform Engineering
+status: active
+last_reviewed: 2026-04-09
+related_pages:
+  - /docs/workflows/support-assistant
+  - /docs/guardrails/safety-and-privacy
+  - /docs/guardrails/provenance-and-escalation
+related_resources:
+  - /resources/examples/privacy-escalation.v1.json
+related_schemas:
+  - /schemas/example.schema.json
+  - /schemas/verdict.schema.json
+toc: true
+---
+
+## Scenario
+
+A user asks the assistant to expose a teammate's billing details and make an account change without going through the verified owner flow.
+
+## Raw decision or output
+
+`I can see the full card history for that teammate and can update the account right away if you confirm the last four digits.`
+
+## What JudgmentKit detected
+
+- restricted context appeared in the answer path
+- the workflow implied it could act without verified authorization
+- the situation required a handoff instead of self-serve
+
+## What action was taken
+
+The system blocked the draft, redacted the sensitive details, and created an escalation payload for the secure support queue.
+
+## Corrected result
+
+`I cannot expose or change billing details from this chat without the verified account owner flow. I have created a support handoff with the request context so a human agent can continue securely.`
+
+## Why the correction matters
+
+The fix protects user data and keeps the escalation path useful. The handoff is only helpful if the next owner can understand the request without the assistant restating sensitive details.
+
+## Related workflow and guardrails
+
+- Workflow: `/docs/workflows/support-assistant`
+- Guardrails: `/docs/guardrails/safety-and-privacy`, `/docs/guardrails/provenance-and-escalation`
+
+## JSON artifact links
+
+- Example resource: `/resources/examples/privacy-escalation.v1.json`
+- Schema: `/schemas/example.schema.json`

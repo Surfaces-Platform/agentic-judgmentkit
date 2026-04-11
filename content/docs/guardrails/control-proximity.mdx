@@ -1,0 +1,85 @@
+---
+title: Control proximity
+slug: /docs/guardrails/control-proximity
+page_type: guardrail
+summary: Keep controls inside or directly adjacent to the viewer, panel, or artifact they change so users can immediately tell what surface they govern.
+agent_summary: >
+  This page explains the control proximity guardrail, the spatial ownership
+  decision it governs, the drift it catches, and how JudgmentKit responds when
+  local controls are detached from the surface they affect.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+workflows:
+  - workflow.ai-ui-generation
+guardrails:
+  - guardrail.control-proximity
+owners:
+  primary: Design Systems
+  risk: Product
+  operational: Frontend Platform
+status: active
+last_reviewed: 2026-04-11
+related_pages:
+  - /docs/workflows/ai-ui-generation
+  - /docs/examples/control-proximity-drift
+  - /docs/guardrails/ui-copy-clarity
+related_resources:
+  - /resources/guardrails/control-proximity.v1.json
+related_schemas:
+  - /schemas/guardrail.schema.json
+toc: true
+---
+
+## Why this matters
+
+Generated UI can have correct labels and still be confusing if the local control is parked away from the surface it changes. The issue is spatial ownership. Users should not have to infer which viewer, pane, or artifact will change next.
+
+## What decision is being governed
+
+This guardrail governs whether a local control is placed inside or directly adjacent to the surface region it changes, rather than in a separate zone that obscures ownership.
+
+## What good judgment looks like
+
+- local view controls live in the local viewer toolbar or immediately beside the governed surface
+- global navigation and cross-surface links stay outside that zone
+- nearby control clusters have one obvious owner
+- the user can tell what will change without scanning across the page
+
+## What drift looks like
+
+1. A JSON or schema toggle sits in a metadata band while changing a code viewer below it.
+2. Local view controls are mixed into a global action cluster.
+3. A button appears to belong to the wrong pane.
+4. The user must visually bridge separate zones to understand control ownership.
+
+## Example in practice
+
+The calibration example uses a resource browser where JSON and Schema buttons control the inline code viewer but sit in a different zone of the detail surface. The fix is to move those local controls into the viewer toolbar directly above the code block while keeping any cross-surface action visually secondary.
+
+## Boundaries
+
+Allowed variation includes compact toolbars on narrow screens, design-system-specific segmented controls, and secondary raw-file links that sit outside the local viewer cluster.
+
+Hard stops include local view toggles floating in unrelated headers, mixed global and local controls with the same visual ownership, and any placement that forces the user to guess which surface a control changes.
+
+## How JudgmentKit responds
+
+Low drift gets relaid out automatically. Medium drift gets relaid out and reviewed. High drift gets blocked and escalated because the interface no longer makes surface ownership obvious.
+
+## Ownership and review
+
+Design Systems owns the decision. Product owns the risk. Frontend Platform owns the implementation path that turns detached-control signals into action.
+
+## Technical reference
+
+- Resource: `/resources/guardrails/control-proximity.v1.json`
+- Schema: `/schemas/guardrail.schema.json`
+
+## Related pages
+
+- /docs/workflows/ai-ui-generation
+- /docs/examples/control-proximity-drift
+- /docs/guardrails/ui-copy-clarity

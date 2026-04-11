@@ -1,0 +1,50 @@
+{
+  "id": "workflow.support-assistant",
+  "type": "workflow",
+  "version": "1.0.0",
+  "title": "Support assistant",
+  "summary": "A customer-facing workflow that helps users understand issues, next steps, and safe escalation paths.",
+  "status": "active",
+  "description": "A support assistant that answers product, billing, and account questions while balancing trust, privacy, speed, and escalation discipline.",
+  "primary_users": ["customers", "support teams", "product teams"],
+  "decisions": [
+    "what information to include or omit",
+    "how confident to sound",
+    "whether to self-serve or escalate",
+    "how to structure next steps",
+    "how much user context to use",
+    "how to stay within runtime budgets"
+  ],
+  "required_inputs": [
+    "user request",
+    "surface",
+    "locale",
+    "consent and data classification state",
+    "traceable actor and toolchain metadata"
+  ],
+  "common_guardrails": [
+    "guardrail.brand-tone",
+    "guardrail.safety-privacy",
+    "guardrail.runtime-cost",
+    "guardrail.provenance-escalation"
+  ],
+  "risk_profile": {
+    "risk_level": "high",
+    "main_risks": [
+      "overconfidence",
+      "privacy exposure",
+      "missed escalation",
+      "slow or costly response"
+    ]
+  },
+  "links": {
+    "docs_url": "https://judgmentkit.com/docs/workflows/support-assistant",
+    "markdown_url": "https://judgmentkit.com/docs/workflows/support-assistant.md",
+    "schema_url": "https://judgmentkit.com/schemas/workflow.schema.json",
+    "example_ids": [
+      "example.brand-tone.support-coercive-copy",
+      "example.privacy.support-escalation"
+    ]
+  },
+  "last_reviewed": "2026-04-09"
+}

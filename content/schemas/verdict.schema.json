@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://judgmentkit.com/schemas/verdict.schema.json",
+  "title": "JudgmentKit Verdict",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "verdict_id",
+    "decision_id",
+    "evaluated_at",
+    "status",
+    "severity",
+    "guardrails_triggered",
+    "recommended_action"
+  ],
+  "properties": {
+    "verdict_id": {
+      "type": "string"
+    },
+    "decision_id": {
+      "type": "string"
+    },
+    "evaluated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pass", "warn", "fail", "quarantine", "escalate"]
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["low", "medium", "high"]
+    },
+    "guardrails_triggered": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "reasons": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "drift_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "recommended_action": {
+      "type": "string",
+      "enum": ["allow", "rewrite", "review", "block", "quarantine", "escalate"]
+    },
+    "rewrite_hint": {
+      "type": "string"
+    },
+    "ownership": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "decision_owner": {
+          "type": "string"
+        },
+        "risk_owner": {
+          "type": "string"
+        },
+        "operational_owner": {
+          "type": "string"
+        }
+      }
+    },
+    "incident_required": {
+      "type": "boolean"
+    }
+  }
+}

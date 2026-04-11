@@ -1,0 +1,69 @@
+---
+title: Brand tone support coercion
+slug: /docs/examples/brand-tone-support-coercion
+page_type: example
+summary: A support assistant turns a billing explanation into coercive copy, then gets corrected by the brand and tone guardrail.
+agent_summary: >
+  This example shows a support assistant drifting into urgency and unsupported
+  certainty, then being rewritten into calm support language.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+workflows:
+  - workflow.support-assistant
+guardrails:
+  - guardrail.brand-tone
+owners:
+  primary: Design Systems
+  risk: Brand
+  operational: Platform Engineering
+status: active
+last_reviewed: 2026-04-09
+related_pages:
+  - /docs/workflows/support-assistant
+  - /docs/guardrails/brand-and-tone
+related_resources:
+  - /resources/examples/brand-tone-support-coercion.v1.json
+related_schemas:
+  - /schemas/example.schema.json
+  - /schemas/verdict.schema.json
+toc: true
+---
+
+## Scenario
+
+A user asks why a billing charge looks wrong and wants the next step immediately.
+
+## Raw decision or output
+
+`Act now before it is too late. We guarantee this will solve your billing problem.`
+
+## What JudgmentKit detected
+
+- coercive phrasing in a support flow
+- confidence that exceeded available evidence
+- tone that increased anxiety instead of reducing it
+
+## What action was taken
+
+The system rewrote the answer, logged the event as a brand-tone drift issue, and kept the corrected copy available for review.
+
+## Corrected result
+
+`We found a billing issue on your account. Review the next steps below to resolve it. If anything looks off, contact support and we will help you.`
+
+## Why the correction matters
+
+The new answer keeps the user moving without inventing certainty or pressure. It also preserves the support posture the product wants people to feel.
+
+## Related workflow and guardrails
+
+- Workflow: `/docs/workflows/support-assistant`
+- Guardrail: `/docs/guardrails/brand-and-tone`
+
+## JSON artifact links
+
+- Example resource: `/resources/examples/brand-tone-support-coercion.v1.json`
+- Schema: `/schemas/example.schema.json`

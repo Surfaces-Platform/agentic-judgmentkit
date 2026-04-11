@@ -1,0 +1,65 @@
+{
+  "id": "workflow.ai-ui-generation",
+  "type": "workflow",
+  "version": "1.0.0",
+  "title": "AI UI generation",
+  "summary": "A builder workflow that turns intent into interface proposals while staying inside design-system, accessibility, and budget constraints.",
+  "status": "active",
+  "description": "A workflow that generates UI structure, copy, and implementation direction for product teams while keeping the output traceable, design-system-first, accessibility-aware, theme-complete, and system-safe.",
+  "primary_users": ["design systems", "product design", "frontend engineering"],
+  "decisions": [
+    "which components and tokens to use",
+    "whether the referenced design system is authoritative for the requested surface",
+    "whether the design system has an accessibility baseline or owner-approved review status",
+    "how much layout variation is acceptable",
+    "when control placement obscures which surface a local control governs",
+    "when UI copy elements are too repetitive or semantically overlapping",
+    "when a first pass is too ornamental for zero-shot generation",
+    "when light and dark mode support should be assumed",
+    "when to simplify due to runtime budget",
+    "when a requested pattern requires design review",
+    "what evidence to carry into implementation handoff"
+  ],
+  "required_inputs": [
+    "feature intent",
+    "target surface",
+    "design system inventory",
+    "accessibility baseline or design-system review status",
+    "time and budget target"
+  ],
+  "common_guardrails": [
+    "guardrail.design-system-integrity",
+    "guardrail.ui-copy-clarity",
+    "guardrail.control-proximity",
+    "guardrail.runtime-cost",
+    "guardrail.provenance-escalation"
+  ],
+  "risk_profile": {
+    "risk_level": "medium",
+    "main_risks": [
+      "component drift",
+      "ambiguous label redundancy",
+      "detached local controls",
+      "design-system override without review",
+      "unknown design-system accessibility status",
+      "ornamental zero-shot output",
+      "missing theme support",
+      "accessibility regressions",
+      "excessive generation cost",
+      "ambiguous implementation handoff"
+    ]
+  },
+  "links": {
+    "docs_url": "https://judgmentkit.com/docs/workflows/ai-ui-generation",
+    "markdown_url": "https://judgmentkit.com/docs/workflows/ai-ui-generation.md",
+    "schema_url": "https://judgmentkit.com/schemas/workflow.schema.json",
+    "example_ids": [
+      "example.ui-generation.component-drift",
+      "example.ui-generation.embellishment-drift",
+      "example.ui-generation.onboarding-clarity-drift",
+      "example.ui-generation.repetitive-copy-drift",
+      "example.ui-generation.control-proximity-drift"
+    ]
+  },
+  "last_reviewed": "2026-04-11"
+}

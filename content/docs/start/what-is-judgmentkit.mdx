@@ -1,0 +1,82 @@
+---
+title: What JudgmentKit is
+slug: /docs/start/what-is-judgmentkit
+page_type: start
+summary: JudgmentKit is an MCP-first operating model for making AI decisions explicit, reusable, and retrievable by agents.
+agent_summary: >
+  This page explains JudgmentKit as an MCP-first system that publishes
+  machine-readable artifacts for agents plus lightweight human reference
+  surfaces.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+owners:
+  primary: Product
+  operational: Platform Engineering
+status: active
+last_reviewed: 2026-04-09
+related_pages:
+  - /docs/start/why-ai-decisions-drift
+  - /docs/how-it-works/decision-lifecycle
+  - /docs/roles/design-leaders
+related_resources: []
+related_schemas: []
+toc: true
+---
+
+## Why use it
+
+Use JudgmentKit when you want an agent to do real work without making up its own rules. It gives the model the workflow, boundaries, examples, and escalation path up front so you get more consistent output, fewer preventable mistakes, and clearer handoff when the agent should stop.
+
+## Use it with agents
+
+Connect your agent to the MCP endpoint, fetch the workflow you care about, call `resolve_related` to pull the linked guardrails and examples, then run the model with those artifacts in context.
+
+For example, for support you would:
+
+- call `get_resource` for `workflow.support-assistant`
+- call `resolve_related` for `workflow.support-assistant`
+- call `get_example` for `example.brand-tone.support-coercive-copy`
+
+`/mcp` is not a human page. It is the endpoint your agent or MCP client connects to.
+
+## Problem in human terms
+
+Teams usually discover AI judgment only after something goes wrong. A response sounds off, a UI drifts from the system, or a workflow quietly crosses a privacy boundary. The failure is visible, but the decision that produced it is not.
+
+## Core definition
+
+JudgmentKit is the operating model that makes those decisions explicit. It documents which decisions exist inside a workflow, what good judgment looks like, where the boundaries are, and how the system should respond when it drifts.
+
+## One source of truth, multiple surfaces
+
+Agents need clean retrieval. Humans still need a way to inspect what the system is using.
+
+That is why JudgmentKit publishes:
+
+- lightweight human reference surfaces for inspection
+- Markdown mirrors for agent retrieval
+- versioned JSON resources for guardrails, workflows, and examples
+- schemas that stabilize machine-consumable contracts
+- a read-only MCP surface for discovery and fetch
+
+## Why this matters operationally
+
+Without a shared judgment layer, product, design, governance, and engineering make local fixes that do not travel. JudgmentKit turns those local fixes into reusable artifacts that can be reviewed, versioned, and fetched at runtime.
+
+## What the MVP includes
+
+- start-here pages for first-time readers
+- five launch guardrail domains
+- two concrete workflows
+- three synthetic examples
+- a public artifact inventory and schema set
+- a read-only MCP endpoint that mirrors the same public truth
+
+## Related pages
+
+- /docs/start/why-ai-decisions-drift
+- /docs/how-it-works/decision-lifecycle
+- /docs/roles/design-leaders

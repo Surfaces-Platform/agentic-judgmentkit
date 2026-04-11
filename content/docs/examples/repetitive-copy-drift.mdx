@@ -1,0 +1,71 @@
+---
+title: Repetitive copy drift
+slug: /docs/examples/repetitive-copy-drift
+page_type: example
+summary: A resource browser detail view repeats the same words across nearby headings, helper text, and controls, then gets rewritten into clearer UI copy roles.
+agent_summary: >
+  This example shows a UI generation draft repeating JSON, Inspect, and Open
+  language across one control cluster until the roles blur together, then
+  rewrites the copy into distinct descriptive and actionable elements.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+workflows:
+  - workflow.ai-ui-generation
+guardrails:
+  - guardrail.ui-copy-clarity
+owners:
+  primary: Design Systems
+  risk: Product
+  operational: Frontend Platform
+status: active
+last_reviewed: 2026-04-11
+related_pages:
+  - /docs/workflows/ai-ui-generation
+  - /docs/guardrails/ui-copy-clarity
+  - /docs/examples/onboarding-clarity-drift
+related_resources:
+  - /resources/examples/repetitive-copy-drift.v1.json
+related_schemas:
+  - /schemas/example.schema.json
+  - /schemas/verdict.schema.json
+toc: true
+---
+
+## Scenario
+
+A generated resource browser detail view puts a heading, helper line, toggle labels, and utility actions in one cluster, but repeats the same words until the user cannot quickly tell what each element does.
+
+## Raw decision or output
+
+`Title the section Inspect JSON. Add helper text that says Inspect the JSON and open the JSON from the JSON tools below. Label the view toggle Inspect JSON and Inspect Schema, then add actions named Open JSON and JSON details next to it.`
+
+## What JudgmentKit detected
+
+- headings, helper text, and actions are reusing the same nouns and verbs
+- different controls sound interchangeable instead of role-specific
+- support text is repeating the action label rather than clarifying it
+
+## What action was taken
+
+The workflow rewrote the cluster so the section heading describes the area, the toggle labels describe the active view, and the utility action describes the one thing that leaves the surface.
+
+## Corrected result
+
+`Use Resource details as the section heading. Keep the view toggle labels as JSON and Schema. Replace the helper text with View the structured artifact in place, or open the raw file separately. Keep a single utility action labeled Open raw JSON.`
+
+## Why the correction matters
+
+The goal is not maximum variety. It is distinct roles. A dense interface gets easier when descriptive copy, control labels, and utility actions stop repeating each other.
+
+## Related workflow and guardrails
+
+- Workflow: `/docs/workflows/ai-ui-generation`
+- Guardrail: `/docs/guardrails/ui-copy-clarity`
+
+## JSON artifact links
+
+- Example resource: `/resources/examples/repetitive-copy-drift.v1.json`
+- Schema: `/schemas/example.schema.json`

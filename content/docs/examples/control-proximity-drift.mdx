@@ -1,0 +1,71 @@
+---
+title: Control proximity drift
+slug: /docs/examples/control-proximity-drift
+page_type: example
+summary: A resource browser places JSON and Schema controls in a different zone from the code viewer they affect, then gets rewritten so the controls live with the viewer.
+agent_summary: >
+  This example shows a UI generation draft separating local viewer controls from
+  the surface they govern, then rewrites the layout so control ownership is
+  obvious at a glance.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+workflows:
+  - workflow.ai-ui-generation
+guardrails:
+  - guardrail.control-proximity
+owners:
+  primary: Design Systems
+  risk: Product
+  operational: Frontend Platform
+status: active
+last_reviewed: 2026-04-11
+related_pages:
+  - /docs/workflows/ai-ui-generation
+  - /docs/guardrails/control-proximity
+  - /docs/examples/repetitive-copy-drift
+related_resources:
+  - /resources/examples/control-proximity-drift.v1.json
+related_schemas:
+  - /schemas/example.schema.json
+  - /schemas/verdict.schema.json
+toc: true
+---
+
+## Scenario
+
+A generated resource browser detail view places JSON and Schema buttons in an upper metadata band even though those controls switch the inline code viewer lower in the page, so the user has to infer which surface they govern.
+
+## Raw decision or output
+
+`Keep the resource title, metadata cards, and JSON/Schema buttons together in the top details band. Put the code viewer further down the page. Add an Open raw JSON button beside the view toggle so all actions stay in one header cluster.`
+
+## What JudgmentKit detected
+
+- the local view controls are detached from the code viewer they govern
+- the header cluster mixes local viewer actions and cross-surface actions with the same ownership
+- the user has to visually bridge separate zones to understand what will change
+
+## What action was taken
+
+The workflow rewrote the layout so JSON and Schema live in the local viewer toolbar directly above the code block. Any raw-file action remains outside that cluster unless it is clearly secondary.
+
+## Corrected result
+
+`Place the JSON and Schema toggle in the viewer toolbar directly above the code block so the local controls sit with the governed surface. Keep Open raw JSON outside that cluster unless it is visually secondary and clearly a separate cross-surface action.`
+
+## Why the correction matters
+
+This is not a copy problem first. It is a spatial ownership problem. A dense interface gets easier when the control sits with the thing it changes.
+
+## Related workflow and guardrails
+
+- Workflow: `/docs/workflows/ai-ui-generation`
+- Guardrail: `/docs/guardrails/control-proximity`
+
+## JSON artifact links
+
+- Example resource: `/resources/examples/control-proximity-drift.v1.json`
+- Schema: `/schemas/example.schema.json`

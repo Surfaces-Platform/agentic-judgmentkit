@@ -1,0 +1,75 @@
+{
+  "id": "guardrail.runtime-cost",
+  "type": "guardrail",
+  "version": "1.0.0",
+  "title": "Runtime and cost",
+  "summary": "Keep model behavior inside latency, retry, and spend budgets without hiding degraded quality.",
+  "status": "active",
+  "audiences": [
+    "product-managers",
+    "platform-engineering",
+    "ai-application-developers"
+  ],
+  "applies_to": {
+    "workflows": ["workflow.support-assistant", "workflow.ai-ui-generation"],
+    "surfaces": ["web", "mobile", "internal-tools"]
+  },
+  "decision": "How much model work, retrieval depth, and response complexity are acceptable for the workflow.",
+  "intent": {
+    "purpose": "Balance user experience, reliability, and spend by making runtime limits explicit.",
+    "who_it_protects": ["end users", "support teams", "platform budgets"],
+    "failure_mode": "The system loops, overthinks, or burns spend to produce marginally better output while the user waits.",
+    "good_judgment": "Use the simplest path that still meets quality needs, and surface when quality is intentionally constrained by budget or latency.",
+    "acceptable_variation": [
+      "shorter outputs on mobile",
+      "reduced retrieval depth for low-risk questions",
+      "higher spend only for explicitly high-value paths"
+    ],
+    "non_negotiables": [
+      "no unbounded retries",
+      "no hidden fallback that fabricates certainty",
+      "no premium-cost path without a documented reason"
+    ]
+  },
+  "detection": {
+    "decision_question": "Is the workflow staying inside documented latency and spend budgets without creating silent quality regressions?",
+    "signals": [
+      "latency budget breach",
+      "retry count",
+      "token usage",
+      "tool invocation depth"
+    ],
+    "thresholds": {
+      "pass": "within target latency and token budget",
+      "warn": "budget pressure or degraded fallback",
+      "fail": "budget breach with user-visible risk"
+    }
+  },
+  "response": {
+    "low": {
+      "action": "trim_and_log",
+      "description": "Shorten the path and log a budget pressure event."
+    },
+    "medium": {
+      "action": "fallback_with_notice",
+      "description": "Use the cheaper path and expose that the answer may be incomplete."
+    },
+    "high": {
+      "action": "block_or_queue",
+      "description": "Stop the response and route to an asynchronous or human-assisted path."
+    }
+  },
+  "ownership": {
+    "decision_owner": "Product",
+    "risk_owner": "Platform Engineering",
+    "operational_owner": "Platform Engineering",
+    "review_cadence": "biweekly"
+  },
+  "links": {
+    "docs_url": "https://judgmentkit.com/docs/guardrails/runtime-and-cost",
+    "markdown_url": "https://judgmentkit.com/docs/guardrails/runtime-and-cost.md",
+    "schema_url": "https://judgmentkit.com/schemas/guardrail.schema.json",
+    "example_ids": ["example.ui-generation.component-drift"]
+  },
+  "last_reviewed": "2026-04-09"
+}

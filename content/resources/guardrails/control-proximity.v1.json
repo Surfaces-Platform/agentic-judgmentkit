@@ -1,0 +1,79 @@
+{
+  "id": "guardrail.control-proximity",
+  "type": "guardrail",
+  "version": "1.0.0",
+  "title": "Control proximity",
+  "summary": "Keep controls inside or directly adjacent to the viewer, panel, or artifact they change so users can immediately tell what surface they govern.",
+  "status": "active",
+  "audiences": [
+    "design-leaders",
+    "product-managers",
+    "platform-engineering",
+    "ai-application-developers"
+  ],
+  "applies_to": {
+    "workflows": ["workflow.ai-ui-generation"],
+    "surfaces": ["web", "mobile", "internal-tools"]
+  },
+  "decision": "Whether a local control is placed inside or directly adjacent to the surface region it changes, rather than in a separate zone that obscures ownership.",
+  "intent": {
+    "purpose": "Prevent generated interfaces from separating local controls from the viewer, panel, or artifact they govern until the user can no longer easily tell which surface will change.",
+    "who_it_protects": ["end users", "product teams", "frontend teams"],
+    "failure_mode": "Generated UI places a local view control in a distant header, metadata band, or unrelated action cluster, so the user has to infer which pane or artifact it affects.",
+    "good_judgment": "Place local view controls in the local viewer toolbar or directly beside the governed surface. Keep global navigation and cross-surface links outside that zone, visually secondary, and clearly distinct from the local control cluster.",
+    "acceptable_variation": [
+      "compress local controls into an overflow or segmented control on narrow screens when the control still stays attached to the governed surface",
+      "place a local control immediately above or beside the affected viewer when layout density requires a compact toolbar",
+      "keep global navigation or raw-file links elsewhere when they are visually secondary and do not read as part of the local view cluster",
+      "follow approved design-system toolbar or inspector patterns when surface ownership remains obvious"
+    ],
+    "non_negotiables": [
+      "no local view toggle parked in a separate header or details band while it affects a lower viewer or sibling pane",
+      "no mixed local-view controls and global navigation actions presented as one undifferentiated cluster",
+      "no placement that forces the user to guess which surface, pane, or artifact a control changes",
+      "no cross-surface action given equal visual ownership to the local viewer controls it does not govern"
+    ]
+  },
+  "detection": {
+    "decision_question": "Does each control sit inside or directly adjacent to the surface it changes, or is it positioned in a separate zone that makes control ownership ambiguous?",
+    "signals": [
+      "a control floats in a header or details band while affecting a lower viewer",
+      "local viewer controls are mixed with global navigation or cross-surface links in one cluster",
+      "a button appears to belong to the wrong pane or region",
+      "the controlled surface has no obvious nearby toolbar or local action zone",
+      "the user must visually scan across zones to infer what the control governs"
+    ],
+    "thresholds": {
+      "pass": "affected-surface ownership is obvious because local controls live inside or directly adjacent to the governed region",
+      "warn": "control placement creates ambiguity but can be fixed with relayout without changing the information architecture",
+      "fail": "a user can plausibly misattribute which surface the control changes"
+    }
+  },
+  "response": {
+    "low": {
+      "action": "auto_relayout",
+      "description": "Relayout the local control so it sits with the surface it governs."
+    },
+    "medium": {
+      "action": "auto_relayout_and_review",
+      "description": "Relayout the control cluster and route the result through design review for ownership clarity."
+    },
+    "high": {
+      "action": "block_and_escalate_to_design_review",
+      "description": "Block the output and require design review because users can no longer reliably tell what surface a control changes."
+    }
+  },
+  "ownership": {
+    "decision_owner": "Design Systems",
+    "risk_owner": "Product",
+    "operational_owner": "Frontend Platform",
+    "review_cadence": "monthly"
+  },
+  "links": {
+    "docs_url": "https://judgmentkit.com/docs/guardrails/control-proximity",
+    "markdown_url": "https://judgmentkit.com/docs/guardrails/control-proximity.md",
+    "schema_url": "https://judgmentkit.com/schemas/guardrail.schema.json",
+    "example_ids": ["example.ui-generation.control-proximity-drift"]
+  },
+  "last_reviewed": "2026-04-11"
+}

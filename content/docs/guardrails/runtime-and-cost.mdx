@@ -1,0 +1,82 @@
+---
+title: Runtime and cost
+slug: /docs/guardrails/runtime-and-cost
+page_type: guardrail
+summary: Keep model behavior inside latency, retry, and spend budgets without hiding degraded quality.
+agent_summary: >
+  This page explains how JudgmentKit makes latency and spend tradeoffs explicit
+  so they can be reviewed like any other product decision.
+audiences:
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+workflows:
+  - workflow.support-assistant
+  - workflow.ai-ui-generation
+guardrails:
+  - guardrail.runtime-cost
+owners:
+  primary: Product
+  risk: Platform Engineering
+  operational: Platform Engineering
+status: active
+last_reviewed: 2026-04-09
+related_pages:
+  - /docs/workflows/support-assistant
+  - /docs/workflows/ai-ui-generation
+  - /docs/examples/ui-generation-drift
+related_resources:
+  - /resources/guardrails/runtime-cost.v1.json
+related_schemas:
+  - /schemas/guardrail.schema.json
+toc: true
+---
+
+## Why this matters
+
+Latency and spend are not infra-only concerns. They shape the product behavior users experience. A workflow that quietly burns budget or stalls the interface has already made a judgment decision, whether the team documented it or not.
+
+## What decision is being governed
+
+This guardrail governs how much model work, retrieval depth, and response complexity are acceptable for a workflow.
+
+## What good judgment looks like
+
+- choose the cheapest path that still meets quality needs
+- expose when the workflow is intentionally taking a cheaper fallback
+- reserve expensive paths for documented high-value cases
+
+## What drift looks like
+
+1. Retry loops or unbounded refinement
+2. Costly reasoning without a product reason
+3. Silent fallback that fabricates certainty instead of acknowledging limits
+
+## Example in practice
+
+The UI generation example shows a common cost drift pattern: open-ended creative intent that silently becomes an unlimited runtime request.
+
+## Boundaries
+
+Allowed variation includes shorter outputs for mobile, lower retrieval depth for low-risk questions, and explicit premium paths where the business case is known.
+
+Hard stops include unbounded retries, hidden fallback that changes risk posture, and premium-cost paths without documented intent.
+
+## How JudgmentKit responds
+
+Budget pressure can trim and log low-risk paths, shift to a cheaper fallback with notice, or stop the workflow entirely when the degraded path would mislead the user.
+
+## Ownership and review
+
+Product owns the tradeoff. Platform Engineering owns the risk and the runtime enforcement.
+
+## Technical reference
+
+- Resource: `/resources/guardrails/runtime-cost.v1.json`
+- Schema: `/schemas/guardrail.schema.json`
+
+## Related pages
+
+- /docs/workflows/support-assistant
+- /docs/workflows/ai-ui-generation
+- /docs/examples/ui-generation-drift

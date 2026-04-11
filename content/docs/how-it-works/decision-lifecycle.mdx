@@ -1,0 +1,68 @@
+---
+title: Decision lifecycle
+slug: /docs/how-it-works/decision-lifecycle
+page_type: concept
+summary: JudgmentKit treats AI behavior as a sequence of decisions that should be declared, evaluated, responded to, and reviewed over time.
+agent_summary: >
+  This page describes the JudgmentKit lifecycle for declaring intent,
+  evaluating fit, responding to drift, and updating guardrails through review.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+owners:
+  primary: Product
+  operational: Platform Engineering
+status: active
+last_reviewed: 2026-04-09
+related_pages:
+  - /docs/start/what-is-judgmentkit
+  - /docs/start/why-ai-decisions-drift
+  - /docs/start/pilot-one-workflow-in-a-week
+related_resources: []
+related_schemas:
+  - /schemas/decision-record.schema.json
+  - /schemas/verdict.schema.json
+toc: true
+---
+
+## Problem in human terms
+
+AI systems do not fail only at the output layer. They fail because the lifecycle around the output is incomplete. Teams often jump from generation to incident response without defining what should have been evaluated or who should act next.
+
+## Lifecycle stages
+
+### Declare intent
+
+Name the workflow, the decision inside it, the boundaries, and the owner. This is where guardrails become real instead of aspirational.
+
+### Evaluate fit
+
+Compare the live decision against the published intent. This may include content checks, component checks, privacy checks, latency budgets, or provenance requirements.
+
+### Respond to drift
+
+Pick the least surprising response that keeps users safe and the system accountable: allow, rewrite, review, block, or escalate.
+
+### Review and update
+
+Use incidents and repeated warnings to update guardrails, examples, and ownership. The goal is not to react to every output but to evolve the published judgment model.
+
+## What artifacts support the lifecycle
+
+- docs pages explain the decision in human terms
+- resources define the machine-readable contract
+- examples make the tradeoff tangible
+- schemas keep downstream tooling stable
+- MCP provides a standard retrieval interface over the same public truth
+
+## What “done” looks like
+
+The lifecycle is working when a reader or agent can trace a decision from explanation to resource to example to owner without guessing.
+
+## Related pages
+
+- /docs/start/what-is-judgmentkit
+- /docs/start/why-ai-decisions-drift
+- /docs/start/pilot-one-workflow-in-a-week

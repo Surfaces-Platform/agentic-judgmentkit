@@ -1,0 +1,85 @@
+---
+title: UI copy clarity
+slug: /docs/guardrails/ui-copy-clarity
+page_type: guardrail
+summary: Keep headings, labels, helper text, and CTAs distinct enough that users can tell what each element means and which action to take.
+agent_summary: >
+  This page explains the UI copy clarity guardrail, the decision it governs,
+  the drift it catches, and how JudgmentKit responds when labels become too
+  repetitive or semantically overlapping.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+workflows:
+  - workflow.ai-ui-generation
+guardrails:
+  - guardrail.ui-copy-clarity
+owners:
+  primary: Design Systems
+  risk: Product
+  operational: Frontend Platform
+status: active
+last_reviewed: 2026-04-11
+related_pages:
+  - /docs/workflows/ai-ui-generation
+  - /docs/examples/repetitive-copy-drift
+  - /docs/guardrails/brand-and-tone
+related_resources:
+  - /resources/guardrails/ui-copy-clarity.v1.json
+related_schemas:
+  - /schemas/guardrail.schema.json
+toc: true
+---
+
+## Why this matters
+
+Generated UI can avoid outright tone problems and still be hard to use. The failure mode is often not a single bad phrase. It is repeated or overlapping language that makes headings, helper text, and controls sound interchangeable.
+
+## What decision is being governed
+
+This guardrail governs whether headings, labels, helper text, and CTA copy are distinct enough for a first-time user to understand hierarchy and next action.
+
+## What good judgment looks like
+
+- one clear job per copy element
+- distinct adjacent action labels
+- helper text that clarifies instead of restating
+- copy hierarchy that makes primary versus secondary emphasis obvious
+
+## What drift looks like
+
+1. Nearby controls reuse the same verb phrase for different actions.
+2. A section heading, helper line, and button all collapse into the same wording.
+3. Support text repeats the CTA instead of explaining what happens next.
+4. Primary and secondary actions sound interchangeable.
+
+## Example in practice
+
+The calibration example uses a resource browser cluster where the view toggle, helper copy, and raw-file action all repeat JSON or Open language. The fix is not more prose. It is clearer separation between section description, in-place view controls, and the one action that leaves the surface.
+
+## Boundaries
+
+Allowed variation includes shortening labels for surface constraints, following approved product terminology, and adapting helper text by device or density.
+
+Hard stops include semantically overlapping labels for different controls, helper text that merely restates the adjacent CTA, and repeated copy that obscures the next action.
+
+## How JudgmentKit responds
+
+Low drift gets rewritten automatically. Medium drift gets rewritten and reviewed. High drift gets blocked and escalated because the interface is no longer telling the user what each element actually does.
+
+## Ownership and review
+
+Design Systems owns the decision. Product owns the risk. Frontend Platform owns the implementation path that turns repeated-copy signals into action.
+
+## Technical reference
+
+- Resource: `/resources/guardrails/ui-copy-clarity.v1.json`
+- Schema: `/schemas/guardrail.schema.json`
+
+## Related pages
+
+- /docs/workflows/ai-ui-generation
+- /docs/examples/repetitive-copy-drift
+- /docs/guardrails/brand-and-tone

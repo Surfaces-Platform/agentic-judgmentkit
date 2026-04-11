@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://judgmentkit.com/schemas/workflow.schema.json",
+  "title": "JudgmentKit Workflow Resource",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "type",
+    "version",
+    "title",
+    "summary",
+    "status",
+    "description",
+    "primary_users",
+    "decisions",
+    "required_inputs",
+    "common_guardrails",
+    "risk_profile",
+    "links",
+    "last_reviewed"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "type": {
+      "const": "workflow"
+    },
+    "version": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "deprecated", "draft"]
+    },
+    "description": {
+      "type": "string"
+    },
+    "primary_users": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "required_inputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "common_guardrails": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "risk_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["risk_level", "main_risks"],
+      "properties": {
+        "risk_level": {
+          "type": "string",
+          "enum": ["low", "medium", "high"]
+        },
+        "main_risks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "links": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["docs_url", "markdown_url", "schema_url"],
+      "properties": {
+        "docs_url": {
+          "type": "string"
+        },
+        "markdown_url": {
+          "type": "string"
+        },
+        "schema_url": {
+          "type": "string"
+        },
+        "example_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "last_reviewed": {
+      "type": "string",
+      "format": "date"
+    }
+  }
+}

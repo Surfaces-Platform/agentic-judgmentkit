@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://judgmentkit.com/schemas/example.schema.json",
+  "title": "JudgmentKit Example Resource",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "type",
+    "version",
+    "title",
+    "summary",
+    "status",
+    "workflow_id",
+    "guardrail_ids",
+    "scenario",
+    "raw_output",
+    "verdict",
+    "corrected_output",
+    "lesson",
+    "links",
+    "last_reviewed"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "type": {
+      "const": "example"
+    },
+    "version": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "deprecated", "draft"]
+    },
+    "workflow_id": {
+      "type": "string"
+    },
+    "guardrail_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "scenario": {
+      "type": "string"
+    },
+    "raw_output": {
+      "type": "string"
+    },
+    "verdict": {
+      "$ref": "https://judgmentkit.com/schemas/verdict.schema.json"
+    },
+    "corrected_output": {
+      "type": "string"
+    },
+    "lesson": {
+      "type": "string"
+    },
+    "links": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["docs_url", "markdown_url", "schema_url"],
+      "properties": {
+        "docs_url": {
+          "type": "string"
+        },
+        "markdown_url": {
+          "type": "string"
+        },
+        "schema_url": {
+          "type": "string"
+        }
+      }
+    },
+    "last_reviewed": {
+      "type": "string",
+      "format": "date"
+    }
+  }
+}
