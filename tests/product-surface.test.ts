@@ -13,7 +13,7 @@ import rawExampleArtifact from "@/public/resources/examples/ui-generation-drift.
 
 describe("product surface content", () => {
   it("defines the three install targets and the derived loaded context", () => {
-    const content = loadProductSurface("https://judgmentkit.com/mcp");
+    const content = loadProductSurface("https://judgmentkit.ai/mcp");
 
     expect(content.install_targets.map((target) => target.id)).toEqual([
       "codex",
@@ -21,46 +21,34 @@ describe("product surface content", () => {
       "cursor",
     ]);
     expect(content.install_targets[0]).toMatchObject({
-      transport: "stdio",
-      connection_label: "Transport",
-      connection_value:
-        "npm --prefix <ABSOLUTE_PATH_TO_JUDGMENTKIT_REPO> run mcp:stdio",
+      transport: "http",
+      connection_label: "URL",
+      connection_value: "https://judgmentkit.ai/mcp",
       config_path: "~/.codex/config.toml",
       install_note:
-        "Run JudgmentKit directly from a local repo checkout. Replace the placeholder path and restart Codex.",
+        "Connect directly to the hosted JudgmentKit MCP and restart Codex.",
     });
     expect(content.install_targets[1]).toMatchObject({
-      transport: "stdio",
-      connection_label: "Command",
-      connection_value:
-        "npm --prefix <ABSOLUTE_PATH_TO_JUDGMENTKIT_REPO> run mcp:stdio",
+      transport: "http",
+      connection_label: "URL",
+      connection_value: "https://judgmentkit.ai/mcp",
       config_path: ".mcp.json",
       install_note:
-        "Run JudgmentKit directly from a local repo checkout. Replace the placeholder path and restart Claude after adding the server.",
+        "Connect directly to the hosted JudgmentKit MCP and restart Claude after adding the server.",
     });
     expect(content.install_targets[2]).toMatchObject({
-      transport: "stdio",
-      connection_label: "Command",
-      connection_value:
-        "npm --prefix <ABSOLUTE_PATH_TO_JUDGMENTKIT_REPO> run mcp:stdio",
+      transport: "http",
+      connection_label: "URL",
+      connection_value: "https://judgmentkit.ai/mcp",
       config_path: "~/.cursor/mcp.json",
       install_note:
-        "Run JudgmentKit directly from a local repo checkout. Replace the placeholder path and reopen the workspace if needed.",
+        "Connect directly to the hosted JudgmentKit MCP and reload Cursor if needed.",
     });
-    expect(content.install_targets[1].config_snippet).toContain('"command": "npm"');
     expect(content.install_targets[1].config_snippet).toContain(
-      '"args": ["--prefix", "<ABSOLUTE_PATH_TO_JUDGMENTKIT_REPO>", "run", "mcp:stdio"]',
+      '"url": "https://judgmentkit.ai/mcp"',
     );
-    expect(content.install_targets[1].config_snippet).toContain('"env": {}');
-    expect(content.install_targets[1].config_snippet).not.toContain(
-      "https://judgmentkit.com/mcp",
-    );
-    expect(content.install_targets[2].config_snippet).toContain('"command": "npm"');
     expect(content.install_targets[2].config_snippet).toContain(
-      '"args": ["--prefix", "<ABSOLUTE_PATH_TO_JUDGMENTKIT_REPO>", "run", "mcp:stdio"]',
-    );
-    expect(content.install_targets[2].config_snippet).not.toContain(
-      "https://judgmentkit.com/mcp",
+      '"url": "https://judgmentkit.ai/mcp"',
     );
     expect(content.loaded_context.map((item) => item.id)).toEqual([
       "workflow.ai-ui-generation",
@@ -78,7 +66,7 @@ describe("product surface content", () => {
   });
 
   it("keeps the raw artifact references available for the inspect route", () => {
-    const content = loadProductSurface("https://judgmentkit.com/mcp");
+    const content = loadProductSurface("https://judgmentkit.ai/mcp");
     const urls = content.reference_links.map((link) => link.url);
 
     expect(content.inspect).toEqual({
@@ -97,7 +85,7 @@ describe("product surface content", () => {
   });
 
   it("sources the first message from the canonical MCP prompt", () => {
-    const content = loadProductSurface("https://judgmentkit.com/mcp");
+    const content = loadProductSurface("https://judgmentkit.ai/mcp");
     const prompt = getPrompt("start_design_workflow");
 
     expect("error" in prompt).toBe(false);
@@ -110,7 +98,7 @@ describe("product surface content", () => {
   });
 
   it("sources the proof from the published example artifact", () => {
-    const content = loadProductSurface("https://judgmentkit.com/mcp");
+    const content = loadProductSurface("https://judgmentkit.ai/mcp");
 
     expect(content.proof.example_id).toBe(rawExampleArtifact.id);
     expect(content.proof.workflow_id).toBe(rawExampleArtifact.workflow_id);
@@ -120,7 +108,7 @@ describe("product surface content", () => {
   });
 
   it("renders anchored resource references on the inspect surface", () => {
-    const content = loadProductSurface("https://judgmentkit.com/mcp");
+    const content = loadProductSurface("https://judgmentkit.ai/mcp");
     const markup = renderToStaticMarkup(
       createElement(InspectSurface, { content }),
     );
@@ -180,7 +168,7 @@ describe("product surface content", () => {
   });
 
   it("resolves inspect resources from legacy hash anchors", () => {
-    const content = loadProductSurface("https://judgmentkit.com/mcp");
+    const content = loadProductSurface("https://judgmentkit.ai/mcp");
 
     expect(
       resolveInspectResourceIdFromHash(

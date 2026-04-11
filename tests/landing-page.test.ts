@@ -7,7 +7,7 @@ import { loadLandingPage } from "@/lib/landing-page";
 
 describe("landing page", () => {
   it("loads the greenfield homepage copy and dogfood inputs", async () => {
-    const content = await loadLandingPage("https://judgmentkit.com/mcp");
+    const content = await loadLandingPage("https://judgmentkit.ai/mcp");
 
     expect(content.headline).toBe("Put your standards in the path of AI work.");
     expect(content.primary_cta_label).toBe("Connect JudgmentKit");
@@ -77,7 +77,7 @@ describe("landing page", () => {
   });
 
   it("keeps raw machine links out of the homepage body", async () => {
-    const content = await loadLandingPage("https://judgmentkit.com/mcp");
+    const content = await loadLandingPage("https://judgmentkit.ai/mcp");
     const markup = renderToStaticMarkup(createElement(LandingPage, { content }));
 
     expect(markup).toContain("Put your standards in the path of AI work.");
@@ -121,7 +121,7 @@ describe("landing page", () => {
   });
 
   it("uses an explicit mobile single-column hero grid and rail containment classes", async () => {
-    const content = await loadLandingPage("https://judgmentkit.com/mcp");
+    const content = await loadLandingPage("https://judgmentkit.ai/mcp");
     const markup = renderToStaticMarkup(createElement(LandingPage, { content }));
 
     expect(markup).toContain('class="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-8"');

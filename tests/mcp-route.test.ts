@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { POST } from "@/app/mcp/route";
+import { GET, POST } from "@/app/mcp/route";
 
 const GENERIC_START_DESIGN_WORKFLOW_PROMPT =
   'Use JudgmentKit for this design task. Call get_workflow_bundle({ workflow_id: "workflow.ai-ui-generation" }) first. Treat any referenced design system as the source of truth for components, tokens, radius, elevation, surfaces, and theme behavior. If a design system is present, ask whether it has an accessibility baseline or owner-approved review status before generating UI; if that status is unknown, pause and ask first. If the brief conflicts with the design system, surface review questions and escalation items instead of silently overriding it. Only when the design system and the brief are both silent, use restrained fallback defaults: approved primitives, a tight 6px radius scale, no decorative gradients, no gratuitous shadows, and both light and dark mode by default. Keep local controls inside or directly adjacent to the surface they govern so ownership stays obvious. Keep runtime bounded and surface review questions before inventing new patterns.';
@@ -9,6 +9,7 @@ async function postJsonRpc(payload: Record<string, unknown>) {
   const request = new Request("http://localhost:3002/mcp", {
     method: "POST",
     headers: {
+      accept: "application/json, text/event-stream",
       "content-type": "application/json",
     },
     body: JSON.stringify(payload),
@@ -18,7 +19,27 @@ async function postJsonRpc(payload: Record<string, unknown>) {
   return response.json();
 }
 
+async function getMetadata() {
+  const request = new Request("http://localhost:3002/mcp", {
+    method: "GET",
+    headers: {
+      accept: "application/json",
+    },
+  });
+
+  const response = await GET(request);
+  return response.json();
+}
+
 describe("mcp route prompts", () => {
+  it("returns route metadata on a non-SSE GET request", async () => {
+    const result = await getMetadata();
+
+    expect(result.transport).toBe("streamable-http");
+    expect(result.capabilities.tools).toBeInstanceOf(Array);
+    expect(result.capabilities.prompts).toBeInstanceOf(Array);
+  });
+
   it("lists the refinement prompt", async () => {
     const result = await postJsonRpc({
       jsonrpc: "2.0",
@@ -41,6 +62,7 @@ describe("mcp route prompts", () => {
       method: "prompts/get",
       params: {
         name: "start_design_workflow",
+        arguments: {},
       },
     });
 

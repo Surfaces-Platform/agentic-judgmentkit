@@ -1,24 +1,38 @@
+import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { NextResponse } from "next/server";
 
-import {
-  getMcpMetadata,
-  handleJsonRpcRequest,
-  jsonRpcError,
-  type JsonRpcRequest,
-} from "@/lib/mcp-jsonrpc";
+import { createJudgmentKitMcpServer, getMcpMetadata } from "@/lib/mcp-server";
 
-export async function GET() {
-  return NextResponse.json(getMcpMetadata("http"));
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+function wantsSse(request: Request) {
+  return request.headers.get("accept")?.includes("text/event-stream") ?? false;
+}
+
+async function handleStreamableHttpRequest(request: Request) {
+  const server = createJudgmentKitMcpServer();
+  const transport = new WebStandardStreamableHTTPServerTransport({
+    sessionIdGenerator: undefined,
+    enableJsonResponse: true,
+  });
+
+  await server.connect(transport);
+  return transport.handleRequest(request);
+}
+
+export async function GET(request: Request) {
+  if (!wantsSse(request)) {
+    return NextResponse.json(getMcpMetadata("streamable-http"));
+  }
+
+  return handleStreamableHttpRequest(request);
 }
 
 export async function POST(request: Request) {
-  let payload: JsonRpcRequest;
+  return handleStreamableHttpRequest(request);
+}
 
-  try {
-    payload = (await request.json()) as JsonRpcRequest;
-  } catch {
-    return NextResponse.json(jsonRpcError(null, -32700, "Invalid JSON payload."));
-  }
-
-  return NextResponse.json(await handleJsonRpcRequest(payload));
+export async function DELETE(request: Request) {
+  return handleStreamableHttpRequest(request);
 }
