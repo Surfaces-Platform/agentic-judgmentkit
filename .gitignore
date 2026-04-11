@@ -1,4 +1,5 @@
 .next
+.vercel
 node_modules
 coverage
 dist
@@ -15,3 +16,4 @@ public/llms.txt
 public/search-index.json
 public/graph.json
 public/mcp-inventory.json
+.env*.local
