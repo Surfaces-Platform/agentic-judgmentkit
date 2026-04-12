@@ -16,7 +16,7 @@ owners:
   primary: Product
   operational: Platform Engineering
 status: active
-last_reviewed: 2026-04-09
+last_reviewed: 2026-04-12
 related_pages:
   - /docs/start/why-ai-decisions-drift
   - /docs/how-it-works/decision-lifecycle
@@ -32,7 +32,7 @@ Use JudgmentKit when you want an agent to do real work without making up its own
 
 ## Use it with agents
 
-Connect your agent to the MCP endpoint, fetch the workflow you care about, call `resolve_related` to pull the linked guardrails and examples, then run the model with those artifacts in context.
+Install JudgmentKit from a local checkout over stdio, fetch the workflow you care about, call `resolve_related` to pull the linked guardrails and examples, then run the model with those artifacts in context.
 
 For example, for support you would:
 
@@ -40,7 +40,7 @@ For example, for support you would:
 - call `resolve_related` for `workflow.support-assistant`
 - call `get_example` for `example.brand-tone.support-coercive-copy`
 
-`/mcp` is not a human page. It is the endpoint your agent or MCP client connects to.
+`/mcp` is not the install target. It is the hosted reference/debug endpoint that mirrors the same public truth as the local JudgmentKit checkout.
 
 ## Problem in human terms
 
@@ -60,7 +60,7 @@ That is why JudgmentKit publishes:
 - Markdown mirrors for agent retrieval
 - versioned JSON resources for guardrails, workflows, and examples
 - schemas that stabilize machine-consumable contracts
-- a read-only MCP surface for discovery and fetch
+- a hosted read-only MCP reference surface for discovery and fetch parity
 
 ## Why this matters operationally
 
@@ -73,7 +73,7 @@ Without a shared judgment layer, product, design, governance, and engineering ma
 - two concrete workflows
 - three synthetic examples
 - a public artifact inventory and schema set
-- a read-only MCP endpoint that mirrors the same public truth
+- a hosted read-only MCP endpoint that mirrors the same public truth as the local stdio install
 
 ## Related pages
 

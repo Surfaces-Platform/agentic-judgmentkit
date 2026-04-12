@@ -130,22 +130,45 @@ export type InstallContractClient = {
   install_note: string;
 };
 
+export type InstallContractRepository = {
+  clone_url: string;
+  local_path_placeholder: string;
+  install_command: string;
+};
+
+export type InstallContractConnection = {
+  command: string;
+  args: string[];
+};
+
+export type InstallContractCommandReference = {
+  name: string;
+  description: string;
+  docs_url: string;
+  arguments: string[];
+  example_call?: string;
+};
+
 export type InstallContractVerification = {
   method: "tools/list";
   server_name: string;
   instructions: string;
   expected_tools: string[];
   expected_prompts: string[];
+  tool_reference: InstallContractCommandReference[];
+  prompt_reference: InstallContractCommandReference[];
 };
 
 export type InstallContract = {
   version: string;
   product_name: string;
   canonical_install_url: string;
-  canonical_mcp_url: string;
+  command_reference_url: string;
+  warning: string;
+  repository: InstallContractRepository;
   server_name: string;
   install_transport: ProductSurfaceTransport;
-  stdio_command: string;
+  connection: InstallContractConnection;
   supported_clients: string[];
   clients: InstallContractClient[];
   verification: InstallContractVerification;
@@ -174,16 +197,37 @@ export type ProductSurfaceReferenceLink = {
   kind: string;
 };
 
-export type ProductSurfaceInspectResource = {
+export type ProductSurfaceInspectViewerMode = "prompt" | "json" | "schema";
+
+export type ProductSurfaceInspectFormat = "json" | "markdown" | "text" | "html";
+
+export type ProductSurfaceInspectItem = {
   id: string;
+  category: string;
   type: string;
   version: string;
   title: string;
   summary: string;
+  subtitle: string;
   url: string;
-  schema_url: string;
+  schema_url?: string;
   last_reviewed: string;
   tags: string[];
+  available_view_modes: ProductSurfaceInspectViewerMode[];
+  default_view_mode: ProductSurfaceInspectViewerMode;
+  prompt_text: string;
+  raw_format: ProductSurfaceInspectFormat;
+};
+
+export type ProductSurfaceReferenceItem = {
+  id: string;
+  group: string;
+  type: string;
+  title: string;
+  summary: string;
+  subtitle: string;
+  url: string;
+  raw_format: ProductSurfaceInspectFormat;
 };
 
 export type ProductSurfaceInspectLink = {
@@ -208,11 +252,13 @@ export type ProductSurfaceContent = {
   install_prompt: string;
   verify_prompt: string;
   install_contract: InstallContract;
+  tool_reference: InstallContractCommandReference[];
+  prompt_reference: InstallContractCommandReference[];
   proof: ProductSurfaceProof;
   loaded_context: ProductSurfaceContextItem[];
-  inspect_resources: ProductSurfaceInspectResource[];
+  inspect_primary_items: ProductSurfaceInspectItem[];
+  inspect_reference_items: ProductSurfaceReferenceItem[];
   inspect: ProductSurfaceInspectLink;
-  reference_links: ProductSurfaceReferenceLink[];
 };
 
 export type LandingPageHeroFact = {

@@ -13,6 +13,18 @@ describe("site build data", () => {
     expect(site.resourceIndex.schemas[0]?.url).toMatch(/^https:\/\/judgmentkit\.ai\//);
     expect(site.llms).toContain("https://judgmentkit.ai/");
     expect(site.mcpInventory.endpoint).toBe("https://judgmentkit.ai/mcp");
+    expect(site.mcpInventory.install_transport).toBe("stdio");
+    expect(site.mcpInventory.command_reference_url).toBe(
+      "https://judgmentkit.ai/inspect#commands",
+    );
+    expect(site.mcpInventory.tool_reference).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: "get_workflow_bundle",
+          docs_url: "https://judgmentkit.ai/inspect#tool-get_workflow_bundle",
+        }),
+      ]),
+    );
   });
 
   it("keeps every guardrail page attached to workflows and resources", async () => {

@@ -4,5 +4,9 @@ import { loadProductSurface } from "@/lib/product-surface";
 export default function InspectPage() {
   const content = loadProductSurface();
 
-  return <InspectSurface content={content} />;
+  return (
+    <div className="h-[calc(100dvh-4.75rem)] overflow-hidden">
+      <InspectSurface content={content} />
+    </div>
+  );
 }

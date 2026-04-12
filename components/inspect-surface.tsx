@@ -4,10 +4,11 @@ import { startTransition, useEffect, useRef, useState } from "react";
 
 import type {
   ProductSurfaceContent,
-  ProductSurfaceInspectResource,
+  ProductSurfaceInspectFormat,
+  ProductSurfaceInspectItem,
+  ProductSurfaceInspectViewerMode,
 } from "@/lib/types";
 
-type InspectViewerMode = "json" | "schema";
 type InspectDocumentState =
   | {
       status: "loading";
@@ -23,6 +24,13 @@ type InspectDocumentState =
 
 const HASH_PREFIX = "#resource-";
 const INSPECT_RESOURCE_RAIL_ID = "inspect-resource-rail";
+const INSPECT_CATEGORY_ORDER = ["Examples", "Workflows", "Guardrails"] as const;
+
+const VIEWER_MODE_LABELS: Record<ProductSurfaceInspectViewerMode, string> = {
+  prompt: "Prompt",
+  json: "JSON",
+  schema: "Schema",
+};
 
 function escapeHtml(value: string) {
   return value
@@ -39,6 +47,14 @@ export function formatInspectJsonText(value: string) {
   } catch {
     return trimmed;
   }
+}
+
+function formatInspectDocumentText(value: string, format: ProductSurfaceInspectFormat) {
+  if (format === "json") {
+    return formatInspectJsonText(value);
+  }
+
+  return value.endsWith("\n") ? value : `${value}\n`;
 }
 
 export function highlightInspectJson(value: string) {
@@ -72,31 +88,60 @@ export function highlightInspectJson(value: string) {
   return html;
 }
 
-export function formatInspectResourceTypeLabel(type: string) {
-  return `${type.charAt(0).toUpperCase()}${type.slice(1)}s`;
-}
-
-export function groupInspectResources(resources: ProductSurfaceInspectResource[]) {
-  return resources.reduce<Record<string, ProductSurfaceInspectResource[]>>((groups, resource) => {
-    const next = groups[resource.type] ?? [];
-    next.push(resource);
-    groups[resource.type] = next;
-    return groups;
-  }, {});
+function groupInspectItems(items: ProductSurfaceInspectItem[]) {
+  return INSPECT_CATEGORY_ORDER.map((category) => ({
+    category,
+    items: items.filter((item) => item.category === category),
+  })).filter((group) => group.items.length > 0);
 }
 
 export function resolveInspectResourceIdFromHash(
   hash: string,
-  resources: ProductSurfaceInspectResource[],
+  items: ProductSurfaceInspectItem[],
 ) {
-  const fallbackId = resources[0]?.id ?? null;
+  const fallbackId = items[0]?.id ?? null;
 
   if (!hash.startsWith(HASH_PREFIX)) {
     return fallbackId;
   }
 
   const id = decodeURIComponent(hash.slice(HASH_PREFIX.length));
-  return resources.some((resource) => resource.id === id) ? id : fallbackId;
+  return items.some((item) => item.id === id) ? id : fallbackId;
+}
+
+function getItemEyebrow(item: ProductSurfaceInspectItem) {
+  switch (item.type) {
+    case "workflow":
+      return "Workflow";
+    case "guardrail":
+      return "Guardrail";
+    case "example":
+      return "Example";
+    default:
+      return item.type;
+  }
+}
+
+function getItemMetadata(item: ProductSurfaceInspectItem) {
+  return [
+    { label: "Resource id", value: item.id },
+    { label: "Version", value: item.version },
+    { label: "Last reviewed", value: item.last_reviewed },
+  ];
+}
+
+function getDocumentUrl(
+  item: ProductSurfaceInspectItem,
+  viewerMode: ProductSurfaceInspectViewerMode,
+) {
+  switch (viewerMode) {
+    case "json":
+      return item.url;
+    case "schema":
+      return item.schema_url;
+    default:
+      return undefined;
+  }
 }
 
 type InspectSurfaceProps = {
@@ -104,29 +149,22 @@ type InspectSurfaceProps = {
 };
 
 export function InspectSurface({ content }: InspectSurfaceProps) {
-  const groupedReferences = content.reference_links.reduce<
-    Record<string, ProductSurfaceContent["reference_links"]>
-  >((groups, link) => {
-    const next = groups[link.group] ?? [];
-    next.push(link);
-    groups[link.group] = next;
-    return groups;
-  }, {});
-  const groupedResources = groupInspectResources(content.inspect_resources);
+  const groupedItems = groupInspectItems(content.inspect_primary_items);
   const [selectedResourceId, setSelectedResourceId] = useState(
-    content.inspect_resources[0]?.id ?? "",
+    content.inspect_primary_items[0]?.id ?? "",
   );
   const [isMobileRailOpen, setIsMobileRailOpen] = useState(false);
-  const [viewerMode, setViewerMode] = useState<InspectViewerMode>("json");
+  const [viewerMode, setViewerMode] = useState<ProductSurfaceInspectViewerMode>("prompt");
   const [documents, setDocuments] = useState<Record<string, InspectDocumentState>>({});
   const isMounted = useRef(true);
   const requestedDocuments = useRef<Set<string>>(new Set());
 
-  const selectedResource =
-    content.inspect_resources.find((resource) => resource.id === selectedResourceId) ??
-    content.inspect_resources[0];
-  const activeDocumentUrl =
-    viewerMode === "json" ? selectedResource?.url : selectedResource?.schema_url;
+  const selectedItem =
+    content.inspect_primary_items.find((item) => item.id === selectedResourceId) ??
+    content.inspect_primary_items[0];
+  const activeDocumentUrl = selectedItem
+    ? getDocumentUrl(selectedItem, viewerMode)
+    : undefined;
   const activeDocument = activeDocumentUrl ? documents[activeDocumentUrl] : undefined;
 
   useEffect(() => {
@@ -137,7 +175,7 @@ export function InspectSurface({ content }: InspectSurfaceProps) {
     function syncSelectedResourceFromHash() {
       const nextId = resolveInspectResourceIdFromHash(
         window.location.hash,
-        content.inspect_resources,
+        content.inspect_primary_items,
       );
 
       if (!nextId) {
@@ -152,7 +190,7 @@ export function InspectSurface({ content }: InspectSurfaceProps) {
     window.addEventListener("hashchange", syncSelectedResourceFromHash);
 
     return () => window.removeEventListener("hashchange", syncSelectedResourceFromHash);
-  }, [content.inspect_resources]);
+  }, [content.inspect_primary_items]);
 
   useEffect(() => {
     isMounted.current = true;
@@ -161,6 +199,14 @@ export function InspectSurface({ content }: InspectSurfaceProps) {
       isMounted.current = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (!selectedItem) {
+      return;
+    }
+
+    setViewerMode(selectedItem.default_view_mode);
+  }, [selectedItem]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -218,7 +264,7 @@ export function InspectSurface({ content }: InspectSurfaceProps) {
   }, [isMobileRailOpen]);
 
   useEffect(() => {
-    if (!selectedResource) {
+    if (!selectedItem) {
       return;
     }
 
@@ -254,7 +300,7 @@ export function InspectSurface({ content }: InspectSurfaceProps) {
           ...current,
           [url]: {
             status: "ready",
-            text: formatInspectJsonText(raw),
+            text: raw,
           },
         }));
       } catch (error) {
@@ -272,11 +318,17 @@ export function InspectSurface({ content }: InspectSurfaceProps) {
       }
     }
 
-    void loadDocument(selectedResource.url);
-    void loadDocument(selectedResource.schema_url);
-  }, [selectedResource]);
+    const documentRequests = [
+      selectedItem.url,
+      ...(selectedItem.schema_url ? [selectedItem.schema_url] : []),
+    ];
 
-  if (!selectedResource) {
+    for (const url of documentRequests) {
+      void loadDocument(url);
+    }
+  }, [selectedItem]);
+
+  if (!selectedItem) {
     return null;
   }
 
@@ -295,60 +347,62 @@ export function InspectSurface({ content }: InspectSurfaceProps) {
     });
   }
 
+  const metadata = getItemMetadata(selectedItem);
+
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+    <div className="h-full w-full overflow-hidden">
       <button
         type="button"
-        aria-label="Close published resources"
+        aria-label="Close inspect navigation"
         onClick={() => setIsMobileRailOpen(false)}
         className={
           isMobileRailOpen
-            ? "fixed inset-0 z-40 bg-[rgba(16,24,39,0.32)] transition-opacity duration-200 md:hidden"
-            : "pointer-events-none fixed inset-0 z-40 bg-[rgba(16,24,39,0.32)] opacity-0 transition-opacity duration-200 md:hidden"
+            ? "fixed inset-x-0 bottom-0 top-[4.75rem] z-40 bg-[rgba(16,24,39,0.32)] transition-opacity duration-200 md:hidden"
+            : "pointer-events-none fixed inset-x-0 bottom-0 top-[4.75rem] z-40 bg-[rgba(16,24,39,0.32)] opacity-0 transition-opacity duration-200 md:hidden"
         }
       />
 
-      <section className="surface-panel inspect-browser-shell md:overflow-hidden">
-        <div className="grid md:grid-cols-[15rem,minmax(0,1fr)] lg:grid-cols-[18rem,minmax(0,1fr)]">
+      <section className="surface-panel inspect-browser-shell h-full overflow-hidden md:rounded-none md:border-x-0 md:border-t-0">
+        <div className="grid h-full min-h-0 md:grid-cols-[17rem,minmax(0,1fr)] lg:grid-cols-[19rem,minmax(0,1fr)]">
           <aside
             id={INSPECT_RESOURCE_RAIL_ID}
             role={isMobileRailOpen ? "dialog" : undefined}
             aria-modal={isMobileRailOpen ? true : undefined}
-            aria-label={isMobileRailOpen ? "Published resources" : undefined}
+            aria-label={isMobileRailOpen ? "Inspect navigation" : undefined}
             className={[
-              "theme-divider fixed inset-y-0 left-0 z-50 min-w-0 w-[min(18rem,calc(100vw-2rem))] max-w-full overflow-y-auto border-r bg-[var(--theme-panel-muted)] px-4 py-4 shadow-2xl transition-transform duration-200 md:static md:z-auto md:w-auto md:max-w-none md:overflow-visible md:border-r-0 md:px-3 lg:px-5 md:shadow-none",
+              "theme-divider fixed bottom-0 left-0 top-[4.75rem] z-50 min-w-0 w-[min(18rem,calc(100vw-2rem))] max-w-full overflow-y-auto border-r bg-[var(--theme-panel-muted)] px-4 py-4 shadow-2xl transition-transform duration-200 md:static md:h-full md:w-auto md:max-w-none md:px-5 md:py-6 md:shadow-none",
               isMobileRailOpen
                 ? "translate-x-0 pointer-events-auto"
                 : "pointer-events-none -translate-x-full md:pointer-events-auto md:translate-x-0",
             ].join(" ")}
           >
-            <nav aria-label="Published resources" className="space-y-4 lg:space-y-5">
-              {Object.entries(groupedResources).map(([type, resources]) => (
-                <section key={type}>
+            <nav aria-label="Inspect navigation" className="space-y-5">
+              {groupedItems.map((group) => (
+                <section key={group.category}>
                   <p className="theme-text-muted text-[11px] font-semibold uppercase tracking-[0.2em]">
-                    {formatInspectResourceTypeLabel(type)}
+                    {group.category}
                   </p>
                   <div className="mt-3 space-y-2">
-                    {resources.map((resource) => {
-                      const isActive = resource.id === selectedResource.id;
+                    {group.items.map((item) => {
+                      const isActive = item.id === selectedItem.id;
 
                       return (
-                        <div id={`resource-${resource.id}`} key={resource.id}>
+                        <div id={`resource-${item.id}`} key={item.id}>
                           <button
                             type="button"
                             aria-pressed={isActive}
-                            onClick={() => handleSelectResource(resource.id)}
+                            onClick={() => handleSelectResource(item.id)}
                             className={
                               isActive
-                                ? "w-full rounded-[var(--landing-radius)] border border-[color:var(--theme-border-strong)] bg-[var(--theme-panel)] px-3 py-3 md:px-2.5 lg:px-3 text-left"
-                                : "w-full rounded-[var(--landing-radius)] border border-transparent bg-transparent px-3 py-3 md:px-2.5 lg:px-3 text-left transition duration-200 hover:border-[color:var(--theme-border)] hover:bg-[var(--theme-panel)]"
+                                ? "w-full rounded-[var(--landing-radius)] border border-[color:var(--theme-border-strong)] bg-[var(--theme-panel)] px-3 py-3 text-left"
+                                : "w-full rounded-[var(--landing-radius)] border border-transparent bg-transparent px-3 py-3 text-left transition duration-200 hover:border-[color:var(--theme-border)] hover:bg-[var(--theme-panel)]"
                             }
                           >
                             <p className="theme-text-primary text-sm font-semibold">
-                              {resource.title}
+                              {item.title}
                             </p>
                             <p className="theme-text-secondary mt-1 text-xs leading-5">
-                              {resource.id}
+                              {item.subtitle}
                             </p>
                           </button>
                         </div>
@@ -360,11 +414,11 @@ export function InspectSurface({ content }: InspectSurfaceProps) {
             </nav>
           </aside>
 
-          <section className="theme-divider min-w-0 md:border-l">
+          <section className="min-w-0 md:flex md:min-h-0 md:flex-col md:overflow-hidden">
             <div className="theme-divider flex items-center border-b px-5 py-4 sm:px-6 md:hidden">
               <button
                 type="button"
-                aria-label="Open published resources"
+                aria-label="Open inspect navigation"
                 aria-expanded={isMobileRailOpen}
                 aria-controls={INSPECT_RESOURCE_RAIL_ID}
                 onClick={() => setIsMobileRailOpen(true)}
@@ -386,146 +440,103 @@ export function InspectSurface({ content }: InspectSurfaceProps) {
               </button>
             </div>
 
-            <div className="px-5 py-5 sm:px-6">
-              <div className="max-w-3xl">
-                <p className="theme-text-muted text-[11px] font-semibold uppercase tracking-[0.2em]">
-                  {selectedResource.type}
-                </p>
-                <h2 className="theme-text-primary mt-3 text-[2rem] font-semibold tracking-[-0.04em]">
-                  {selectedResource.title}
-                </h2>
-                <p className="theme-text-secondary mt-3 text-base leading-7">
-                  {selectedResource.summary}
-                </p>
+            <div className="md:min-h-0 md:overflow-y-auto">
+              <div className="px-5 py-5 sm:px-6">
+                <div className="max-w-3xl">
+                  <p className="theme-text-muted text-[11px] font-semibold uppercase tracking-[0.2em]">
+                    {getItemEyebrow(selectedItem)}
+                  </p>
+                  <h2 className="theme-text-primary mt-3 text-[2rem] font-semibold tracking-[-0.04em]">
+                    {selectedItem.title}
+                  </h2>
+                  <p className="theme-text-secondary mt-3 text-base leading-7">
+                    {selectedItem.summary}
+                  </p>
+                </div>
+
+                <dl className="mt-5 grid gap-3 sm:grid-cols-3">
+                  {metadata.map((entry) => (
+                    <div key={entry.label} className="theme-control-surface min-w-0 px-3 py-3">
+                      <dt className="theme-text-muted text-[11px] font-semibold uppercase tracking-[0.18em]">
+                        {entry.label}
+                      </dt>
+                      <dd className="theme-text-primary mt-2 break-all text-sm font-semibold">
+                        {entry.value}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
               </div>
 
-              <dl className="mt-5 grid gap-3 sm:grid-cols-3">
-                <div className="theme-control-surface min-w-0 px-3 py-3">
-                  <dt className="theme-text-muted text-[11px] font-semibold uppercase tracking-[0.18em]">
-                    Resource id
-                  </dt>
-                  <dd className="theme-text-primary mt-2 text-sm font-semibold">
-                    {selectedResource.id}
-                  </dd>
+              <div className="theme-divider border-t px-5 py-5 sm:px-6">
+                <div className="inspect-viewer-toolbar flex flex-wrap items-center gap-2">
+                  {selectedItem.available_view_modes.map((mode) => (
+                    <button
+                      key={mode}
+                      type="button"
+                      aria-pressed={viewerMode === mode}
+                      onClick={() => setViewerMode(mode)}
+                      className={
+                        viewerMode === mode
+                          ? "theme-button-solid landing-flat-control px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em]"
+                          : "theme-button-outline landing-flat-control px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em]"
+                      }
+                    >
+                      {VIEWER_MODE_LABELS[mode]}
+                    </button>
+                  ))}
                 </div>
-                <div className="theme-control-surface min-w-0 px-3 py-3">
-                  <dt className="theme-text-muted text-[11px] font-semibold uppercase tracking-[0.18em]">
-                    Version
-                  </dt>
-                  <dd className="theme-text-primary mt-2 text-sm font-semibold">
-                    {selectedResource.version}
-                  </dd>
-                </div>
-                <div className="theme-control-surface min-w-0 px-3 py-3">
-                  <dt className="theme-text-muted text-[11px] font-semibold uppercase tracking-[0.18em]">
-                    Last reviewed
-                  </dt>
-                  <dd className="theme-text-primary mt-2 text-sm font-semibold">
-                    {selectedResource.last_reviewed}
-                  </dd>
-                </div>
-              </dl>
-            </div>
 
-            <div className="theme-divider border-t px-5 py-5 sm:px-6">
-              <div className="inspect-viewer-toolbar flex flex-wrap items-center gap-2">
-                <button
-                  type="button"
-                  aria-pressed={viewerMode === "json"}
-                  onClick={() => setViewerMode("json")}
-                  className={
-                    viewerMode === "json"
-                      ? "theme-button-solid landing-flat-control px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em]"
-                      : "theme-button-outline landing-flat-control px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em]"
-                  }
-                >
-                  JSON
-                </button>
-                <button
-                  type="button"
-                  aria-pressed={viewerMode === "schema"}
-                  onClick={() => setViewerMode("schema")}
-                  className={
-                    viewerMode === "schema"
-                      ? "theme-button-solid landing-flat-control px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em]"
-                      : "theme-button-outline landing-flat-control px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em]"
-                  }
-                >
-                  Schema
-                </button>
-              </div>
-
-              <div className="mt-4">
-                {activeDocument?.status === "error" ? (
-                  <div className="theme-control-surface px-4 py-4">
-                    <p className="theme-text-primary text-sm font-semibold">
-                      Unable to load this document.
-                    </p>
-                    <p className="theme-text-secondary mt-2 text-sm leading-6">
-                      {activeDocument.error}
-                    </p>
-                  </div>
-                ) : activeDocument?.status === "ready" ? (
-                  <pre className="theme-code-block overflow-x-auto px-4 py-4 text-xs leading-6 sm:text-sm">
-                    <code
-                      dangerouslySetInnerHTML={{
-                        __html: highlightInspectJson(activeDocument.text),
-                      }}
-                    />
-                  </pre>
-                ) : (
-                  <div className="theme-control-surface px-4 py-4">
-                    <p className="theme-text-primary text-sm font-semibold">
-                      Loading {viewerMode === "json" ? "JSON" : "schema"}...
-                    </p>
-                    <p className="theme-text-secondary mt-2 text-sm leading-6">
-                      Pulling the selected resource into the inline viewer.
-                    </p>
-                  </div>
-                )}
+                <div className="mt-4">
+                  {viewerMode === "prompt" ? (
+                    <pre className="theme-code-block overflow-x-auto whitespace-pre-wrap break-words px-4 py-4 text-xs leading-6 sm:text-sm">
+                      <code>{selectedItem.prompt_text}</code>
+                    </pre>
+                  ) : !activeDocumentUrl ? (
+                    <div className="theme-control-surface px-4 py-4">
+                      <p className="theme-text-primary text-sm font-semibold">
+                        This view is not available for the selected resource.
+                      </p>
+                      <p className="theme-text-secondary mt-2 text-sm leading-6">
+                        Switch back to Prompt or choose another example, workflow, or
+                        guardrail.
+                      </p>
+                    </div>
+                  ) : activeDocument?.status === "error" ? (
+                    <div className="theme-control-surface px-4 py-4">
+                      <p className="theme-text-primary text-sm font-semibold">
+                        Unable to load this document.
+                      </p>
+                      <p className="theme-text-secondary mt-2 text-sm leading-6">
+                        {activeDocument.error}
+                      </p>
+                    </div>
+                  ) : activeDocument?.status === "ready" ? (
+                    <pre className="theme-code-block overflow-x-auto px-4 py-4 text-xs leading-6 sm:text-sm">
+                      <code
+                        dangerouslySetInnerHTML={{
+                          __html: highlightInspectJson(
+                            formatInspectDocumentText(activeDocument.text, "json"),
+                          ),
+                        }}
+                      />
+                    </pre>
+                  ) : (
+                    <div className="theme-control-surface px-4 py-4">
+                      <p className="theme-text-primary text-sm font-semibold">
+                        Loading {VIEWER_MODE_LABELS[viewerMode]}...
+                      </p>
+                      <p className="theme-text-secondary mt-2 text-sm leading-6">
+                        Pulling the selected resource into the inline viewer.
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </section>
         </div>
       </section>
-
-      {content.reference_links.length > 0 ? (
-        <section className="surface-panel-muted mt-4 px-4 py-4 sm:px-5">
-          <p className="theme-text-primary text-sm font-semibold">Published endpoints and files</p>
-          <p className="theme-text-secondary mt-1 text-sm leading-6">{content.inspect.description}</p>
-
-          <div className="mt-5 space-y-4">
-            {Object.entries(groupedReferences).map(([group, links]) => (
-              <div key={group}>
-                <p className="theme-text-muted text-[11px] font-semibold uppercase tracking-[0.22em]">
-                  {group}
-                </p>
-                <div className="theme-divider mt-2 divide-y">
-                  {links.map((link) => (
-                    <div
-                      key={`${group}-${link.url}`}
-                      className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between"
-                    >
-                      <div>
-                        <p className="theme-text-primary text-sm font-medium">{link.label}</p>
-                        <p className="theme-text-muted mt-1 text-[11px] font-semibold uppercase tracking-[0.18em]">
-                          {link.kind}
-                        </p>
-                      </div>
-                      <a
-                        href={link.url}
-                        className="theme-link-subtle text-sm font-medium underline underline-offset-4"
-                      >
-                        Open
-                      </a>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      ) : null}
     </div>
   );
 }

@@ -36,6 +36,11 @@ import {
   sha256,
   unique,
 } from "@/lib/utils";
+import {
+  createCommandReferenceUrl,
+  createPromptReferences,
+  createToolReferences,
+} from "@/lib/mcp-reference";
 
 type LoadedResource = Awaited<ReturnType<typeof loadResources>>[number];
 type LoadedSchema = Awaited<ReturnType<typeof loadSchemas>>[number];
@@ -175,7 +180,7 @@ function createLlmsText(pages: DocPage[], resourceIndex: ResourceIndex) {
 
 JudgmentKit makes AI decisions visible, measurable, and usable at runtime.
 
-JudgmentKit is an MCP-first product. Humans use the run surface and inspect surface to connect and verify the system. Agents use the published Markdown mirrors, JSON resources, schemas, examples, and MCP endpoint.
+JudgmentKit is an MCP-first product. Humans use the run surface and inspect surface to connect and verify the system. Agents install the local JudgmentKit server over stdio, then use the published Markdown mirrors, JSON resources, schemas, examples, and hosted reference surfaces.
 
 ## Overview
 - ${ROOT_URL}/
@@ -200,6 +205,8 @@ ${schemaUrls.map((url) => `- ${url}`).join("\n")}
 ${examplePages.map((url) => `- ${url}`).join("\n")}
 
 ## MCP
+Install uses a local stdio checkout. The hosted endpoint below is for reference, debug, and parity with the published inventory.
+
 - ${ROOT_URL}/mcp
 - ${ROOT_URL}/mcp-inventory.json
 
@@ -209,24 +216,20 @@ ${examplePages.map((url) => `- ${url}`).join("\n")}
 }
 
 function createMcpInventory(resourceIndex: ResourceIndex) {
+  const toolReference = createToolReferences(ROOT_URL);
+  const promptReference = createPromptReferences(ROOT_URL);
+
   return {
     version: "1.0.0",
     endpoint: `${ROOT_URL}/mcp`,
-    tools: [
-      "list_resources",
-      "get_resource",
-      "get_workflow_bundle",
-      "get_page_markdown",
-      "get_example",
-      "resolve_related",
-    ],
-    prompts: [
-      "explain_guardrail",
-      "apply_guardrail_to_draft",
-      "summarize_example_incident",
-      "start_design_workflow",
-      "refine_design_first_pass",
-    ],
+    install_transport: "stdio",
+    warning:
+      "Install JudgmentKit from a local checkout over stdio. The hosted /mcp endpoint is for reference/debug only.",
+    command_reference_url: createCommandReferenceUrl(ROOT_URL),
+    tools: toolReference.map((entry) => entry.name),
+    prompts: promptReference.map((entry) => entry.name),
+    tool_reference: toolReference,
+    prompt_reference: promptReference,
     resources: resourceIndex.resources.map((resource) => ({
       id: resource.id,
       type: resource.type,

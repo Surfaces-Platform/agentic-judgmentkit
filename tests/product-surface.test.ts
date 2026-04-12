@@ -8,9 +8,15 @@ import {
   resolveInspectResourceIdFromHash,
 } from "@/components/inspect-surface";
 import {
+  ReferenceSurface,
+  formatReferenceSourceText,
+} from "@/components/reference-surface";
+import {
   CANONICAL_INSTALL_URL,
-  LOCAL_JUDGMENTKIT_REPO_PLACEHOLDER,
-  LOCAL_JUDGMENTKIT_STDIO_COMMAND,
+  JUDGMENTKIT_REPOSITORY_CLONE_URL,
+  LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER,
+  LOCAL_JUDGMENTKIT_INSTALL_COMMAND,
+  LOCAL_JUDGMENTKIT_STDIO_ARGS,
 } from "@/lib/constants";
 import { listPrompts, listTools } from "@/lib/mcp";
 import { loadInstallContract, loadProductSurface } from "@/lib/product-surface";
@@ -28,29 +34,32 @@ describe("product surface content", () => {
     expect(content.install_targets[0]).toMatchObject({
       transport: "stdio",
       connection_label: "Command",
-      connection_value: LOCAL_JUDGMENTKIT_STDIO_COMMAND,
+      connection_value:
+        "npm --prefix <ABSOLUTE_PATH_TO_LOCAL_JUDGMENTKIT_CHECKOUT> run mcp:stdio",
       config_path: "~/.codex/config.toml",
       install_note: "Save the file and restart Codex.",
     });
     expect(content.install_targets[1]).toMatchObject({
       transport: "stdio",
       connection_label: "Command",
-      connection_value: LOCAL_JUDGMENTKIT_STDIO_COMMAND,
+      connection_value:
+        "npm --prefix <ABSOLUTE_PATH_TO_LOCAL_JUDGMENTKIT_CHECKOUT> run mcp:stdio",
       config_path: ".mcp.json",
       install_note: "Save the file and restart Claude.",
     });
     expect(content.install_targets[2]).toMatchObject({
       transport: "stdio",
       connection_label: "Command",
-      connection_value: LOCAL_JUDGMENTKIT_STDIO_COMMAND,
+      connection_value:
+        "npm --prefix <ABSOLUTE_PATH_TO_LOCAL_JUDGMENTKIT_CHECKOUT> run mcp:stdio",
       config_path: "~/.cursor/mcp.json",
       install_note: "Save the file and reload Cursor.",
     });
     expect(content.install_targets[0].config_snippet).toContain(
-      `args = ["--prefix", "${LOCAL_JUDGMENTKIT_REPO_PLACEHOLDER}", "run", "mcp:stdio"]`,
+      `args = ["--prefix", "${LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER}", "run", "mcp:stdio"]`,
     );
     expect(content.install_targets[1].config_snippet).toContain(
-      `"args": ["--prefix", "${LOCAL_JUDGMENTKIT_REPO_PLACEHOLDER}", "run", "mcp:stdio"]`,
+      `"args": ["--prefix", "${LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER}", "run", "mcp:stdio"]`,
     );
     expect(content.install_contract.supported_clients).toEqual([
       "codex",
@@ -77,18 +86,28 @@ describe("product surface content", () => {
   it("derives client-agnostic install and verify prompts", () => {
     const content = loadProductSurface();
 
-    expect(content.install_prompt).toContain(CANONICAL_INSTALL_URL);
-    expect(content.install_prompt).toContain('named "judgmentkit"');
-    expect(content.install_prompt).toContain("Save the config");
-    expect(content.verify_prompt).toContain("tools/list");
-    expect(content.verify_prompt).toContain("match the inventory");
+    expect(content.install_prompt).toBe(
+      `Install JudgmentKit in this client from ${CANONICAL_INSTALL_URL}.`,
+    );
+    expect(content.verify_prompt).toBe(
+      'Call MCP tools/list against the local "judgmentkit" server.',
+    );
   });
 
   it("builds a canonical /install contract for agents", () => {
     const contract = loadInstallContract();
 
     expect(contract.canonical_install_url).toBe(CANONICAL_INSTALL_URL);
-    expect(contract.stdio_command).toBe(LOCAL_JUDGMENTKIT_STDIO_COMMAND);
+    expect(contract.command_reference_url).toBe("https://judgmentkit.ai/inspect#commands");
+    expect(contract.repository).toEqual({
+      clone_url: JUDGMENTKIT_REPOSITORY_CLONE_URL,
+      local_path_placeholder: LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER,
+      install_command: LOCAL_JUDGMENTKIT_INSTALL_COMMAND,
+    });
+    expect(contract.connection).toEqual({
+      command: "npm",
+      args: LOCAL_JUDGMENTKIT_STDIO_ARGS,
+    });
     expect(contract.supported_clients).toEqual(["codex", "claude", "cursor"]);
     expect(contract.clients).toEqual([
       expect.objectContaining({
@@ -116,17 +135,33 @@ describe("product surface content", () => {
     expect(contract.verification.expected_prompts).toEqual(
       listPrompts().map((prompt) => prompt.name),
     );
+    expect(contract.verification.tool_reference).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: "get_workflow_bundle",
+          docs_url: "https://judgmentkit.ai/inspect#tool-get_workflow_bundle",
+        }),
+      ]),
+    );
+    expect(contract.verification.prompt_reference).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: "start_design_workflow",
+          docs_url: "https://judgmentkit.ai/inspect#prompt-start_design_workflow",
+        }),
+      ]),
+    );
   });
 
   it("keeps the raw artifact references available for the inspect route", () => {
     const content = loadProductSurface();
-    const urls = content.reference_links.map((link) => link.url);
+    const urls = content.inspect_reference_items.map((item) => item.url);
 
     expect(content.inspect).toEqual({
-      href: "/inspect",
-      label: "Inspect raw references",
+      href: "/reference",
+      label: "Open JudgmentKit reference",
       description:
-        "Use the published endpoint, indexes, mirrors, and schema files when you need to verify what is deployed or read the machine-facing artifacts outside the inline browser.",
+        "Use the install contract, command anchors, published artifacts, and hosted debug surfaces when you need to verify what is deployed or inspect the machine-facing materials outside the inline browser.",
     });
     expect(urls).toContain("/install");
     expect(urls).toContain("/mcp");
@@ -136,6 +171,43 @@ describe("product surface content", () => {
     expect(urls).toContain("/resources/workflows/ai-ui-generation.v1.json");
     expect(urls).toContain("/docs/workflows/ai-ui-generation.md");
     expect(urls).toContain("/schemas/workflow.schema.json");
+  });
+
+  it("builds human-facing inspect items and secondary reference files", () => {
+    const content = loadProductSurface();
+    const workflowItem = content.inspect_primary_items.find(
+      (item) => item.id === "workflow.ai-ui-generation",
+    );
+    const guardrailItem = content.inspect_primary_items.find(
+      (item) => item.id === "guardrail.design-system-integrity",
+    );
+    const exampleItem = content.inspect_primary_items.find(
+      (item) => item.id === "example.ui-generation.embellishment-drift",
+    );
+    const referenceItem = content.inspect_reference_items.find(
+      (item) => item.url === "/install",
+    );
+
+    expect(content.inspect_primary_items[0]?.id).toBe(
+      "example.ui-generation.embellishment-drift",
+    );
+    expect(workflowItem).toMatchObject({
+      category: "Workflows",
+      available_view_modes: ["prompt", "json", "schema"],
+      default_view_mode: "prompt",
+    });
+    expect(workflowItem?.prompt_text).toContain('Use JudgmentKit workflow "AI UI generation"');
+    expect(workflowItem?.prompt_text).toContain("Task:");
+    expect(guardrailItem?.prompt_text).toContain("Apply JudgmentKit guardrail");
+    expect(guardrailItem?.prompt_text).toContain("Draft:");
+    expect(exampleItem?.prompt_text).toContain("Use JudgmentKit example");
+    expect(exampleItem?.prompt_text).toContain("Task:");
+    expect(referenceItem).toMatchObject({
+      group: "Install and discovery",
+      type: "install",
+      raw_format: "html",
+    });
+    expect(referenceItem?.summary).toContain("authoritative install surface");
   });
 
   it("sources the proof from the published example artifact", () => {
@@ -148,7 +220,7 @@ describe("product surface content", () => {
     expect(content.proof.guided_text).toBe(rawExampleArtifact.corrected_output);
   });
 
-  it("renders anchored resource references on the inspect surface", () => {
+  it("renders the get started inspect surface without the lower reference section", () => {
     const content = loadProductSurface();
     const markup = renderToStaticMarkup(
       createElement(InspectSurface, { content }),
@@ -156,57 +228,74 @@ describe("product surface content", () => {
 
     expect(markup).toContain("inspect-browser-shell");
     expect(markup).toContain(">Examples<");
-    expect(markup).toContain(">Guardrails<");
     expect(markup).toContain(">Workflows<");
-    expect(markup).toContain("Published endpoints and files");
-    expect(markup).toContain("Live MCP");
-    expect(markup).toContain("Core artifacts");
-    expect(markup).toContain("Docs mirrors");
-    expect(markup).toContain("Workflow resource");
-    expect(markup).toContain("Example resource");
-    expect(markup).toContain("Workflow mirror");
-    expect(markup).toContain("Example mirror");
+    expect(markup).toContain(">Guardrails<");
+    expect(markup).toContain("Use JudgmentKit example");
     expect(markup).toContain("inspect-viewer-toolbar");
-    expect(markup).toContain('aria-label="Open published resources"');
+    expect(markup).toContain(">Prompt<");
+    expect(markup).toContain(">JSON<");
+    expect(markup).toContain(">Schema<");
+    expect(markup).toContain('aria-label="Open inspect navigation"');
     expect(markup).toContain('aria-controls="inspect-resource-rail"');
     expect(markup).toContain('id="inspect-resource-rail"');
-    expect(markup).toContain("fixed inset-y-0 left-0 z-50");
+    expect(markup).toContain("fixed bottom-0 left-0 top-[4.75rem] z-50");
     expect(markup).toContain("w-[min(18rem,calc(100vw-2rem))]");
     expect(markup).toContain("-translate-x-full");
-    expect(markup).toContain("fixed inset-0 z-40");
-    expect(markup).toContain("md:grid-cols-[15rem,minmax(0,1fr)]");
-    expect(markup).toContain("lg:grid-cols-[18rem,minmax(0,1fr)]");
-    expect(markup).toContain("md:border-l");
-    expect(markup).toContain("md:px-3");
+    expect(markup).toContain("fixed inset-x-0 bottom-0 top-[4.75rem] z-40");
+    expect(markup).toContain("h-full w-full overflow-hidden");
+    expect(markup).toContain("surface-panel inspect-browser-shell h-full overflow-hidden");
+    expect(markup).toContain("md:rounded-none");
+    expect(markup).toContain("md:border-x-0");
+    expect(markup).toContain("md:border-t-0");
+    expect(markup).toContain("md:grid-cols-[17rem,minmax(0,1fr)]");
+    expect(markup).toContain("lg:grid-cols-[19rem,minmax(0,1fr)]");
     expect(markup).toContain('id="resource-workflow.ai-ui-generation"');
-    expect(markup).toContain('href="/install"');
-    expect(markup).toContain('href="/resources/workflows/ai-ui-generation.v1.json"');
-    expect(markup).toContain('href="/mcp"');
-    expect(markup).toContain('href="/resources/index.json"');
-    expect(markup).toContain('href="/schemas/workflow.schema.json"');
-    expect(markup).not.toContain("Inspect published JudgmentKit resources");
-    expect(markup).not.toContain("Resource browser");
-    expect(markup).not.toContain("Resource library");
-    expect(markup).not.toContain("Select a published resource to load its JSON and schema in place.");
-    expect(markup).not.toContain("Utility links");
-    expect(markup).not.toContain("JSON viewer");
-    expect(markup).not.toContain("Schema viewer");
-    expect(markup).not.toContain("Copy JSON");
-    expect(markup).not.toContain("Copy schema");
     expect(markup).not.toContain("Open raw JSON");
-    expect(markup).not.toContain("Open schema");
-    expect(markup).not.toContain("theme-chip");
-    expect(markup).not.toContain("Advanced surface");
-    expect(markup).not.toContain("Back to run surface");
-    expect(markup).not.toContain("Direct machine surfaces");
-    expect(markup).not.toContain("Workflow JSON");
-    expect(markup).not.toContain("Example JSON");
-    expect(markup).not.toContain("AI UI generation markdown");
-    expect(markup).not.toContain("UI generation drift markdown");
-    expect(markup).not.toContain("gap-6");
-    expect(markup).not.toContain('class="grid lg:grid-cols-[18rem,minmax(0,1fr)]"');
-    expect(markup).not.toContain('class="theme-divider min-w-0 border-t md:border-l md:border-t-0"');
-    expect(markup.indexOf("Last reviewed")).toBeLessThan(markup.indexOf(">JSON<"));
+    expect(markup).not.toContain("Contact");
+    expect(markup).not.toContain("Human-facing inspection");
+    expect(markup).not.toContain("Start with examples, then open the workflow and guardrails.");
+    expect(markup).not.toContain("What to prompt");
+    expect(markup).not.toContain("Reference");
+    expect(markup).not.toContain("Published artifacts and command anchors");
+    expect(markup).not.toContain("Implementation reference");
+    expect(markup).not.toContain("Install contract");
+    expect(markup).not.toContain("Command inventory");
+    expect(markup.indexOf(">Examples<")).toBeLessThan(markup.indexOf(">Workflows<"));
+    expect(markup.indexOf(">Examples<")).toBeLessThan(markup.indexOf(">Guardrails<"));
+    expect(markup.indexOf("Zero-shot UI generation rewritten to design-system-first restrained output")).toBeLessThan(
+      markup.indexOf("Landing page first pass rewritten for clearer onboarding"),
+    );
+    expect(markup.indexOf("Landing page first pass rewritten for clearer onboarding")).toBeLessThan(
+      markup.indexOf("Repetitive UI copy rewritten into distinct control language"),
+    );
+    expect(markup.indexOf("Repetitive UI copy rewritten into distinct control language")).toBeLessThan(
+      markup.indexOf("UI generation request rewritten to system-safe output"),
+    );
+    expect(markup.indexOf(">Prompt<")).toBeLessThan(markup.indexOf(">JSON<"));
+    expect(markup.indexOf(">JSON<")).toBeLessThan(markup.indexOf(">Schema<"));
+  });
+
+  it("renders the reference surface on its own page", () => {
+    const content = loadProductSurface();
+    const markup = renderToStaticMarkup(createElement(ReferenceSurface, { content }));
+
+    expect(markup).toContain("Reference");
+    expect(markup).toContain("Published artifacts and command anchors");
+    expect(markup).toContain('placeholder="Search reference"');
+    expect(markup).toContain("Implementation reference");
+    expect(markup).toContain("Install contract");
+    expect(markup).toContain("Command inventory");
+    expect(markup).toContain("get_workflow_bundle");
+    expect(markup).toContain("start_design_workflow");
+    expect(markup).toContain('id="commands"');
+    expect(markup).toContain('id="tool-get_workflow_bundle"');
+    expect(markup).toContain('id="prompt-start_design_workflow"');
+    expect(markup).toContain('aria-haspopup="dialog"');
+    expect(markup).toContain(">View source<");
+    expect(markup).toContain("/inspect#tool-get_workflow_bundle");
+    expect(markup).not.toContain("Reference preview");
+    expect(markup).not.toContain(">Open link<");
+    expect(markup).not.toContain("New tab");
   });
 
   it("resolves inspect resources from legacy hash anchors", () => {
@@ -215,20 +304,29 @@ describe("product surface content", () => {
     expect(
       resolveInspectResourceIdFromHash(
         "#resource-workflow.ai-ui-generation",
-        content.inspect_resources,
+        content.inspect_primary_items,
       ),
     ).toBe("workflow.ai-ui-generation");
     expect(
       resolveInspectResourceIdFromHash(
         "#resource-missing",
-        content.inspect_resources,
+        content.inspect_primary_items,
       ),
-    ).toBe(content.inspect_resources[0].id);
+    ).toBe(content.inspect_primary_items[0].id);
   });
 
   it("formats fetched JSON for the inline viewer", () => {
     expect(formatInspectJsonText('{"id":"workflow.ai-ui-generation","version":1}')).toBe(
       '{\n  "id": "workflow.ai-ui-generation",\n  "version": 1\n}\n',
+    );
+  });
+
+  it("pretty prints reference JSON by default and preserves raw mode", () => {
+    expect(formatReferenceSourceText('{"id":"workflow.ai-ui-generation","version":1}', "json", true)).toBe(
+      '{\n  "id": "workflow.ai-ui-generation",\n  "version": 1\n}\n',
+    );
+    expect(formatReferenceSourceText('{"id":"workflow.ai-ui-generation","version":1}', "json", false)).toBe(
+      '{"id":"workflow.ai-ui-generation","version":1}\n',
     );
   });
 });

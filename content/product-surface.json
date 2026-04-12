@@ -4,7 +4,7 @@
   "utility_sentence": "Connect the MCP. Paste the first message. Run the first pass.",
   "run_sequence": ["Connect", "Paste", "Run"],
   "workbench_label": "Run the first pass",
-  "workbench_support": "Pick the client, add JudgmentKit from a local checkout over stdio, paste the starter prompt, and let the agent begin inside the published workflow.",
+  "workbench_support": "Tell the agent to clone JudgmentKit from GitHub, run npm install in that local checkout, configure the client to launch it over stdio, then paste the starter prompt.",
   "proof_heading": "Generated UI proof",
   "proof_support": "Same brief. One uncontrolled pass and one JudgmentKit-guided pass.",
   "proof_notes": [
@@ -20,10 +20,10 @@
       "label": "Codex",
       "transport": "stdio",
       "connection_label": "Command",
-      "connection_value": "npm --prefix <ABSOLUTE_PATH_TO_JUDGMENTKIT_REPO> run mcp:stdio",
+      "connection_value": "npm --prefix <ABSOLUTE_PATH_TO_LOCAL_JUDGMENTKIT_CHECKOUT> run mcp:stdio",
       "config_path": "~/.codex/config.toml",
       "install_note": "Save the file and restart Codex.",
-      "config_snippet": "[mcp_servers.judgmentkit]\ncommand = \"npm\"\nargs = [\"--prefix\", \"<ABSOLUTE_PATH_TO_JUDGMENTKIT_REPO>\", \"run\", \"mcp:stdio\"]",
+      "config_snippet": "[mcp_servers.judgmentkit]\ncommand = \"npm\"\nargs = [\"--prefix\", \"<ABSOLUTE_PATH_TO_LOCAL_JUDGMENTKIT_CHECKOUT>\", \"run\", \"mcp:stdio\"]",
       "starter_call": "get_workflow_bundle({ workflow_id: \"workflow.ai-ui-generation\" })"
     },
     {
@@ -31,10 +31,10 @@
       "label": "Claude",
       "transport": "stdio",
       "connection_label": "Command",
-      "connection_value": "npm --prefix <ABSOLUTE_PATH_TO_JUDGMENTKIT_REPO> run mcp:stdio",
+      "connection_value": "npm --prefix <ABSOLUTE_PATH_TO_LOCAL_JUDGMENTKIT_CHECKOUT> run mcp:stdio",
       "config_path": ".mcp.json",
       "install_note": "Save the file and restart Claude.",
-      "config_snippet": "{\n  \"mcpServers\": {\n    \"judgmentkit\": {\n      \"command\": \"npm\",\n      \"args\": [\"--prefix\", \"<ABSOLUTE_PATH_TO_JUDGMENTKIT_REPO>\", \"run\", \"mcp:stdio\"]\n    }\n  }\n}",
+      "config_snippet": "{\n  \"mcpServers\": {\n    \"judgmentkit\": {\n      \"command\": \"npm\",\n      \"args\": [\"--prefix\", \"<ABSOLUTE_PATH_TO_LOCAL_JUDGMENTKIT_CHECKOUT>\", \"run\", \"mcp:stdio\"]\n    }\n  }\n}",
       "starter_call": "get_workflow_bundle({ workflow_id: \"workflow.ai-ui-generation\" })"
     },
     {
@@ -42,45 +42,39 @@
       "label": "Cursor",
       "transport": "stdio",
       "connection_label": "Command",
-      "connection_value": "npm --prefix <ABSOLUTE_PATH_TO_JUDGMENTKIT_REPO> run mcp:stdio",
+      "connection_value": "npm --prefix <ABSOLUTE_PATH_TO_LOCAL_JUDGMENTKIT_CHECKOUT> run mcp:stdio",
       "config_path": "~/.cursor/mcp.json",
       "install_note": "Save the file and reload Cursor.",
-      "config_snippet": "{\n  \"mcpServers\": {\n    \"judgmentkit\": {\n      \"command\": \"npm\",\n      \"args\": [\"--prefix\", \"<ABSOLUTE_PATH_TO_JUDGMENTKIT_REPO>\", \"run\", \"mcp:stdio\"]\n    }\n  }\n}",
+      "config_snippet": "{\n  \"mcpServers\": {\n    \"judgmentkit\": {\n      \"command\": \"npm\",\n      \"args\": [\"--prefix\", \"<ABSOLUTE_PATH_TO_LOCAL_JUDGMENTKIT_CHECKOUT>\", \"run\", \"mcp:stdio\"]\n    }\n  }\n}",
       "starter_call": "get_workflow_bundle({ workflow_id: \"workflow.ai-ui-generation\" })"
     }
   ],
   "inspect": {
-    "href": "/inspect",
-    "label": "Inspect raw references",
-    "description": "Use the published endpoint, indexes, mirrors, and schema files when you need to verify what is deployed or read the machine-facing artifacts outside the inline browser."
+    "href": "/reference",
+    "label": "Open JudgmentKit reference",
+    "description": "Use the install contract, command anchors, published artifacts, and hosted debug surfaces when you need to verify what is deployed or inspect the machine-facing materials outside the inline browser."
   },
   "reference_links": [
     {
-      "group": "Live MCP",
+      "group": "Install and discovery",
       "label": "Install contract",
       "url": "/install",
       "kind": "install"
     },
     {
-      "group": "Live MCP",
-      "label": "Raw MCP endpoint",
-      "url": "/mcp",
-      "kind": "endpoint"
-    },
-    {
-      "group": "Live MCP",
-      "label": "MCP inventory",
+      "group": "Install and discovery",
+      "label": "Command inventory",
       "url": "/mcp-inventory.json",
       "kind": "index"
     },
     {
-      "group": "Live MCP",
+      "group": "Install and discovery",
       "label": "llms.txt",
       "url": "/llms.txt",
       "kind": "discovery"
     },
     {
-      "group": "Live MCP",
+      "group": "Install and discovery",
       "label": "Resource index",
       "url": "/resources/index.json",
       "kind": "index"
@@ -144,6 +138,12 @@
       "label": "Example schema",
       "url": "/schemas/example.schema.json",
       "kind": "schema"
+    },
+    {
+      "group": "Hosted debug",
+      "label": "Hosted MCP endpoint (debug only)",
+      "url": "/mcp",
+      "kind": "endpoint"
     }
   ]
 }

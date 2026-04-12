@@ -2,11 +2,20 @@ import path from "node:path";
 
 export const CANONICAL_SITE_URL = "https://judgmentkit.ai";
 export const CANONICAL_INSTALL_URL = `${CANONICAL_SITE_URL}/install`;
-export const CANONICAL_MCP_URL = `${CANONICAL_SITE_URL}/mcp`;
+export const HOSTED_MCP_REFERENCE_URL = `${CANONICAL_SITE_URL}/mcp`;
 export const DEFAULT_LOCAL_SITE_URL = "http://localhost:3000";
-export const LOCAL_JUDGMENTKIT_REPO_PLACEHOLDER =
-  "<ABSOLUTE_PATH_TO_JUDGMENTKIT_REPO>";
-export const LOCAL_JUDGMENTKIT_STDIO_COMMAND = `npm --prefix ${LOCAL_JUDGMENTKIT_REPO_PLACEHOLDER} run mcp:stdio`;
+export const JUDGMENTKIT_REPOSITORY_CLONE_URL =
+  "https://github.com/Surfaces-Platform/agentic-judgmentkit.git";
+export const LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER =
+  "<ABSOLUTE_PATH_TO_LOCAL_JUDGMENTKIT_CHECKOUT>";
+export const LOCAL_JUDGMENTKIT_INSTALL_COMMAND = `npm --prefix ${LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER} install`;
+export const LOCAL_JUDGMENTKIT_STDIO_ARGS = [
+  "--prefix",
+  LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER,
+  "run",
+  "mcp:stdio",
+];
+export const LOCAL_JUDGMENTKIT_STDIO_COMMAND = `npm --prefix ${LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER} run mcp:stdio`;
 
 function normalizeSiteUrl(value: string) {
   const trimmed = value.trim();
