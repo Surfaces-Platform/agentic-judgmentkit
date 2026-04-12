@@ -10,7 +10,9 @@ describe("landing page", () => {
     const content = loadLandingPage();
 
     expect(content.eyebrow).toBe("Judgment for AI agents");
-    expect(content.headline).toBe("Install JudgmentKit before your agent starts the first draft.");
+    expect(content.headline).toBe(
+      "JudgmentKit gives your agent workflow guidance, guardrails, and verification.",
+    );
     expect(content.install_prompt).toContain("https://judgmentkit.ai/install");
     expect(content.verify_prompt).toContain("tools/list");
   });
@@ -19,23 +21,25 @@ describe("landing page", () => {
     const content = loadLandingPage();
     const markup = renderToStaticMarkup(createElement(LandingPage, { content }));
 
-    expect(markup).toContain("Install JudgmentKit before your agent starts the first draft.");
-    expect(markup).toContain("Install JudgmentKit");
-    expect(markup).toContain("Verify JudgmentKit");
-    expect(markup).toContain("Copy install prompt");
-    expect(markup).toContain("Copy verify prompt");
+    expect(markup).toContain(
+      "JudgmentKit gives your agent workflow guidance, guardrails, and verification.",
+    );
+    expect(markup).toContain("Tell your agent to install");
+    expect(markup).toContain("Ask agent what JudgmentKit can do");
+    expect(markup).toContain('aria-label="Copy install prompt"');
+    expect(markup).toContain('aria-label="Copy verify prompt"');
     expect(markup).toContain("https://judgmentkit.ai/install");
     expect(markup).toContain("tools/list");
-    expect(markup).toContain('href="/inspect"');
-    expect(markup).toContain("Inspect raw references");
+    expect(markup).not.toContain("through MCP");
     expect(markup).not.toContain("Codex");
     expect(markup).not.toContain("Claude");
     expect(markup).not.toContain("Cursor");
     expect(markup).not.toContain("~/.codex/config.toml");
     expect(markup).not.toContain(".mcp.json");
     expect(markup).not.toContain("~/.cursor/mcp.json");
-    expect(markup).not.toContain("&lt;ABSOLUTE_PATH_TO_JUDGMENTKIT_REPO&gt;");
+    expect(markup).not.toContain("&lt;ABSOLUTE_PATH_TO_LOCAL_JUDGMENTKIT_CHECKOUT&gt;");
     expect(markup).not.toContain("Two prompts. That is the whole setup.");
+    expect(markup).not.toContain("Open JudgmentKit reference");
   });
 
   it("keeps the old workflow, proof, dogfood, and install-card sections off the homepage", () => {
@@ -57,6 +61,8 @@ describe("landing page", () => {
     expect(markup).not.toContain("What happens next");
     expect(markup).not.toContain("Add JudgmentKit locally");
     expect(markup).not.toContain("Start the workflow");
-    expect(markup).not.toContain("Use the published endpoint, indexes, mirrors, and schema files");
+    expect(markup).not.toContain("Use the install contract, command anchors, published artifacts, and hosted debug surfaces");
+    expect(markup).not.toContain("Do not configure the client");
+    expect(markup).not.toContain('href="/inspect"');
   });
 });

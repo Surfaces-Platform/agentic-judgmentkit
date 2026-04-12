@@ -6,16 +6,17 @@ import { usePathname } from "next/navigation";
 export function SiteHeader() {
   const pathname = usePathname();
   const isHome = pathname === "/";
-  const isInspect =
-    pathname === "/inspect" ||
+  const isGetStarted = pathname === "/inspect";
+  const isReference =
+    pathname === "/reference" ||
     pathname.startsWith("/docs/") ||
     pathname.startsWith("/resources/") ||
     pathname.startsWith("/schemas/") ||
     pathname.startsWith("/mcp");
 
   return (
-    <header className="theme-divider sticky top-0 z-40 border-b bg-[var(--theme-canvas)]">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+    <header className="theme-divider sticky top-0 z-[60] border-b bg-[var(--theme-canvas)]">
+      <div className="flex min-h-[4.75rem] w-full items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
         <div className="flex items-center gap-4">
           <Link href="/" className="group inline-flex items-center gap-2.5">
             <span className="theme-mark flex h-10 w-10 items-center justify-center text-sm font-semibold tracking-[0.24em]">
@@ -40,10 +41,17 @@ export function SiteHeader() {
           </Link>
           <Link
             href="/inspect"
-            aria-current={isInspect ? "page" : undefined}
-            className={isInspect ? "theme-nav-pill theme-nav-pill-active" : "theme-nav-pill"}
+            aria-current={isGetStarted ? "page" : undefined}
+            className={isGetStarted ? "theme-nav-pill theme-nav-pill-active" : "theme-nav-pill"}
           >
-            Inspect
+            Get Started
+          </Link>
+          <Link
+            href="/reference"
+            aria-current={isReference ? "page" : undefined}
+            className={isReference ? "theme-nav-pill theme-nav-pill-active" : "theme-nav-pill"}
+          >
+            Reference
           </Link>
         </nav>
       </div>
