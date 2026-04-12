@@ -1,7 +1,12 @@
 import path from "node:path";
 
 export const CANONICAL_SITE_URL = "https://judgmentkit.ai";
+export const CANONICAL_INSTALL_URL = `${CANONICAL_SITE_URL}/install`;
+export const CANONICAL_MCP_URL = `${CANONICAL_SITE_URL}/mcp`;
 export const DEFAULT_LOCAL_SITE_URL = "http://localhost:3000";
+export const LOCAL_JUDGMENTKIT_REPO_PLACEHOLDER =
+  "<ABSOLUTE_PATH_TO_JUDGMENTKIT_REPO>";
+export const LOCAL_JUDGMENTKIT_STDIO_COMMAND = `npm --prefix ${LOCAL_JUDGMENTKIT_REPO_PLACEHOLDER} run mcp:stdio`;
 
 function normalizeSiteUrl(value: string) {
   const trimmed = value.trim();

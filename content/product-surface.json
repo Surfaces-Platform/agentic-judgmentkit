@@ -4,7 +4,7 @@
   "utility_sentence": "Connect the MCP. Paste the first message. Run the first pass.",
   "run_sequence": ["Connect", "Paste", "Run"],
   "workbench_label": "Run the first pass",
-  "workbench_support": "Pick the client, wire in JudgmentKit using the right transport, paste the canonical message, and let the agent start inside the published workflow.",
+  "workbench_support": "Pick the client, add JudgmentKit from a local checkout over stdio, paste the starter prompt, and let the agent begin inside the published workflow.",
   "proof_heading": "Generated UI proof",
   "proof_support": "Same brief. One uncontrolled pass and one JudgmentKit-guided pass.",
   "proof_notes": [
@@ -18,43 +18,49 @@
     {
       "id": "codex",
       "label": "Codex",
-      "transport": "http",
-      "connection_label": "URL",
-      "connection_value": "__HTTP_MCP_ENDPOINT__",
+      "transport": "stdio",
+      "connection_label": "Command",
+      "connection_value": "npm --prefix <ABSOLUTE_PATH_TO_JUDGMENTKIT_REPO> run mcp:stdio",
       "config_path": "~/.codex/config.toml",
-      "install_note": "Connect directly to the hosted JudgmentKit MCP and restart Codex.",
-      "config_snippet": "[mcp_servers.judgmentkit]\nurl = \"__HTTP_MCP_ENDPOINT__\"",
+      "install_note": "Save the file and restart Codex.",
+      "config_snippet": "[mcp_servers.judgmentkit]\ncommand = \"npm\"\nargs = [\"--prefix\", \"<ABSOLUTE_PATH_TO_JUDGMENTKIT_REPO>\", \"run\", \"mcp:stdio\"]",
       "starter_call": "get_workflow_bundle({ workflow_id: \"workflow.ai-ui-generation\" })"
     },
     {
       "id": "claude",
       "label": "Claude",
-      "transport": "http",
-      "connection_label": "URL",
-      "connection_value": "__HTTP_MCP_ENDPOINT__",
+      "transport": "stdio",
+      "connection_label": "Command",
+      "connection_value": "npm --prefix <ABSOLUTE_PATH_TO_JUDGMENTKIT_REPO> run mcp:stdio",
       "config_path": ".mcp.json",
-      "install_note": "Connect directly to the hosted JudgmentKit MCP and restart Claude after adding the server.",
-      "config_snippet": "{\n  \"mcpServers\": {\n    \"judgmentkit\": {\n      \"url\": \"__HTTP_MCP_ENDPOINT__\"\n    }\n  }\n}",
+      "install_note": "Save the file and restart Claude.",
+      "config_snippet": "{\n  \"mcpServers\": {\n    \"judgmentkit\": {\n      \"command\": \"npm\",\n      \"args\": [\"--prefix\", \"<ABSOLUTE_PATH_TO_JUDGMENTKIT_REPO>\", \"run\", \"mcp:stdio\"]\n    }\n  }\n}",
       "starter_call": "get_workflow_bundle({ workflow_id: \"workflow.ai-ui-generation\" })"
     },
     {
       "id": "cursor",
       "label": "Cursor",
-      "transport": "http",
-      "connection_label": "URL",
-      "connection_value": "__HTTP_MCP_ENDPOINT__",
+      "transport": "stdio",
+      "connection_label": "Command",
+      "connection_value": "npm --prefix <ABSOLUTE_PATH_TO_JUDGMENTKIT_REPO> run mcp:stdio",
       "config_path": "~/.cursor/mcp.json",
-      "install_note": "Connect directly to the hosted JudgmentKit MCP and reload Cursor if needed.",
-      "config_snippet": "{\n  \"mcpServers\": {\n    \"judgmentkit\": {\n      \"url\": \"__HTTP_MCP_ENDPOINT__\"\n    }\n  }\n}",
+      "install_note": "Save the file and reload Cursor.",
+      "config_snippet": "{\n  \"mcpServers\": {\n    \"judgmentkit\": {\n      \"command\": \"npm\",\n      \"args\": [\"--prefix\", \"<ABSOLUTE_PATH_TO_JUDGMENTKIT_REPO>\", \"run\", \"mcp:stdio\"]\n    }\n  }\n}",
       "starter_call": "get_workflow_bundle({ workflow_id: \"workflow.ai-ui-generation\" })"
     }
   ],
   "inspect": {
     "href": "/inspect",
-    "label": "Browse raw references",
+    "label": "Inspect raw references",
     "description": "Use the published endpoint, indexes, mirrors, and schema files when you need to verify what is deployed or read the machine-facing artifacts outside the inline browser."
   },
   "reference_links": [
+    {
+      "group": "Live MCP",
+      "label": "Install contract",
+      "url": "/install",
+      "kind": "install"
+    },
     {
       "group": "Live MCP",
       "label": "Raw MCP endpoint",

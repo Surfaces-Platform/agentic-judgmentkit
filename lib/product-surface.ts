@@ -1,9 +1,18 @@
 import { z } from "zod";
 
 import rawProductSurface from "@/content/product-surface.json";
-import { ROOT_URL } from "@/lib/constants";
-import { getPrompt } from "@/lib/mcp";
-import type { ProductSurfaceContent } from "@/lib/types";
+import {
+  CANONICAL_INSTALL_URL,
+  CANONICAL_MCP_URL,
+  LOCAL_JUDGMENTKIT_STDIO_COMMAND,
+  ROOT_URL,
+} from "@/lib/constants";
+import { listPrompts, listTools } from "@/lib/mcp";
+import type {
+  InstallContract,
+  ProductSurfaceContent,
+  ProductSurfaceInstallTarget,
+} from "@/lib/types";
 import rawExampleArtifact from "@/public/resources/examples/ui-generation-drift.v1.json";
 import rawResourceIndex from "@/public/resources/index.json";
 import rawWorkflowArtifact from "@/public/resources/workflows/ai-ui-generation.v1.json";
@@ -80,24 +89,68 @@ const resourceIndexSchema = z.object({
   ),
 });
 
-function injectHttpEndpoint(value: string, endpoint: string) {
-  return value.replaceAll("__HTTP_MCP_ENDPOINT__", endpoint);
-}
-
 function toRelativeUrl(url: string) {
   return url.startsWith(ROOT_URL) ? url.replace(ROOT_URL, "") : url;
 }
 
-export function loadProductSurface(httpMcpEndpoint: string): ProductSurfaceContent {
+function createHomepageInstallPrompt() {
+  return [
+    "Install JudgmentKit in this client.",
+    `Read ${CANONICAL_INSTALL_URL} and use that JSON to configure a local MCP server named "judgmentkit" with the real local JudgmentKit repo path on this machine.`,
+    "Save the config, then reload or restart the client.",
+  ].join("\n");
+}
+
+function createHomepageVerifyPrompt() {
+  return [
+    "Verify the local JudgmentKit install.",
+    'Call MCP tools/list against the local "judgmentkit" server.',
+    `Success means the returned tools match the inventory in ${CANONICAL_INSTALL_URL}.`,
+  ].join("\n");
+}
+
+function resolveConfigFormat(target: ProductSurfaceInstallTarget) {
+  return target.config_path.endsWith(".toml") ? "toml" : "json";
+}
+
+export function loadInstallContract(): InstallContract {
+  const content = productSurfaceSchema.parse(rawProductSurface);
+
+  return {
+    version: "1.0.0",
+    product_name: content.product_name,
+    canonical_install_url: CANONICAL_INSTALL_URL,
+    canonical_mcp_url: CANONICAL_MCP_URL,
+    server_name: "judgmentkit",
+    install_transport: "stdio",
+    stdio_command: LOCAL_JUDGMENTKIT_STDIO_COMMAND,
+    supported_clients: content.install_targets.map((target) => target.id),
+    clients: content.install_targets.map((target) => ({
+      id: target.id,
+      label: target.label,
+      transport: target.transport,
+      config_path: target.config_path,
+      config_format: resolveConfigFormat(target),
+      config_snippet: target.config_snippet,
+      install_note: target.install_note,
+    })),
+    verification: {
+      method: "tools/list",
+      server_name: "judgmentkit",
+      instructions:
+        'After configuring the local "judgmentkit" MCP server, call MCP tools/list against that local server to confirm the install is reachable.',
+      expected_tools: listTools().map((tool) => tool.name),
+      expected_prompts: listPrompts().map((prompt) => prompt.name),
+    },
+  };
+}
+
+export function loadProductSurface(): ProductSurfaceContent {
   const content = productSurfaceSchema.parse(rawProductSurface);
   const exampleArtifact = exampleArtifactSchema.parse(rawExampleArtifact);
   const workflowArtifact = workflowArtifactSchema.parse(rawWorkflowArtifact);
   const resourceIndex = resourceIndexSchema.parse(rawResourceIndex);
-  const prompt = getPrompt("start_design_workflow");
-
-  if ("error" in prompt) {
-    throw new Error("Missing start_design_workflow prompt.");
-  }
+  const installContract = loadInstallContract();
 
   if (workflowArtifact.id !== exampleArtifact.workflow_id) {
     throw new Error("Workflow artifact does not match the published example artifact.");
@@ -138,13 +191,10 @@ export function loadProductSurface(httpMcpEndpoint: string): ProductSurfaceConte
 
   return {
     ...content,
-    first_message: prompt.template,
-    starter_prompt_name: prompt.name,
-    install_targets: content.install_targets.map((target) => ({
-      ...target,
-      connection_value: injectHttpEndpoint(target.connection_value, httpMcpEndpoint),
-      config_snippet: injectHttpEndpoint(target.config_snippet, httpMcpEndpoint),
-    })),
+    install_targets: content.install_targets,
+    install_prompt: createHomepageInstallPrompt(),
+    verify_prompt: createHomepageVerifyPrompt(),
+    install_contract: installContract,
     proof: {
       workflow_id: exampleArtifact.workflow_id,
       example_id: exampleArtifact.id,

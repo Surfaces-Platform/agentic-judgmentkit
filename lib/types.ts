@@ -120,6 +120,37 @@ export type ProductSurfaceInstallTarget = {
   starter_call: string;
 };
 
+export type InstallContractClient = {
+  id: string;
+  label: string;
+  transport: ProductSurfaceTransport;
+  config_path: string;
+  config_format: "json" | "toml";
+  config_snippet: string;
+  install_note: string;
+};
+
+export type InstallContractVerification = {
+  method: "tools/list";
+  server_name: string;
+  instructions: string;
+  expected_tools: string[];
+  expected_prompts: string[];
+};
+
+export type InstallContract = {
+  version: string;
+  product_name: string;
+  canonical_install_url: string;
+  canonical_mcp_url: string;
+  server_name: string;
+  install_transport: ProductSurfaceTransport;
+  stdio_command: string;
+  supported_clients: string[];
+  clients: InstallContractClient[];
+  verification: InstallContractVerification;
+};
+
 export type ProductSurfaceProof = {
   workflow_id: string;
   example_id: string;
@@ -174,8 +205,9 @@ export type ProductSurfaceContent = {
   context_heading: string;
   context_support: string;
   install_targets: ProductSurfaceInstallTarget[];
-  first_message: string;
-  starter_prompt_name: string;
+  install_prompt: string;
+  verify_prompt: string;
+  install_contract: InstallContract;
   proof: ProductSurfaceProof;
   loaded_context: ProductSurfaceContextItem[];
   inspect_resources: ProductSurfaceInspectResource[];
@@ -235,42 +267,17 @@ export type LandingPageWorkflowStep = {
   review_focus: string;
 };
 
+export type LandingPageSupportStep = {
+  title: string;
+  body: string;
+};
+
 export type LandingPageContent = {
   product_name: string;
   eyebrow: string;
   headline: string;
   subhead: string;
-  primary_cta_label: string;
-  secondary_cta_label: string;
-  hero_facts: LandingPageHeroFact[];
-  workflow_heading: string;
-  workflow_support: string;
-  workflow_steps: LandingPageWorkflowStep[];
-  install_label: string;
-  install_support: string;
-  dogfood_label: string;
-  dogfood_support: string;
-  dogfood_run: LandingPageDogfoodRun;
-  install_targets: ProductSurfaceInstallTarget[];
-  first_message: string;
-  starter_prompt_name: string;
-  proof_heading: string;
-  proof_support: string;
-  proof_inputs: LandingPageProofInput[];
-  proof: ProductSurfaceProof;
-  proof_notes: string[];
-  proof_lesson: string;
-  proof_reasons: string[];
-  outcomes_heading: string;
-  outcomes_support: string;
-  outcomes: LandingPageOutcome[];
-  context_heading: string;
-  context_support: string;
-  context_call: string;
-  loaded_context: ProductSurfaceContextItem[];
+  install_prompt: string;
+  verify_prompt: string;
   inspect: ProductSurfaceInspectLink;
-  final_heading: string;
-  final_support: string;
-  final_primary_cta_label: string;
-  final_secondary_cta_label: string;
 };
