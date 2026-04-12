@@ -33,9 +33,9 @@
   "corrected_output": "Place the JSON and Schema toggle in the viewer toolbar directly above the code block so the local controls sit with the governed surface. Keep Open raw JSON outside that cluster unless it is visually secondary and clearly a separate cross-surface action.",
   "lesson": "Generated UI should colocate local controls with the surface they change. Proximity clarifies ownership before the user has to read or infer anything else.",
   "links": {
-    "docs_url": "https://judgmentkit.com/docs/examples/control-proximity-drift",
-    "markdown_url": "https://judgmentkit.com/docs/examples/control-proximity-drift.md",
-    "schema_url": "https://judgmentkit.com/schemas/example.schema.json"
+    "docs_url": "https://judgmentkit.ai/docs/examples/control-proximity-drift",
+    "markdown_url": "https://judgmentkit.ai/docs/examples/control-proximity-drift.md",
+    "schema_url": "https://judgmentkit.ai/schemas/example.schema.json"
   },
   "last_reviewed": "2026-04-11"
 }

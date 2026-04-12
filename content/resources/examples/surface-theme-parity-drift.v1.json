@@ -1,0 +1,42 @@
+{
+  "id": "example.ui-generation.surface-theme-parity-drift",
+  "type": "example",
+  "version": "1.0.0",
+  "title": "Dark-only code block rewritten into the active theme model",
+  "summary": "A generated setup surface uses a light page shell but drops in a dark terminal-style code block, then gets rewritten so the artifact surface matches the active theme while staying distinct.",
+  "status": "active",
+  "workflow_id": "workflow.ai-ui-generation",
+  "guardrail_ids": ["guardrail.surface-theme-parity"],
+  "scenario": "A generated setup page uses a light product shell with muted panels and restrained borders, but the install command is rendered in a black terminal block with neon syntax colors, making the code sample feel like a different theme model than the rest of the interface.",
+  "raw_output": "Keep the setup surface bright and paper-like, then drop the install command into a black terminal panel with glowing syntax colors so it feels technical and stands out from the rest of the page.",
+  "verdict": {
+    "verdict_id": "ver_009",
+    "decision_id": "dec_009",
+    "evaluated_at": "2026-04-12T00:00:00Z",
+    "status": "warn",
+    "severity": "medium",
+    "guardrails_triggered": ["guardrail.surface-theme-parity"],
+    "reasons": [
+      "the code block introduces a separate dark theme model inside a light interface",
+      "the artifact surface relies on theme mismatch instead of local structure to feel distinct",
+      "syntax contrast is tuned for a different surface than the surrounding UI"
+    ],
+    "drift_score": 0.44,
+    "recommended_action": "review",
+    "rewrite_hint": "Keep the command block visually distinct, but render it as a light-theme artifact surface with dark syntax colors and stronger local borders. In dark mode, switch that same artifact treatment into the dark variant instead of freezing a terminal theme.",
+    "ownership": {
+      "decision_owner": "Design Systems",
+      "risk_owner": "Accessibility",
+      "operational_owner": "Frontend Platform"
+    },
+    "incident_required": false
+  },
+  "corrected_output": "Show the install command in a light artifact panel that stays inside the page's light theme, using a slightly stronger border and retuned syntax contrast instead of a dark terminal block. In dark mode, switch that same artifact panel into the dark theme variant so the code surface continues to match the surrounding shell.",
+  "lesson": "Artifact surfaces should stay inside the active theme model. Distinction should come from local structure and syntax treatment, not from forcing a separate dark or light theme inside the page.",
+  "links": {
+    "docs_url": "https://judgmentkit.ai/docs/examples/surface-theme-parity-drift",
+    "markdown_url": "https://judgmentkit.ai/docs/examples/surface-theme-parity-drift.md",
+    "schema_url": "https://judgmentkit.ai/schemas/example.schema.json"
+  },
+  "last_reviewed": "2026-04-12"
+}

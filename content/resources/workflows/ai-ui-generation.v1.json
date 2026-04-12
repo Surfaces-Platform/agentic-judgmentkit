@@ -13,6 +13,7 @@
     "whether the design system has an accessibility baseline or owner-approved review status",
     "how much layout variation is acceptable",
     "when control placement obscures which surface a local control governs",
+    "when embedded code or artifact surfaces drift away from the surrounding theme model",
     "when UI copy elements are too repetitive or semantically overlapping",
     "when a first pass is too ornamental for zero-shot generation",
     "when light and dark mode support should be assumed",
@@ -31,6 +32,7 @@
     "guardrail.design-system-integrity",
     "guardrail.ui-copy-clarity",
     "guardrail.control-proximity",
+    "guardrail.surface-theme-parity",
     "guardrail.runtime-cost",
     "guardrail.provenance-escalation"
   ],
@@ -40,6 +42,7 @@
       "component drift",
       "ambiguous label redundancy",
       "detached local controls",
+      "mismatched code or artifact themes",
       "design-system override without review",
       "unknown design-system accessibility status",
       "ornamental zero-shot output",
@@ -50,16 +53,17 @@
     ]
   },
   "links": {
-    "docs_url": "https://judgmentkit.com/docs/workflows/ai-ui-generation",
-    "markdown_url": "https://judgmentkit.com/docs/workflows/ai-ui-generation.md",
-    "schema_url": "https://judgmentkit.com/schemas/workflow.schema.json",
+    "docs_url": "https://judgmentkit.ai/docs/workflows/ai-ui-generation",
+    "markdown_url": "https://judgmentkit.ai/docs/workflows/ai-ui-generation.md",
+    "schema_url": "https://judgmentkit.ai/schemas/workflow.schema.json",
     "example_ids": [
       "example.ui-generation.component-drift",
       "example.ui-generation.embellishment-drift",
       "example.ui-generation.onboarding-clarity-drift",
       "example.ui-generation.repetitive-copy-drift",
-      "example.ui-generation.control-proximity-drift"
+      "example.ui-generation.control-proximity-drift",
+      "example.ui-generation.surface-theme-parity-drift"
     ]
   },
-  "last_reviewed": "2026-04-11"
+  "last_reviewed": "2026-04-12"
 }

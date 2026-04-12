@@ -38,9 +38,9 @@
   "corrected_output": "Confirm the referenced design system is accessibility-reviewed, then generate a restrained first-pass analytics workbench using the system's approved surfaces, typography, spacing, radius, and elevation tokens. Keep decorative styling out of the zero-shot pass, and provide light and dark theme variants unless the brief or the system explicitly scopes otherwise.",
   "lesson": "Zero-shot UI generation should work with design systems, not around them. If a system exists, confirm its accessibility status before treating it as authority. Ornament belongs in an explicit art-direction request, not in the first pass.",
   "links": {
-    "docs_url": "https://judgmentkit.com/docs/examples/embellishment-drift",
-    "markdown_url": "https://judgmentkit.com/docs/examples/embellishment-drift.md",
-    "schema_url": "https://judgmentkit.com/schemas/example.schema.json"
+    "docs_url": "https://judgmentkit.ai/docs/examples/embellishment-drift",
+    "markdown_url": "https://judgmentkit.ai/docs/examples/embellishment-drift.md",
+    "schema_url": "https://judgmentkit.ai/schemas/example.schema.json"
   },
   "last_reviewed": "2026-04-11"
 }

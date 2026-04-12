@@ -38,9 +38,9 @@
     ]
   },
   "links": {
-    "docs_url": "https://judgmentkit.com/docs/workflows/support-assistant",
-    "markdown_url": "https://judgmentkit.com/docs/workflows/support-assistant.md",
-    "schema_url": "https://judgmentkit.com/schemas/workflow.schema.json",
+    "docs_url": "https://judgmentkit.ai/docs/workflows/support-assistant",
+    "markdown_url": "https://judgmentkit.ai/docs/workflows/support-assistant.md",
+    "schema_url": "https://judgmentkit.ai/schemas/workflow.schema.json",
     "example_ids": [
       "example.brand-tone.support-coercive-copy",
       "example.privacy.support-escalation"

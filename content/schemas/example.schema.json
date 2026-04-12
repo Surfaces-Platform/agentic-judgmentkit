@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://judgmentkit.com/schemas/example.schema.json",
+  "$id": "https://judgmentkit.ai/schemas/example.schema.json",
   "title": "JudgmentKit Example Resource",
   "type": "object",
   "additionalProperties": false,
@@ -57,7 +57,7 @@
       "type": "string"
     },
     "verdict": {
-      "$ref": "https://judgmentkit.com/schemas/verdict.schema.json"
+      "$ref": "https://judgmentkit.ai/schemas/verdict.schema.json"
     },
     "corrected_output": {
       "type": "string"

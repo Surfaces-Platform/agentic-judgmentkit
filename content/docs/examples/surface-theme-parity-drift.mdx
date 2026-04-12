@@ -1,0 +1,71 @@
+---
+title: Surface theme parity drift
+slug: /docs/examples/surface-theme-parity-drift
+page_type: example
+summary: A generated setup surface uses a light page shell but drops in a dark terminal-style code block, then gets rewritten so the artifact surface matches the active theme while staying distinct.
+agent_summary: >
+  This example shows a UI generation draft defaulting a code sample to a
+  mismatched dark terminal treatment, then rewrites it into a theme-matched
+  artifact surface with preserved contrast and readability.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+workflows:
+  - workflow.ai-ui-generation
+guardrails:
+  - guardrail.surface-theme-parity
+owners:
+  primary: Design Systems
+  risk: Accessibility
+  operational: Frontend Platform
+status: active
+last_reviewed: 2026-04-12
+related_pages:
+  - /docs/workflows/ai-ui-generation
+  - /docs/guardrails/surface-theme-parity
+  - /docs/examples/embellishment-drift
+related_resources:
+  - /resources/examples/surface-theme-parity-drift.v1.json
+related_schemas:
+  - /schemas/example.schema.json
+  - /schemas/verdict.schema.json
+toc: true
+---
+
+## Scenario
+
+A generated setup page uses a light product shell with muted panels and restrained borders, but the install command is rendered in a black terminal block with neon syntax colors, making the code sample feel like a different theme model than the rest of the interface.
+
+## Raw decision or output
+
+`Keep the setup surface bright and paper-like, then drop the install command into a black terminal panel with glowing syntax colors so it feels technical and stands out from the rest of the page.`
+
+## What JudgmentKit detected
+
+- the code block introduces a separate dark theme model inside a light interface
+- the artifact surface relies on theme mismatch instead of local structure to feel distinct
+- syntax contrast is tuned for a different surface than the surrounding UI
+
+## What action was taken
+
+The workflow rewrote the command surface so it stayed inside the page's active theme model. Distinction moved to the artifact border, local spacing, and retuned syntax colors instead of a forced dark terminal treatment.
+
+## Corrected result
+
+`Show the install command in a light artifact panel that stays inside the page's light theme, using a slightly stronger border and retuned syntax contrast instead of a dark terminal block. In dark mode, switch that same artifact panel into the dark theme variant so the code surface continues to match the surrounding shell.`
+
+## Why the correction matters
+
+This is not only a visual-style issue. When code surfaces assume their own theme, readability and accessibility start depending on a mismatch that the rest of the interface does not share.
+
+## Related workflow and guardrails
+
+- Workflow: `/docs/workflows/ai-ui-generation`
+- Guardrail: `/docs/guardrails/surface-theme-parity`
+
+## JSON artifact links
+
+- Example resource: `/resources/examples/surface-theme-parity-drift.v1.json`
+- Schema: `/schemas/example.schema.json`

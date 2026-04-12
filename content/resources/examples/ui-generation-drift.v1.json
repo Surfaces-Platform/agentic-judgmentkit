@@ -39,9 +39,9 @@
   "corrected_output": "Generate a first-pass settings page using approved form, card, and navigation primitives, then flag open design questions for a second reviewed pass if the team wants to go beyond the system.",
   "lesson": "High-quality UI generation should stay inside approved primitives first, then escalate novelty through a deliberate review path instead of spending unlimited runtime on speculative variation.",
   "links": {
-    "docs_url": "https://judgmentkit.com/docs/examples/ui-generation-drift",
-    "markdown_url": "https://judgmentkit.com/docs/examples/ui-generation-drift.md",
-    "schema_url": "https://judgmentkit.com/schemas/example.schema.json"
+    "docs_url": "https://judgmentkit.ai/docs/examples/ui-generation-drift",
+    "markdown_url": "https://judgmentkit.ai/docs/examples/ui-generation-drift.md",
+    "schema_url": "https://judgmentkit.ai/schemas/example.schema.json"
   },
   "last_reviewed": "2026-04-09"
 }

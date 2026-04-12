@@ -74,6 +74,12 @@ describe("stdio mcp server", () => {
       "accessibility baseline or owner-approved review status",
     );
     expect(promptResponse.messages[0].content.text).toContain(
+      'get_resource({ id: "guardrail.surface-theme-parity" })',
+    );
+    expect(promptResponse.messages[0].content.text).toContain(
+      'get_example({ id: "example.ui-generation.surface-theme-parity-drift" })',
+    );
+    expect(promptResponse.messages[0].content.text).toContain(
       "review_checklist",
     );
   });

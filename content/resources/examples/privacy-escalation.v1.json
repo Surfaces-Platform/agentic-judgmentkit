@@ -39,9 +39,9 @@
   "corrected_output": "I cannot expose or change billing details from this chat without the verified account owner flow. I have created a support handoff with the request context so a human agent can continue securely.",
   "lesson": "High-risk support flows should name the boundary, avoid repeating sensitive details, and create a handoff payload that preserves context for the next owner.",
   "links": {
-    "docs_url": "https://judgmentkit.com/docs/examples/privacy-escalation",
-    "markdown_url": "https://judgmentkit.com/docs/examples/privacy-escalation.md",
-    "schema_url": "https://judgmentkit.com/schemas/example.schema.json"
+    "docs_url": "https://judgmentkit.ai/docs/examples/privacy-escalation",
+    "markdown_url": "https://judgmentkit.ai/docs/examples/privacy-escalation.md",
+    "schema_url": "https://judgmentkit.ai/schemas/example.schema.json"
   },
   "last_reviewed": "2026-04-09"
 }

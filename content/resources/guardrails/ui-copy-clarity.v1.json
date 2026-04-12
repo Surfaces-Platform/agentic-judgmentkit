@@ -70,9 +70,9 @@
     "review_cadence": "monthly"
   },
   "links": {
-    "docs_url": "https://judgmentkit.com/docs/guardrails/ui-copy-clarity",
-    "markdown_url": "https://judgmentkit.com/docs/guardrails/ui-copy-clarity.md",
-    "schema_url": "https://judgmentkit.com/schemas/guardrail.schema.json",
+    "docs_url": "https://judgmentkit.ai/docs/guardrails/ui-copy-clarity",
+    "markdown_url": "https://judgmentkit.ai/docs/guardrails/ui-copy-clarity.md",
+    "schema_url": "https://judgmentkit.ai/schemas/guardrail.schema.json",
     "example_ids": ["example.ui-generation.repetitive-copy-drift"]
   },
   "last_reviewed": "2026-04-11"

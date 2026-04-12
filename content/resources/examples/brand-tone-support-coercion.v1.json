@@ -33,9 +33,9 @@
   "corrected_output": "We found a billing issue on your account. Review the next steps below to resolve it. If anything looks off, contact support and we will help you.",
   "lesson": "Support language should reduce anxiety and explain the next step without pressure or unsupported certainty.",
   "links": {
-    "docs_url": "https://judgmentkit.com/docs/examples/brand-tone-support-coercion",
-    "markdown_url": "https://judgmentkit.com/docs/examples/brand-tone-support-coercion.md",
-    "schema_url": "https://judgmentkit.com/schemas/example.schema.json"
+    "docs_url": "https://judgmentkit.ai/docs/examples/brand-tone-support-coercion",
+    "markdown_url": "https://judgmentkit.ai/docs/examples/brand-tone-support-coercion.md",
+    "schema_url": "https://judgmentkit.ai/schemas/example.schema.json"
   },
   "last_reviewed": "2026-04-09"
 }

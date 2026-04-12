@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { GET, POST } from "@/app/mcp/route";
 
 const GENERIC_START_DESIGN_WORKFLOW_PROMPT =
-  'Use JudgmentKit for this design task. Call get_workflow_bundle({ workflow_id: "workflow.ai-ui-generation" }) first. Treat any referenced design system as the source of truth for components, tokens, radius, elevation, surfaces, and theme behavior. If a design system is present, ask whether it has an accessibility baseline or owner-approved review status before generating UI; if that status is unknown, pause and ask first. If the brief conflicts with the design system, surface review questions and escalation items instead of silently overriding it. Only when the design system and the brief are both silent, use restrained fallback defaults: approved primitives, a tight 6px radius scale, no decorative gradients, no gratuitous shadows, and both light and dark mode by default. Keep local controls inside or directly adjacent to the surface they govern so ownership stays obvious. Keep runtime bounded and surface review questions before inventing new patterns.';
+  'Use JudgmentKit for this design task. Call get_workflow_bundle({ workflow_id: "workflow.ai-ui-generation" }) first. Treat any referenced design system as the source of truth for components, tokens, radius, elevation, surfaces, and theme behavior. If a design system is present, ask whether it has an accessibility baseline or owner-approved review status before generating UI; if that status is unknown, pause and ask first. If the brief conflicts with the design system, surface review questions and escalation items instead of silently overriding it. Only when the design system and the brief are both silent, use restrained fallback defaults: approved primitives, a tight 6px radius scale, no decorative gradients, no gratuitous shadows, and both light and dark mode by default. If the interface includes code blocks, inline viewers, inspectors, or artifact panels, also call get_resource({ id: "guardrail.surface-theme-parity" }) and use get_example({ id: "example.ui-generation.surface-theme-parity-drift" }) as calibration so those surfaces stay inside the active light/dark theme model instead of defaulting to a dark terminal treatment. Keep local controls inside or directly adjacent to the surface they govern so ownership stays obvious. Keep runtime bounded and surface review questions before inventing new patterns.';
 
 async function postJsonRpc(payload: Record<string, unknown>) {
   const request = new Request("http://localhost:3002/mcp", {
@@ -130,6 +130,12 @@ describe("mcp route prompts", () => {
     );
     expect(result.result.messages[0].content.text).toContain(
       'get_example({ id: "example.ui-generation.control-proximity-drift" })',
+    );
+    expect(result.result.messages[0].content.text).toContain(
+      'get_resource({ id: "guardrail.surface-theme-parity" })',
+    );
+    expect(result.result.messages[0].content.text).toContain(
+      'get_example({ id: "example.ui-generation.surface-theme-parity-drift" })',
     );
     expect(result.result.messages[0].content.text).toContain(
       "accessibility baseline or owner-approved review status",

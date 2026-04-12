@@ -51,4 +51,23 @@ describe("search ranking", () => {
       exampleResults.some((result) => result.id === "example.ui-generation.control-proximity-drift"),
     ).toBe(true);
   });
+
+  it("finds the surface theme parity artifacts through search text", async () => {
+    const site = await buildSiteData();
+    const guardrailResults = searchDocuments(site.searchDocuments, "surface theme parity", {
+      kind: "resource",
+    });
+    const exampleResults = searchDocuments(site.searchDocuments, "dark terminal block", {
+      kind: "resource",
+    });
+
+    expect(
+      guardrailResults.some((result) => result.id === "guardrail.surface-theme-parity"),
+    ).toBe(true);
+    expect(
+      exampleResults.some(
+        (result) => result.id === "example.ui-generation.surface-theme-parity-drift",
+      ),
+    ).toBe(true);
+  });
 });

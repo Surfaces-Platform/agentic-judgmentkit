@@ -78,9 +78,9 @@
     "review_cadence": "monthly"
   },
   "links": {
-    "docs_url": "https://judgmentkit.com/docs/guardrails/design-system-integrity",
-    "markdown_url": "https://judgmentkit.com/docs/guardrails/design-system-integrity.md",
-    "schema_url": "https://judgmentkit.com/schemas/guardrail.schema.json",
+    "docs_url": "https://judgmentkit.ai/docs/guardrails/design-system-integrity",
+    "markdown_url": "https://judgmentkit.ai/docs/guardrails/design-system-integrity.md",
+    "schema_url": "https://judgmentkit.ai/schemas/guardrail.schema.json",
     "example_ids": [
       "example.ui-generation.component-drift",
       "example.ui-generation.embellishment-drift"

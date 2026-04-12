@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { getPrompt, handleToolCall } from "@/lib/mcp";
 
 const GENERIC_START_DESIGN_WORKFLOW_PROMPT =
-  'Use JudgmentKit for this design task. Call get_workflow_bundle({ workflow_id: "workflow.ai-ui-generation" }) first. Treat any referenced design system as the source of truth for components, tokens, radius, elevation, surfaces, and theme behavior. If a design system is present, ask whether it has an accessibility baseline or owner-approved review status before generating UI; if that status is unknown, pause and ask first. If the brief conflicts with the design system, surface review questions and escalation items instead of silently overriding it. Only when the design system and the brief are both silent, use restrained fallback defaults: approved primitives, a tight 6px radius scale, no decorative gradients, no gratuitous shadows, and both light and dark mode by default. Keep local controls inside or directly adjacent to the surface they govern so ownership stays obvious. Keep runtime bounded and surface review questions before inventing new patterns.';
+  'Use JudgmentKit for this design task. Call get_workflow_bundle({ workflow_id: "workflow.ai-ui-generation" }) first. Treat any referenced design system as the source of truth for components, tokens, radius, elevation, surfaces, and theme behavior. If a design system is present, ask whether it has an accessibility baseline or owner-approved review status before generating UI; if that status is unknown, pause and ask first. If the brief conflicts with the design system, surface review questions and escalation items instead of silently overriding it. Only when the design system and the brief are both silent, use restrained fallback defaults: approved primitives, a tight 6px radius scale, no decorative gradients, no gratuitous shadows, and both light and dark mode by default. If the interface includes code blocks, inline viewers, inspectors, or artifact panels, also call get_resource({ id: "guardrail.surface-theme-parity" }) and use get_example({ id: "example.ui-generation.surface-theme-parity-drift" }) as calibration so those surfaces stay inside the active light/dark theme model instead of defaulting to a dark terminal treatment. Keep local controls inside or directly adjacent to the surface they govern so ownership stays obvious. Keep runtime bounded and surface review questions before inventing new patterns.';
 
 describe("mcp tools", () => {
   it("lists guardrail resources", async () => {
@@ -14,7 +14,7 @@ describe("mcp tools", () => {
       return;
     }
 
-    expect(result.resources).toHaveLength(7);
+    expect(result.resources).toHaveLength(8);
   });
 
   it("returns markdown mirrors for docs pages", async () => {
@@ -67,6 +67,12 @@ describe("mcp tools", () => {
           example.id === "example.ui-generation.control-proximity-drift",
       ),
     ).toBe(true);
+    expect(
+      result.bundle.examples.some(
+        (example: { id: string }) =>
+          example.id === "example.ui-generation.surface-theme-parity-drift",
+      ),
+    ).toBe(true);
     expect(result.bundle.starter_instructions).toContain(
       "design system as the source of truth",
     );
@@ -81,6 +87,12 @@ describe("mcp tools", () => {
     );
     expect(result.bundle.starter_instructions).toContain(
       "Keep local controls inside or directly adjacent to the surface they govern.",
+    );
+    expect(result.bundle.starter_instructions).toContain(
+      "guardrail.surface-theme-parity",
+    );
+    expect(result.bundle.starter_instructions).toContain(
+      "example.ui-generation.surface-theme-parity-drift",
     );
   });
 
@@ -110,6 +122,10 @@ describe("mcp tools", () => {
     expect(prompt.template).toContain(featureIntent);
     expect(prompt.template).toContain(
       'get_workflow_bundle({ workflow_id: "workflow.ai-ui-generation", feature_intent: "Generate the JudgmentKit.com landing page" })',
+    );
+    expect(prompt.template).toContain("guardrail.surface-theme-parity");
+    expect(prompt.template).toContain(
+      "example.ui-generation.surface-theme-parity-drift",
     );
     expect(prompt.template).not.toContain("ignored_arg");
   });
@@ -145,6 +161,9 @@ describe("mcp tools", () => {
     );
     expect(result.bundle.starter_instructions).toContain(
       "Keep local controls inside or directly adjacent to the surface they govern.",
+    );
+    expect(result.bundle.starter_instructions).toContain(
+      "guardrail.surface-theme-parity",
     );
     expect(prompt.template).toContain(featureIntent);
   });
@@ -217,6 +236,12 @@ describe("mcp tools", () => {
       'get_example({ id: "example.ui-generation.control-proximity-drift" })',
     );
     expect(prompt.template).toContain(
+      'get_resource({ id: "guardrail.surface-theme-parity" })',
+    );
+    expect(prompt.template).toContain(
+      'get_example({ id: "example.ui-generation.surface-theme-parity-drift" })',
+    );
+    expect(prompt.template).toContain(
       "accessibility baseline or owner-approved review status",
     );
     expect(prompt.template).toContain("pause and ask first");
@@ -287,7 +312,19 @@ describe("mcp tools", () => {
     expect(
       result.related.resources.some(
         (resource: { id: string }) =>
+          resource.id === "guardrail.surface-theme-parity",
+      ),
+    ).toBe(true);
+    expect(
+      result.related.resources.some(
+        (resource: { id: string }) =>
           resource.id === "example.ui-generation.control-proximity-drift",
+      ),
+    ).toBe(true);
+    expect(
+      result.related.resources.some(
+        (resource: { id: string }) =>
+          resource.id === "example.ui-generation.surface-theme-parity-drift",
       ),
     ).toBe(true);
     expect(result.related.resources.length).toBeGreaterThan(0);

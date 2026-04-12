@@ -62,6 +62,7 @@ describe("product surface content", () => {
       "guardrail.design-system-integrity",
       "guardrail.ui-copy-clarity",
       "guardrail.control-proximity",
+      "guardrail.surface-theme-parity",
       "guardrail.runtime-cost",
       "guardrail.provenance-escalation",
       "example.ui-generation.component-drift",
@@ -69,6 +70,7 @@ describe("product surface content", () => {
       "example.ui-generation.onboarding-clarity-drift",
       "example.ui-generation.repetitive-copy-drift",
       "example.ui-generation.control-proximity-drift",
+      "example.ui-generation.surface-theme-parity-drift",
     ]);
   });
 

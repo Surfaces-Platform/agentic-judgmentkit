@@ -1,0 +1,79 @@
+{
+  "id": "guardrail.surface-theme-parity",
+  "type": "guardrail",
+  "version": "1.0.0",
+  "title": "Surface theme parity",
+  "summary": "Keep code blocks, viewers, inspectors, and artifact panels inside the surrounding light/dark theme model so they stay coherent, readable, and accessible.",
+  "status": "active",
+  "audiences": [
+    "design-leaders",
+    "product-managers",
+    "platform-engineering",
+    "ai-application-developers"
+  ],
+  "applies_to": {
+    "workflows": ["workflow.ai-ui-generation"],
+    "surfaces": ["web", "mobile", "internal-tools"]
+  },
+  "decision": "Whether an embedded code, viewer, or artifact surface follows the active light/dark theme model of the surrounding interface while remaining visually distinct.",
+  "intent": {
+    "purpose": "Prevent generated interfaces from dropping dark-only code blocks, terminal chrome, or mismatched artifact viewers into a surface that otherwise follows a different theme model.",
+    "who_it_protects": ["end users", "design systems", "frontend teams"],
+    "failure_mode": "Generated UI uses a separate theme model for a code or artifact surface, so a light interface suddenly contains a dark terminal block or a dark interface suddenly contains a bright artifact card that feels detached, less readable, and less accessible.",
+    "good_judgment": "Keep artifact surfaces theme-matched with the active interface mode while using borders, spacing, typography, and local syntax contrast to signal that the region is code or machine-facing content.",
+    "acceptable_variation": [
+      "make code or artifact surfaces slightly more muted or more bordered than surrounding panels while keeping the same light or dark theme model",
+      "use syntax-highlight colors that are retuned for the active surface instead of reusing a dark-terminal palette everywhere",
+      "follow approved design-system treatment for inspectors, viewers, or code samples when those surfaces still track the active theme model",
+      "preserve strong local distinction through layout, labeling, or borders instead of forcing a separate theme"
+    ],
+    "non_negotiables": [
+      "no dark-only code block or terminal treatment inside an otherwise light-themed surface unless the brief explicitly requires a separate terminal artifact",
+      "no bright light artifact panel inside an otherwise dark-themed surface unless the brief explicitly requires a separate theme",
+      "no syntax palette that depends on a mismatched background to stay legible",
+      "no artifact surface that implies a different product theme model from the rest of the interface without explicit approval"
+    ]
+  },
+  "detection": {
+    "decision_question": "Do code blocks, viewers, and artifact panels follow the active light/dark theme model of the surrounding interface, or do they introduce a separate theme treatment that breaks coherence and readability?",
+    "signals": [
+      "a light interface contains a dark terminal-style code block without an explicit reason",
+      "a dark interface contains a light artifact surface that reads like a different theme",
+      "syntax colors only remain legible because the surface uses a mismatched background",
+      "artifact surfaces feel detached because theme contrast, not local structure, is doing all the separation",
+      "embedded viewers imply a different theme model than the surrounding shell"
+    ],
+    "thresholds": {
+      "pass": "artifact surfaces remain clearly identifiable while staying inside the active light or dark theme model",
+      "warn": "a code or artifact surface uses an off-theme treatment that can be corrected by retuning the local surface and syntax colors",
+      "fail": "theme mismatch materially harms readability, accessibility, or visual coherence"
+    }
+  },
+  "response": {
+    "low": {
+      "action": "auto_retheme_surface",
+      "description": "Retheme the local artifact surface to match the surrounding light or dark mode while preserving distinction."
+    },
+    "medium": {
+      "action": "auto_retheme_and_review",
+      "description": "Retheme the artifact surface and route the result through design review for accessibility and coherence."
+    },
+    "high": {
+      "action": "block_and_escalate_to_design_review",
+      "description": "Block the output and require design review because the mismatched theme treatment undermines readability or accessibility."
+    }
+  },
+  "ownership": {
+    "decision_owner": "Design Systems",
+    "risk_owner": "Accessibility",
+    "operational_owner": "Frontend Platform",
+    "review_cadence": "monthly"
+  },
+  "links": {
+    "docs_url": "https://judgmentkit.ai/docs/guardrails/surface-theme-parity",
+    "markdown_url": "https://judgmentkit.ai/docs/guardrails/surface-theme-parity.md",
+    "schema_url": "https://judgmentkit.ai/schemas/guardrail.schema.json",
+    "example_ids": ["example.ui-generation.surface-theme-parity-drift"]
+  },
+  "last_reviewed": "2026-04-12"
+}

@@ -1,0 +1,85 @@
+---
+title: Surface theme parity
+slug: /docs/guardrails/surface-theme-parity
+page_type: guardrail
+summary: Keep code blocks, viewers, inspectors, and artifact panels inside the surrounding light/dark theme model so they stay coherent, readable, and accessible.
+agent_summary: >
+  This page explains the surface theme parity guardrail, the embedded-theme
+  decision it governs, the drift it catches, and how JudgmentKit responds when
+  code or artifact surfaces default to a mismatched dark or light theme.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+workflows:
+  - workflow.ai-ui-generation
+guardrails:
+  - guardrail.surface-theme-parity
+owners:
+  primary: Design Systems
+  risk: Accessibility
+  operational: Frontend Platform
+status: active
+last_reviewed: 2026-04-12
+related_pages:
+  - /docs/workflows/ai-ui-generation
+  - /docs/examples/surface-theme-parity-drift
+  - /docs/guardrails/design-system-integrity
+related_resources:
+  - /resources/guardrails/surface-theme-parity.v1.json
+related_schemas:
+  - /schemas/guardrail.schema.json
+toc: true
+---
+
+## Why this matters
+
+Generated UI often defaults code blocks and inspectors to a dark terminal treatment, even when the rest of the interface is clearly light. That drift makes the surface feel less coherent and can quietly turn syntax contrast and readability into an accessibility problem.
+
+## What decision is being governed
+
+This guardrail governs whether an embedded code, viewer, or artifact surface follows the active light/dark theme model of the surrounding interface while remaining visibly distinct.
+
+## What good judgment looks like
+
+- code blocks and viewers stay inside the active light or dark theme model
+- artifact surfaces still read as machine-facing through border, spacing, and syntax contrast
+- syntax-highlight colors are retuned for the local surface instead of assuming a dark terminal background
+- visual distinction comes from local structure, not from forcing a separate theme
+
+## What drift looks like
+
+1. A light interface suddenly contains a black terminal block with neon syntax colors.
+2. A dark interface drops in a bright white artifact card that reads like a different theme.
+3. Syntax colors only work because the block assumes the wrong background.
+4. The code surface feels detached because it uses a separate theme instead of a theme-matched artifact treatment.
+
+## Example in practice
+
+The calibration example uses a generated setup page where the install command sits in a dark terminal panel even though the rest of the page is light and restrained. The fix is to keep the code surface inside the same light theme model while using stronger local borders and syntax contrast to preserve distinction.
+
+## Boundaries
+
+Allowed variation includes slightly more muted artifact surfaces, stronger borders, retuned syntax colors, and design-system-specific viewer treatments that stay inside the active theme model.
+
+Hard stops include dark-only code blocks inside otherwise light interfaces, bright light viewers inside otherwise dark interfaces, and any syntax palette that stays readable only because the surface is mismatched with the page theme.
+
+## How JudgmentKit responds
+
+Low drift gets rethemed automatically. Medium drift gets rethemed and reviewed. High drift gets blocked and escalated because the mismatched surface treatment undermines readability, accessibility, or coherence.
+
+## Ownership and review
+
+Design Systems owns the decision. Accessibility owns the risk. Frontend Platform owns the implementation path that turns off-theme artifact surfaces into rewrite actions.
+
+## Technical reference
+
+- Resource: `/resources/guardrails/surface-theme-parity.v1.json`
+- Schema: `/schemas/guardrail.schema.json`
+
+## Related pages
+
+- /docs/workflows/ai-ui-generation
+- /docs/examples/surface-theme-parity-drift
+- /docs/guardrails/design-system-integrity

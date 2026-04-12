@@ -33,9 +33,9 @@
   "corrected_output": "Use Resource details as the section heading. Keep the view toggle labels as JSON and Schema. Replace the helper text with View the structured artifact in place, or open the raw file separately. Keep a single utility action labeled Open raw JSON.",
   "lesson": "Generated UI copy should separate description from action and keep adjacent controls semantically distinct, especially when a user is choosing the next step from a dense cluster.",
   "links": {
-    "docs_url": "https://judgmentkit.com/docs/examples/repetitive-copy-drift",
-    "markdown_url": "https://judgmentkit.com/docs/examples/repetitive-copy-drift.md",
-    "schema_url": "https://judgmentkit.com/schemas/example.schema.json"
+    "docs_url": "https://judgmentkit.ai/docs/examples/repetitive-copy-drift",
+    "markdown_url": "https://judgmentkit.ai/docs/examples/repetitive-copy-drift.md",
+    "schema_url": "https://judgmentkit.ai/schemas/example.schema.json"
   },
   "last_reviewed": "2026-04-11"
 }

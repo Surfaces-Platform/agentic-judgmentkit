@@ -39,9 +39,9 @@
   "corrected_output": "Lead with what JudgmentKit is, why it improves the first pass, and how to connect it in one screen. Keep inspect links and raw artifacts below the primary onboarding path, and only surface them once the team already knows the next step.",
   "lesson": "JudgmentKit-guided refinement should reduce self-referential artifact density when it obscures onboarding. Prove the product after the page makes the product and next action obvious to the human decision-maker.",
   "links": {
-    "docs_url": "https://judgmentkit.com/docs/examples/onboarding-clarity-drift",
-    "markdown_url": "https://judgmentkit.com/docs/examples/onboarding-clarity-drift.md",
-    "schema_url": "https://judgmentkit.com/schemas/example.schema.json"
+    "docs_url": "https://judgmentkit.ai/docs/examples/onboarding-clarity-drift",
+    "markdown_url": "https://judgmentkit.ai/docs/examples/onboarding-clarity-drift.md",
+    "schema_url": "https://judgmentkit.ai/schemas/example.schema.json"
   },
   "last_reviewed": "2026-04-10"
 }

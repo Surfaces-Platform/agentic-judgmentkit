@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://judgmentkit.com/schemas/guardrail.schema.json",
+  "$id": "https://judgmentkit.ai/schemas/guardrail.schema.json",
   "title": "JudgmentKit Guardrail Resource",
   "type": "object",
   "additionalProperties": false,

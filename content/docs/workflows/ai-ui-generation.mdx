@@ -22,6 +22,7 @@ related_pages:
   - /docs/guardrails/design-system-integrity
   - /docs/guardrails/ui-copy-clarity
   - /docs/guardrails/control-proximity
+  - /docs/guardrails/surface-theme-parity
   - /docs/guardrails/runtime-and-cost
   - /docs/guardrails/provenance-and-escalation
   - /docs/examples/ui-generation-drift
@@ -29,6 +30,7 @@ related_pages:
   - /docs/examples/onboarding-clarity-drift
   - /docs/examples/repetitive-copy-drift
   - /docs/examples/control-proximity-drift
+  - /docs/examples/surface-theme-parity-drift
 related_resources:
   - /resources/workflows/ai-ui-generation.v1.json
 related_schemas:
@@ -60,6 +62,7 @@ Generated UI can look impressive and still create downstream cleanup. The main r
 - `guardrail.design-system-integrity`
 - `guardrail.ui-copy-clarity`
 - `guardrail.control-proximity`
+- `guardrail.surface-theme-parity`
 - `guardrail.runtime-cost`
 - `guardrail.provenance-escalation`
 
@@ -73,7 +76,7 @@ Generated UI can look impressive and still create downstream cleanup. The main r
 
 ## Examples in practice
 
-The workflow now includes five calibration patterns. One example shows an over-scoped request that asks for novelty, custom primitives, and unlimited reasoning in one pass. Another shows a zero-shot UI pass drifting toward decorative chrome and single-theme output while ignoring a referenced design system. A third shows a landing-page draft that over-exposes internals and proof before it makes onboarding obvious. A fourth shows a dense control cluster where headings, helper copy, and actions repeat the same words until the next step is unclear. The fifth shows local viewer controls drifting into a separate details zone, making it harder to tell what surface they govern. In each case JudgmentKit rewrites the request into a clearer, system-safe pass plus explicit review questions.
+The workflow now includes six calibration patterns. One example shows an over-scoped request that asks for novelty, custom primitives, and unlimited reasoning in one pass. Another shows a zero-shot UI pass drifting toward decorative chrome and single-theme output while ignoring a referenced design system. A third shows a landing-page draft that over-exposes internals and proof before it makes onboarding obvious. A fourth shows a dense control cluster where headings, helper copy, and actions repeat the same words until the next step is unclear. A fifth shows local viewer controls drifting into a separate details zone, making it harder to tell what surface they govern. The sixth shows a dark terminal-style code block dropped into an otherwise light interface instead of using a theme-matched artifact surface. In each case JudgmentKit rewrites the request into a clearer, system-safe pass plus explicit review questions.
 
 ## Common drift patterns
 
@@ -84,9 +87,10 @@ The workflow now includes five calibration patterns. One example shows an over-s
 5. Accessibility semantics disappear in the pursuit of style.
 6. Headings, helper text, and CTA labels reuse the same words until different UI elements sound interchangeable.
 7. Local controls drift into a separate header or metadata zone from the viewer, panel, or artifact they change.
-8. Runtime cost grows because the prompt asks for open-ended refinement.
-9. The output leaves implementation teams guessing what is fixed versus exploratory.
-10. The page explains internal artifacts before it explains what the product is or how to start.
+8. A code block or artifact viewer introduces a separate dark or light theme model that the surrounding interface does not use.
+9. Runtime cost grows because the prompt asks for open-ended refinement.
+10. The output leaves implementation teams guessing what is fixed versus exploratory.
+11. The page explains internal artifacts before it explains what the product is or how to start.
 
 ## Escalation points
 
@@ -104,6 +108,7 @@ Escalate when the requested pattern cannot be expressed with approved primitives
 - /docs/guardrails/design-system-integrity
 - /docs/guardrails/ui-copy-clarity
 - /docs/guardrails/control-proximity
+- /docs/guardrails/surface-theme-parity
 - /docs/guardrails/runtime-and-cost
 - /docs/guardrails/provenance-and-escalation
 - /docs/examples/ui-generation-drift
@@ -111,3 +116,4 @@ Escalate when the requested pattern cannot be expressed with approved primitives
 - /docs/examples/onboarding-clarity-drift
 - /docs/examples/repetitive-copy-drift
 - /docs/examples/control-proximity-drift
+- /docs/examples/surface-theme-parity-drift

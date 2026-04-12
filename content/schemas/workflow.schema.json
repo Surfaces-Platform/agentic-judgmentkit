@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://judgmentkit.com/schemas/workflow.schema.json",
+  "$id": "https://judgmentkit.ai/schemas/workflow.schema.json",
   "title": "JudgmentKit Workflow Resource",
   "type": "object",
   "additionalProperties": false,

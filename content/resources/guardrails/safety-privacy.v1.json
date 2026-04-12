@@ -67,9 +67,9 @@
     "review_cadence": "monthly"
   },
   "links": {
-    "docs_url": "https://judgmentkit.com/docs/guardrails/safety-and-privacy",
-    "markdown_url": "https://judgmentkit.com/docs/guardrails/safety-and-privacy.md",
-    "schema_url": "https://judgmentkit.com/schemas/guardrail.schema.json",
+    "docs_url": "https://judgmentkit.ai/docs/guardrails/safety-and-privacy",
+    "markdown_url": "https://judgmentkit.ai/docs/guardrails/safety-and-privacy.md",
+    "schema_url": "https://judgmentkit.ai/schemas/guardrail.schema.json",
     "example_ids": ["example.privacy.support-escalation"]
   },
   "last_reviewed": "2026-04-09"
