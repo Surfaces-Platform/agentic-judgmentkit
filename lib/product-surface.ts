@@ -23,6 +23,7 @@ import {
 import { listPrompts, listTools } from "@/lib/mcp";
 import type {
   InstallContract,
+  InstallerClientId,
   ProductSurfaceContent,
   ProductSurfaceInspectFormat,
   ProductSurfaceInspectItem,
@@ -34,8 +35,10 @@ import rawExampleArtifact from "@/public/resources/examples/ui-generation-drift.
 import rawResourceIndex from "@/public/resources/index.json";
 import rawWorkflowArtifact from "@/public/resources/workflows/ai-ui-generation.v1.json";
 
+const installClientIdSchema = z.enum(["codex", "claude", "cursor"]);
+
 const installTargetSchema = z.object({
-  id: z.string(),
+  id: installClientIdSchema,
   label: z.string(),
   transport: z.enum(["http", "stdio"]),
   connection_label: z.string(),
@@ -133,6 +136,10 @@ function createHomepageInstallCommand() {
 
 function createHomepageVerifyPrompt() {
   return "Call MCP tools/list against the local judgmentkit server";
+}
+
+function getSupportedClientIds(targets: { id: InstallerClientId }[]) {
+  return targets.map((target) => target.id);
 }
 
 function resolveConfigFormat(target: ProductSurfaceInstallTarget) {
@@ -345,7 +352,7 @@ export function loadInstallContract(): InstallContract {
       command: "npm",
       args: LOCAL_JUDGMENTKIT_STDIO_ARGS,
     },
-    supported_clients: content.install_targets.map((target) => target.id),
+    supported_clients: getSupportedClientIds(content.install_targets),
     clients: content.install_targets.map((target) => ({
       id: target.id,
       label: target.label,
