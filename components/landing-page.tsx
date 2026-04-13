@@ -8,12 +8,17 @@ type LandingPageProps = {
 export function LandingPage({ content }: LandingPageProps) {
   const prompts = [
     {
-      title: "Tell your agent to install",
-      copyLabel: "Copy install prompt",
+      title: "Run the installer",
+      copyLabel: "Copy install command",
+      value: content.install_command,
+    },
+    {
+      title: "Manual fallback",
+      copyLabel: "Copy manual fallback prompt",
       value: content.install_prompt,
     },
     {
-      title: "Ask agent what JudgmentKit can do",
+      title: "Verify locally",
       copyLabel: "Copy verify prompt",
       value: content.verify_prompt,
     },

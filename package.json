@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "generate": "tsx scripts/generate-site.ts",
+    "mcp:install": "node --import tsx ./scripts/install-mcp.ts",
     "mcp:stdio": "node --import tsx ./scripts/judgmentkit-mcp-stdio.ts",
     "test": "vitest run",
     "check": "npm run generate && npm run test && npm run lint"

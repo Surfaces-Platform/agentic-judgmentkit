@@ -13,9 +13,11 @@ import {
 } from "@/components/reference-surface";
 import {
   CANONICAL_INSTALL_URL,
+  HOSTED_JUDGMENTKIT_BOOTSTRAP_COMMAND,
   JUDGMENTKIT_REPOSITORY_CLONE_URL,
   LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER,
   LOCAL_JUDGMENTKIT_INSTALL_COMMAND,
+  LOCAL_JUDGMENTKIT_INSTALLER_COMMAND,
   LOCAL_JUDGMENTKIT_STDIO_ARGS,
 } from "@/lib/constants";
 import { listPrompts, listTools } from "@/lib/mcp";
@@ -89,8 +91,9 @@ describe("product surface content", () => {
   it("derives client-agnostic install and verify prompts", () => {
     const content = loadProductSurface();
 
+    expect(content.install_command).toBe(HOSTED_JUDGMENTKIT_BOOTSTRAP_COMMAND);
     expect(content.install_prompt).toBe(
-      `Install JudgmentKit in this client from ${CANONICAL_INSTALL_URL}`,
+      `If the hosted installer cannot edit this client, use the manual fallback at ${CANONICAL_INSTALL_URL}`,
     );
     expect(content.verify_prompt).toBe(
       "Call MCP tools/list against the local judgmentkit server",
@@ -102,6 +105,9 @@ describe("product surface content", () => {
 
     expect(contract.canonical_install_url).toBe(CANONICAL_INSTALL_URL);
     expect(contract.command_reference_url).toBe("https://judgmentkit.ai/inspect#commands");
+    expect(contract.installer.local_script_command).toBe(
+      LOCAL_JUDGMENTKIT_INSTALLER_COMMAND,
+    );
     expect(contract.repository).toEqual({
       clone_url: JUDGMENTKIT_REPOSITORY_CLONE_URL,
       local_path_placeholder: LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER,

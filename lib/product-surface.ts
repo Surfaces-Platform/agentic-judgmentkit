@@ -3,11 +3,15 @@ import { z } from "zod";
 import rawProductSurface from "@/content/product-surface.json";
 import {
   CANONICAL_INSTALL_URL,
+  CANONICAL_INSTALL_BOOTSTRAP_URL,
   CANONICAL_SITE_URL,
+  DEFAULT_LOCAL_JUDGMENTKIT_CHECKOUT_PATH,
   HOSTED_MCP_REFERENCE_URL,
+  HOSTED_JUDGMENTKIT_BOOTSTRAP_COMMAND,
   JUDGMENTKIT_REPOSITORY_CLONE_URL,
   LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER,
   LOCAL_JUDGMENTKIT_INSTALL_COMMAND,
+  LOCAL_JUDGMENTKIT_INSTALLER_COMMAND,
   LOCAL_JUDGMENTKIT_STDIO_ARGS,
   ROOT_URL,
 } from "@/lib/constants";
@@ -120,7 +124,11 @@ function toRelativeUrl(url: string) {
 }
 
 function createHomepageInstallPrompt() {
-  return `Install JudgmentKit in this client from ${CANONICAL_INSTALL_URL}`;
+  return `If the hosted installer cannot edit this client, use the manual fallback at ${CANONICAL_INSTALL_URL}`;
+}
+
+function createHomepageInstallCommand() {
+  return HOSTED_JUDGMENTKIT_BOOTSTRAP_COMMAND;
 }
 
 function createHomepageVerifyPrompt() {
@@ -311,11 +319,21 @@ export function loadInstallContract(): InstallContract {
   const promptReference = createPromptReferences(CANONICAL_SITE_URL);
 
   return {
-    version: "1.0.0",
+    version: "2.0.0",
     product_name: content.product_name,
     canonical_install_url: CANONICAL_INSTALL_URL,
     command_reference_url: createCommandReferenceUrl(CANONICAL_SITE_URL),
     warning: `Install JudgmentKit from a local checkout over stdio. ${HOSTED_MCP_REFERENCE_URL} is a hosted reference/debug endpoint, not the install target.`,
+    installer: {
+      mode: "hosted-bootstrap",
+      bootstrap_url: CANONICAL_INSTALL_BOOTSTRAP_URL,
+      bootstrap_command: HOSTED_JUDGMENTKIT_BOOTSTRAP_COMMAND,
+      local_script_command: LOCAL_JUDGMENTKIT_INSTALLER_COMMAND,
+      default_checkout_path: DEFAULT_LOCAL_JUDGMENTKIT_CHECKOUT_PATH,
+      edits_config_by_default: true,
+      supports_dry_run: true,
+      supports_no_verify: true,
+    },
     repository: {
       clone_url: JUDGMENTKIT_REPOSITORY_CLONE_URL,
       local_path_placeholder: LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER,
@@ -390,6 +408,7 @@ export function loadProductSurface(): ProductSurfaceContent {
   return {
     ...content,
     install_targets: content.install_targets,
+    install_command: createHomepageInstallCommand(),
     install_prompt: createHomepageInstallPrompt(),
     verify_prompt: createHomepageVerifyPrompt(),
     install_contract: installContract,

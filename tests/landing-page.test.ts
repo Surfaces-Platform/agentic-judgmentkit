@@ -13,7 +13,12 @@ describe("landing page", () => {
     expect(content.headline).toBe(
       "JudgmentKit gives your agent workflow guidance, guardrails, and verification.",
     );
-    expect(content.install_prompt).toBe("Install JudgmentKit in this client from https://judgmentkit.ai/install");
+    expect(content.install_command).toBe(
+      "curl -fsSL https://judgmentkit.ai/install/bootstrap | bash -s -- --client <codex|claude|cursor>",
+    );
+    expect(content.install_prompt).toBe(
+      "If the hosted installer cannot edit this client, use the manual fallback at https://judgmentkit.ai/install",
+    );
     expect(content.verify_prompt).toBe(
       "Call MCP tools/list against the local judgmentkit server",
     );
@@ -26,11 +31,18 @@ describe("landing page", () => {
     expect(markup).toContain(
       "JudgmentKit gives your agent workflow guidance, guardrails, and verification.",
     );
-    expect(markup).toContain("Tell your agent to install");
-    expect(markup).toContain("Ask agent what JudgmentKit can do");
-    expect(markup).toContain('aria-label="Copy install prompt"');
+    expect(markup).toContain("Run the installer");
+    expect(markup).toContain("Manual fallback");
+    expect(markup).toContain("Verify locally");
+    expect(markup).toContain('aria-label="Copy install command"');
+    expect(markup).toContain('aria-label="Copy manual fallback prompt"');
     expect(markup).toContain('aria-label="Copy verify prompt"');
-    expect(markup).toContain("Install JudgmentKit in this client from https://judgmentkit.ai/install");
+    expect(markup).toContain(
+      "curl -fsSL https://judgmentkit.ai/install/bootstrap | bash -s -- --client &lt;codex|claude|cursor&gt;",
+    );
+    expect(markup).toContain(
+      "If the hosted installer cannot edit this client, use the manual fallback at https://judgmentkit.ai/install",
+    );
     expect(markup).toContain("Call MCP tools/list against the local judgmentkit server");
     expect(markup).not.toContain("through MCP");
     expect(markup).not.toContain("Codex");

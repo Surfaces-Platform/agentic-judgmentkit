@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "judgmentkit": {
+      "command": "npm",
+      "args": ["--prefix", "/tmp/old-judgmentkit", "run", "mcp:stdio"]
+    },
+    "other": {
+      "command": "node",
+      "args": ["./other.js"]
+    }
+  },
+  "theme": "dark"
+}

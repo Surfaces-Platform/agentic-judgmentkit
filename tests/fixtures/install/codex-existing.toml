@@ -1,0 +1,10 @@
+[mcp_servers.other]
+command = "node"
+args = ["./other.js"]
+
+[mcp_servers.judgmentkit]
+command = "npm"
+args = ["--prefix", "/tmp/old-judgmentkit", "run", "mcp:stdio"]
+
+[projects.demo]
+trust_level = "trusted"

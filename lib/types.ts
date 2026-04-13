@@ -107,9 +107,10 @@ export type GraphNode = {
 };
 
 export type ProductSurfaceTransport = "http" | "stdio";
+export type InstallerClientId = "codex" | "claude" | "cursor";
 
 export type ProductSurfaceInstallTarget = {
-  id: string;
+  id: InstallerClientId;
   label: string;
   transport: ProductSurfaceTransport;
   connection_label: string;
@@ -121,13 +122,24 @@ export type ProductSurfaceInstallTarget = {
 };
 
 export type InstallContractClient = {
-  id: string;
+  id: InstallerClientId;
   label: string;
   transport: ProductSurfaceTransport;
   config_path: string;
   config_format: "json" | "toml";
   config_snippet: string;
   install_note: string;
+};
+
+export type InstallContractInstaller = {
+  mode: "hosted-bootstrap";
+  bootstrap_url: string;
+  bootstrap_command: string;
+  local_script_command: string;
+  default_checkout_path: string;
+  edits_config_by_default: boolean;
+  supports_dry_run: boolean;
+  supports_no_verify: boolean;
 };
 
 export type InstallContractRepository = {
@@ -165,11 +177,12 @@ export type InstallContract = {
   canonical_install_url: string;
   command_reference_url: string;
   warning: string;
+  installer: InstallContractInstaller;
   repository: InstallContractRepository;
   server_name: string;
   install_transport: ProductSurfaceTransport;
   connection: InstallContractConnection;
-  supported_clients: string[];
+  supported_clients: InstallerClientId[];
   clients: InstallContractClient[];
   verification: InstallContractVerification;
 };
@@ -249,6 +262,7 @@ export type ProductSurfaceContent = {
   context_heading: string;
   context_support: string;
   install_targets: ProductSurfaceInstallTarget[];
+  install_command: string;
   install_prompt: string;
   verify_prompt: string;
   install_contract: InstallContract;
@@ -323,6 +337,7 @@ export type LandingPageContent = {
   eyebrow: string;
   headline: string;
   subhead: string;
+  install_command: string;
   install_prompt: string;
   verify_prompt: string;
   inspect: ProductSurfaceInspectLink;

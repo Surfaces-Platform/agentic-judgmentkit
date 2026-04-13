@@ -2,10 +2,14 @@ import { describe, expect, it } from "vitest";
 
 import {
   CANONICAL_INSTALL_URL,
+  CANONICAL_INSTALL_BOOTSTRAP_URL,
+  DEFAULT_LOCAL_JUDGMENTKIT_CHECKOUT_PATH,
   HOSTED_MCP_REFERENCE_URL,
+  HOSTED_JUDGMENTKIT_BOOTSTRAP_COMMAND,
   JUDGMENTKIT_REPOSITORY_CLONE_URL,
   LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER,
   LOCAL_JUDGMENTKIT_INSTALL_COMMAND,
+  LOCAL_JUDGMENTKIT_INSTALLER_COMMAND,
   LOCAL_JUDGMENTKIT_STDIO_ARGS,
 } from "@/lib/constants";
 import { GET } from "@/app/install/route";
@@ -19,6 +23,16 @@ describe("install route", () => {
     expect(result.canonical_install_url).toBe(CANONICAL_INSTALL_URL);
     expect(result.command_reference_url).toBe("https://judgmentkit.ai/inspect#commands");
     expect(result.warning).toContain(HOSTED_MCP_REFERENCE_URL);
+    expect(result.installer).toEqual({
+      mode: "hosted-bootstrap",
+      bootstrap_url: CANONICAL_INSTALL_BOOTSTRAP_URL,
+      bootstrap_command: HOSTED_JUDGMENTKIT_BOOTSTRAP_COMMAND,
+      local_script_command: LOCAL_JUDGMENTKIT_INSTALLER_COMMAND,
+      default_checkout_path: DEFAULT_LOCAL_JUDGMENTKIT_CHECKOUT_PATH,
+      edits_config_by_default: true,
+      supports_dry_run: true,
+      supports_no_verify: true,
+    });
     expect(result.repository).toEqual({
       clone_url: JUDGMENTKIT_REPOSITORY_CLONE_URL,
       local_path_placeholder: LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER,

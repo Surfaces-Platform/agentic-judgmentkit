@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "other": {
+      "command": "node",
+      "args": ["./other.js"]
+    }
+  }
+}

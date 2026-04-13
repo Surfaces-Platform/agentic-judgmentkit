@@ -171,8 +171,11 @@ describe("homepage install smoke", () => {
   it("keeps the homepage prompts pointed at the canonical install flow", () => {
     const content = loadLandingPage();
 
+    expect(content.install_command).toBe(
+      "curl -fsSL https://judgmentkit.ai/install/bootstrap | bash -s -- --client <codex|claude|cursor>",
+    );
     expect(content.install_prompt).toBe(
-      `Install JudgmentKit in this client from ${CANONICAL_INSTALL_URL}`,
+      `If the hosted installer cannot edit this client, use the manual fallback at ${CANONICAL_INSTALL_URL}`,
     );
     expect(content.verify_prompt).toBe(
       "Call MCP tools/list against the local judgmentkit server",
