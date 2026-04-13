@@ -1,10 +1,8 @@
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
 import { createJudgmentKitMcpServer } from "@/lib/mcp-server";
-import { writeGeneratedArtifacts } from "@/lib/site";
 
 async function main() {
-  await writeGeneratedArtifacts();
   const server = createJudgmentKitMcpServer();
   const transport = new StdioServerTransport();
   await server.connect(transport);
