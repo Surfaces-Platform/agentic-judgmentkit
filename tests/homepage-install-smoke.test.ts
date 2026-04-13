@@ -171,9 +171,12 @@ describe("homepage install smoke", () => {
   it("keeps the homepage prompts pointed at the canonical install flow", () => {
     const content = loadLandingPage();
 
-    expect(content.install_prompt).toContain(CANONICAL_INSTALL_URL);
-    expect(content.verify_prompt).toContain("tools/list");
-    expect(content.verify_prompt).toContain('"judgmentkit"');
+    expect(content.install_prompt).toBe(
+      `Install JudgmentKit in this client from ${CANONICAL_INSTALL_URL}`,
+    );
+    expect(content.verify_prompt).toBe(
+      "Call MCP tools/list against the local judgmentkit server",
+    );
   });
 
   it("turns each published client snippet into a working local MCP connection", async () => {

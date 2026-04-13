@@ -13,8 +13,10 @@ describe("landing page", () => {
     expect(content.headline).toBe(
       "JudgmentKit gives your agent workflow guidance, guardrails, and verification.",
     );
-    expect(content.install_prompt).toContain("https://judgmentkit.ai/install");
-    expect(content.verify_prompt).toContain("tools/list");
+    expect(content.install_prompt).toBe("Install JudgmentKit in this client from https://judgmentkit.ai/install");
+    expect(content.verify_prompt).toBe(
+      "Call MCP tools/list against the local judgmentkit server",
+    );
   });
 
   it("renders the install and verify prompts without client cards", () => {
@@ -28,8 +30,8 @@ describe("landing page", () => {
     expect(markup).toContain("Ask agent what JudgmentKit can do");
     expect(markup).toContain('aria-label="Copy install prompt"');
     expect(markup).toContain('aria-label="Copy verify prompt"');
-    expect(markup).toContain("https://judgmentkit.ai/install");
-    expect(markup).toContain("tools/list");
+    expect(markup).toContain("Install JudgmentKit in this client from https://judgmentkit.ai/install");
+    expect(markup).toContain("Call MCP tools/list against the local judgmentkit server");
     expect(markup).not.toContain("through MCP");
     expect(markup).not.toContain("Codex");
     expect(markup).not.toContain("Claude");

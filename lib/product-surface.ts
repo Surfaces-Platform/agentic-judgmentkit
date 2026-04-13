@@ -120,11 +120,11 @@ function toRelativeUrl(url: string) {
 }
 
 function createHomepageInstallPrompt() {
-  return `Install JudgmentKit in this client from ${CANONICAL_INSTALL_URL}.`;
+  return `Install JudgmentKit in this client from ${CANONICAL_INSTALL_URL}`;
 }
 
 function createHomepageVerifyPrompt() {
-  return 'Call MCP tools/list against the local "judgmentkit" server.';
+  return "Call MCP tools/list against the local judgmentkit server";
 }
 
 function resolveConfigFormat(target: ProductSurfaceInstallTarget) {

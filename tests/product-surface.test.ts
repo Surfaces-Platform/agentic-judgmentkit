@@ -87,10 +87,10 @@ describe("product surface content", () => {
     const content = loadProductSurface();
 
     expect(content.install_prompt).toBe(
-      `Install JudgmentKit in this client from ${CANONICAL_INSTALL_URL}.`,
+      `Install JudgmentKit in this client from ${CANONICAL_INSTALL_URL}`,
     );
     expect(content.verify_prompt).toBe(
-      'Call MCP tools/list against the local "judgmentkit" server.',
+      "Call MCP tools/list against the local judgmentkit server",
     );
   });
 
