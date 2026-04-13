@@ -1,8 +1,20 @@
+import fs from "node:fs/promises";
 import path from "node:path";
 
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { afterEach, describe, expect, it } from "vitest";
+
+function getExpectedToolNames() {
+  return [
+    "list_resources",
+    "get_resource",
+    "get_workflow_bundle",
+    "get_page_markdown",
+    "get_example",
+    "resolve_related",
+  ];
+}
 
 function withTimeout<T>(promise: Promise<T>, timeoutMs: number) {
   return Promise.race([
@@ -16,28 +28,36 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number) {
 describe("stdio mcp server", () => {
   let transport: StdioClientTransport | undefined;
   let client: Client | undefined;
+  let stderrOutput = "";
 
   afterEach(async () => {
     await transport?.close();
     transport = undefined;
     client = undefined;
+    stderrOutput = "";
   });
 
-  it("responds to initialize and prompts/get over stdio", async () => {
-    const cliPath = path.join(
-      process.cwd(),
-      "node_modules",
-      "tsx",
-      "dist",
-      "cli.mjs",
+  it("launches the production stdio script and exposes the static tool catalog", async () => {
+    const packageJsonPath = path.join(process.cwd(), "package.json");
+    const packageJson = JSON.parse(
+      await fs.readFile(packageJsonPath, "utf8"),
+    ) as {
+      scripts?: Record<string, string>;
+    };
+
+    expect(packageJson.scripts?.["mcp:stdio"]).toBe(
+      "node --import tsx ./scripts/judgmentkit-mcp-stdio.ts",
     );
-    const scriptPath = path.join(process.cwd(), "scripts", "judgmentkit-mcp-stdio.ts");
 
     transport = new StdioClientTransport({
-      command: process.execPath,
-      args: [cliPath, scriptPath],
+      command: "npm",
+      args: ["--prefix", process.cwd(), "run", "mcp:stdio"],
       cwd: process.cwd(),
       stderr: "pipe",
+    });
+
+    transport.stderr?.on("data", (chunk: Buffer | string) => {
+      stderrOutput += chunk.toString();
     });
 
     client = new Client({
@@ -46,6 +66,11 @@ describe("stdio mcp server", () => {
     });
 
     await withTimeout(client.connect(transport), 5_000);
+
+    const toolsResponse = await withTimeout(client.listTools(), 5_000);
+    expect(toolsResponse.tools.map((tool) => tool.name)).toEqual(
+      getExpectedToolNames(),
+    );
 
     const promptResponse = await withTimeout(
       client.getPrompt({
@@ -82,5 +107,7 @@ describe("stdio mcp server", () => {
     expect(promptResponse.messages[0].content.text).toContain(
       "review_checklist",
     );
+    expect(stderrOutput).not.toContain("EPERM");
+    expect(stderrOutput).not.toContain("listen");
   });
 });

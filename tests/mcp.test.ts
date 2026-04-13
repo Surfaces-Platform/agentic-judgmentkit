@@ -1,11 +1,24 @@
-import { describe, expect, it } from "vitest";
+import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 
-import { getPrompt, handleToolCall } from "@/lib/mcp";
+import { afterEach, describe, expect, it } from "vitest";
+
+import {
+  getPrompt,
+  handleToolCall,
+  listTools,
+  setPublicDirOverrideForTests,
+} from "@/lib/mcp";
 
 const GENERIC_START_DESIGN_WORKFLOW_PROMPT =
   'Use JudgmentKit for this design task. Call get_workflow_bundle({ workflow_id: "workflow.ai-ui-generation" }) first. Treat any referenced design system as the source of truth for components, tokens, radius, elevation, surfaces, and theme behavior. If a design system is present, ask whether it has an accessibility baseline or owner-approved review status before generating UI; if that status is unknown, pause and ask first. If the brief conflicts with the design system, surface review questions and escalation items instead of silently overriding it. Only when the design system and the brief are both silent, use restrained fallback defaults: approved primitives, a tight 6px radius scale, no decorative gradients, no gratuitous shadows, and both light and dark mode by default. If the interface includes code blocks, inline viewers, inspectors, or artifact panels, also call get_resource({ id: "guardrail.surface-theme-parity" }) and use get_example({ id: "example.ui-generation.surface-theme-parity-drift" }) as calibration so those surfaces stay inside the active light/dark theme model instead of defaulting to a dark terminal treatment. Keep local controls inside or directly adjacent to the surface they govern so ownership stays obvious. Keep runtime bounded and surface review questions before inventing new patterns.';
 
 describe("mcp tools", () => {
+  afterEach(() => {
+    setPublicDirOverrideForTests();
+  });
+
   it("lists guardrail resources", async () => {
     const result = await handleToolCall("list_resources", { type: "guardrail" });
 
@@ -328,5 +341,55 @@ describe("mcp tools", () => {
       ),
     ).toBe(true);
     expect(result.related.resources.length).toBeGreaterThan(0);
+  });
+
+  it("keeps tools/list static when generated public artifacts are missing", async () => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "judgmentkit-mcp-"));
+    setPublicDirOverrideForTests(tempDir);
+
+    const result = await handleToolCall("list_resources", { type: "guardrail" });
+
+    expect(listTools().map((tool) => tool.name)).toEqual([
+      "list_resources",
+      "get_resource",
+      "get_workflow_bundle",
+      "get_page_markdown",
+      "get_example",
+      "resolve_related",
+    ]);
+    expect("error" in result).toBe(true);
+    if (!("error" in result)) {
+      return;
+    }
+
+    expect(result.error.code).toBe("generated_artifacts_missing");
+    expect(result.error.message).toContain(
+      "Generated public artifacts missing; run `npm run generate`.",
+    );
+    expect(result.error.message).toContain("public/resources/index.json");
+    expect(result.error.suggested_action).toContain("npm run generate");
+  });
+
+  it("reuses the actionable bootstrap error across content-backed tools", async () => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "judgmentkit-mcp-"));
+    setPublicDirOverrideForTests(tempDir);
+
+    const workflowResult = await handleToolCall("get_workflow_bundle", {
+      workflow_id: "workflow.ai-ui-generation",
+    });
+    const relatedResult = await handleToolCall("resolve_related", {
+      id: "workflow.ai-ui-generation",
+    });
+
+    expect("error" in workflowResult).toBe(true);
+    expect("error" in relatedResult).toBe(true);
+    if (!("error" in workflowResult) || !("error" in relatedResult)) {
+      return;
+    }
+
+    expect(workflowResult.error.code).toBe("generated_artifacts_missing");
+    expect(relatedResult.error.code).toBe("generated_artifacts_missing");
+    expect(workflowResult.error.message).toContain("public/graph.json");
+    expect(relatedResult.error.suggested_action).toContain("restart the stdio server");
   });
 });

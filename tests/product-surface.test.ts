@@ -37,7 +37,8 @@ describe("product surface content", () => {
       connection_value:
         "npm --prefix <ABSOLUTE_PATH_TO_LOCAL_JUDGMENTKIT_CHECKOUT> run mcp:stdio",
       config_path: "~/.codex/config.toml",
-      install_note: "Save the file and restart Codex.",
+      install_note:
+        "Save the file and restart Codex. Use the packaged mcp:stdio script and avoid wrappers that open auxiliary IPC listeners before stdio starts.",
     });
     expect(content.install_targets[1]).toMatchObject({
       transport: "stdio",
@@ -45,7 +46,8 @@ describe("product surface content", () => {
       connection_value:
         "npm --prefix <ABSOLUTE_PATH_TO_LOCAL_JUDGMENTKIT_CHECKOUT> run mcp:stdio",
       config_path: ".mcp.json",
-      install_note: "Save the file and restart Claude.",
+      install_note:
+        "Save the file and restart Claude. Use the packaged mcp:stdio script and avoid wrappers that open auxiliary IPC listeners before stdio starts.",
     });
     expect(content.install_targets[2]).toMatchObject({
       transport: "stdio",
@@ -53,7 +55,8 @@ describe("product surface content", () => {
       connection_value:
         "npm --prefix <ABSOLUTE_PATH_TO_LOCAL_JUDGMENTKIT_CHECKOUT> run mcp:stdio",
       config_path: "~/.cursor/mcp.json",
-      install_note: "Save the file and reload Cursor.",
+      install_note:
+        "Save the file and reload Cursor. Use the packaged mcp:stdio script and avoid wrappers that open auxiliary IPC listeners before stdio starts.",
     });
     expect(content.install_targets[0].config_snippet).toContain(
       `args = ["--prefix", "${LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER}", "run", "mcp:stdio"]`,

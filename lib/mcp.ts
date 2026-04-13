@@ -17,15 +17,87 @@ const GENERIC_START_DESIGN_WORKFLOW_PROMPT =
   'Use JudgmentKit for this design task. Call get_workflow_bundle({ workflow_id: "workflow.ai-ui-generation" }) first. Treat any referenced design system as the source of truth for components, tokens, radius, elevation, surfaces, and theme behavior. If a design system is present, ask whether it has an accessibility baseline or owner-approved review status before generating UI; if that status is unknown, pause and ask first. If the brief conflicts with the design system, surface review questions and escalation items instead of silently overriding it. Only when the design system and the brief are both silent, use restrained fallback defaults: approved primitives, a tight 6px radius scale, no decorative gradients, no gratuitous shadows, and both light and dark mode by default. If the interface includes code blocks, inline viewers, inspectors, or artifact panels, also call get_resource({ id: "guardrail.surface-theme-parity" }) and use get_example({ id: "example.ui-generation.surface-theme-parity-drift" }) as calibration so those surfaces stay inside the active light/dark theme model instead of defaulting to a dark terminal treatment. Keep local controls inside or directly adjacent to the surface they govern so ownership stays obvious. Keep runtime bounded and surface review questions before inventing new patterns.';
 
 const REFINE_DESIGN_FIRST_PASS_PROMPT_NAME = "refine_design_first_pass";
+const GENERATED_ARTIFACTS_MISSING_MESSAGE =
+  "Generated public artifacts missing; run `npm run generate`.";
+const GENERATED_ARTIFACTS_MISSING_ACTION =
+  "Run `npm run generate`, then restart the stdio server and retry the tool call.";
+const REQUIRED_PUBLIC_ARTIFACTS = [
+  { parts: ["resources", "index.json"], label: "public/resources/index.json" },
+  { parts: ["graph.json"], label: "public/graph.json" },
+  { parts: ["docs"], label: "public/docs" },
+] as const;
+
+class GeneratedArtifactsMissingError extends Error {
+  readonly code = "generated_artifacts_missing";
+
+  constructor(readonly missingPaths: string[]) {
+    super(
+      `${GENERATED_ARTIFACTS_MISSING_MESSAGE} Missing: ${missingPaths.join(", ")}.`,
+    );
+    this.name = "GeneratedArtifactsMissingError";
+  }
+}
+
+let publicDirOverride: string | undefined;
+let generatedArtifactsCheck: Promise<void> | undefined;
+
+function resolvePublicDir() {
+  return publicDirOverride ?? PUBLIC_DIR;
+}
+
+async function statPublicPath(...parts: string[]) {
+  const filePath = path.join(resolvePublicDir(), ...parts);
+  await fs.stat(filePath);
+}
+
+async function ensureGeneratedArtifactsAvailable() {
+  const pendingCheck =
+    generatedArtifactsCheck ??
+    (generatedArtifactsCheck = (async () => {
+      const missingPaths: string[] = [];
+
+      for (const artifact of REQUIRED_PUBLIC_ARTIFACTS) {
+        try {
+          await statPublicPath(...artifact.parts);
+        } catch (error) {
+          if ((error as NodeJS.ErrnoException)?.code === "ENOENT") {
+            missingPaths.push(artifact.label);
+            continue;
+          }
+
+          throw error;
+        }
+      }
+
+      if (missingPaths.length > 0) {
+        throw new GeneratedArtifactsMissingError(missingPaths);
+      }
+    })());
+
+  try {
+    await pendingCheck;
+  } catch (error) {
+    generatedArtifactsCheck = undefined;
+    throw error;
+  }
+}
+
+function isGeneratedArtifactsMissingError(
+  error: unknown,
+): error is GeneratedArtifactsMissingError {
+  return error instanceof GeneratedArtifactsMissingError;
+}
 
 async function readJson<T>(...parts: string[]) {
-  const filePath = path.join(PUBLIC_DIR, ...parts);
+  await ensureGeneratedArtifactsAvailable();
+  const filePath = path.join(resolvePublicDir(), ...parts);
   const raw = await fs.readFile(filePath, "utf8");
   return JSON.parse(raw) as T;
 }
 
 async function readText(...parts: string[]) {
-  const filePath = path.join(PUBLIC_DIR, ...parts);
+  await ensureGeneratedArtifactsAvailable();
+  const filePath = path.join(resolvePublicDir(), ...parts);
   return fs.readFile(filePath, "utf8");
 }
 
@@ -46,6 +118,14 @@ function createError(code: string, message: string, suggestedAction: string) {
       suggested_action: suggestedAction,
     },
   };
+}
+
+function createGeneratedArtifactsMissingResponse(error: GeneratedArtifactsMissingError) {
+  return createError(
+    error.code,
+    error.message,
+    GENERATED_ARTIFACTS_MISSING_ACTION,
+  );
 }
 
 function isRecord(value: unknown): value is JsonRecord {
@@ -408,7 +488,11 @@ async function getPageMarkdown(args: ToolArgs) {
       version: "1.0.0",
       markdown,
     });
-  } catch {
+  } catch (error) {
+    if (isGeneratedArtifactsMissingError(error)) {
+      throw error;
+    }
+
     return createError(
       "not_found",
       `Markdown mirror for ${slug} was not found.`,
@@ -519,26 +603,39 @@ const PROMPTS: Record<string, PromptDefinition> = {
 };
 
 export async function handleToolCall(name: string, args: ToolArgs) {
-  switch (name) {
-    case "list_resources":
-      return listResources(args);
-    case "get_resource":
-      return getResource(args);
-    case "get_workflow_bundle":
-      return getWorkflowBundle(args);
-    case "get_page_markdown":
-      return getPageMarkdown(args);
-    case "get_example":
-      return getExample(args);
-    case "resolve_related":
-      return resolveRelated(args);
-    default:
-      return createError(
-        "invalid_request",
-        `Tool ${name} is not supported.`,
-        "Call tools/list to discover available tools.",
-      );
+  try {
+    switch (name) {
+      case "list_resources":
+        return await listResources(args);
+      case "get_resource":
+        return await getResource(args);
+      case "get_workflow_bundle":
+        return await getWorkflowBundle(args);
+      case "get_page_markdown":
+        return await getPageMarkdown(args);
+      case "get_example":
+        return await getExample(args);
+      case "resolve_related":
+        return await resolveRelated(args);
+      default:
+        return createError(
+          "invalid_request",
+          `Tool ${name} is not supported.`,
+          "Call tools/list to discover available tools.",
+        );
+    }
+  } catch (error) {
+    if (isGeneratedArtifactsMissingError(error)) {
+      return createGeneratedArtifactsMissingResponse(error);
+    }
+
+    throw error;
   }
+}
+
+export function setPublicDirOverrideForTests(value?: string) {
+  publicDirOverride = value;
+  generatedArtifactsCheck = undefined;
 }
 
 export function listPrompts() {
