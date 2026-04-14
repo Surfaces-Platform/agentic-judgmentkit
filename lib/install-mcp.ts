@@ -9,7 +9,7 @@ import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js"
 import {
   JUDGMENTKIT_REPOSITORY_CLONE_URL,
 } from "@/lib/constants";
-import { loadInstallContract } from "@/lib/product-surface";
+import { loadInstallContract } from "@/lib/install-contract";
 import type { InstallContract, InstallContractClient, InstallerClientId } from "@/lib/types";
 
 type RunCommandOptions = {

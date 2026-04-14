@@ -1,3 +1,4 @@
+import { execFile } from "node:child_process";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -16,6 +17,59 @@ import {
 
 async function loadFixture(name: string) {
   return fs.readFile(path.join(process.cwd(), "tests", "fixtures", "install", name), "utf8");
+}
+
+function runInstallScript(
+  cwd: string,
+  env: NodeJS.ProcessEnv,
+  args: string[],
+) {
+  return new Promise<{ stdout: string; stderr: string }>((resolve, reject) => {
+    execFile(
+      process.execPath,
+      ["--import", "tsx", "./scripts/install-mcp.ts", ...args],
+      {
+        cwd,
+        env,
+        encoding: "utf8",
+      },
+      (error, stdout, stderr) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+
+        resolve({ stdout, stderr });
+      },
+    );
+  });
+}
+
+async function createInstallerSmokeCheckout() {
+  const checkoutDir = await fs.mkdtemp(
+    path.join(os.tmpdir(), "judgmentkit-install-smoke-checkout-"),
+  );
+
+  await fs.cp(path.join(process.cwd(), "lib"), path.join(checkoutDir, "lib"), {
+    recursive: true,
+  });
+  await fs.cp(
+    path.join(process.cwd(), "content", "product-surface.json"),
+    path.join(checkoutDir, "content", "product-surface.json"),
+  );
+  await fs.cp(
+    path.join(process.cwd(), "scripts", "install-mcp.ts"),
+    path.join(checkoutDir, "scripts", "install-mcp.ts"),
+  );
+  await fs.cp(path.join(process.cwd(), "package.json"), path.join(checkoutDir, "package.json"));
+  await fs.cp(path.join(process.cwd(), "tsconfig.json"), path.join(checkoutDir, "tsconfig.json"));
+  await fs.symlink(
+    path.join(process.cwd(), "node_modules"),
+    path.join(checkoutDir, "node_modules"),
+    "dir",
+  );
+
+  return checkoutDir;
 }
 
 describe("install script", () => {
@@ -123,5 +177,30 @@ args = ["--prefix", "/tmp/new-judgmentkit", "run", "mcp:stdio"]`,
       expect(writtenConfig).toContain("judgmentkit");
       expect(writtenConfig).toContain(process.cwd());
     }
+  });
+
+  it("runs the installer CLI in a checkout without generated public artifacts", async () => {
+    const checkoutDir = await createInstallerSmokeCheckout();
+    const homeDir = await fs.mkdtemp(path.join(os.tmpdir(), "judgmentkit-home-"));
+
+    await expect(
+      fs.stat(path.join(checkoutDir, "public", "resources", "index.json")),
+    ).rejects.toMatchObject({ code: "ENOENT" });
+
+    const { stdout, stderr } = await runInstallScript(
+      checkoutDir,
+      {
+        ...process.env,
+        HOME: homeDir,
+      },
+      ["--client", "codex", "--dry-run"],
+    );
+
+    expect(stderr).toBe("");
+    expect(stdout).toContain("JudgmentKit installer prepared client: codex");
+    expect(stdout).toContain(`Checkout path: ${path.join(homeDir, "judgmentkit")}`);
+    expect(stdout).toContain("Mode: dry-run/manual");
+    expect(stdout).toContain("Manual fallback snippet:");
+    expect(stdout).not.toContain("MODULE_NOT_FOUND");
   });
 });

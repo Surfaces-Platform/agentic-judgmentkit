@@ -19,8 +19,9 @@ import {
   LOCAL_JUDGMENTKIT_INSTALLER_COMMAND,
   LOCAL_JUDGMENTKIT_STDIO_ARGS,
 } from "@/lib/constants";
+import { loadInstallContract } from "@/lib/install-contract";
 import { listPrompts, listTools } from "@/lib/mcp";
-import { loadInstallContract, loadProductSurface } from "@/lib/product-surface";
+import { loadProductSurface } from "@/lib/product-surface";
 import rawExampleArtifact from "@/public/resources/examples/ui-generation-drift.v1.json";
 
 describe("product surface content", () => {

@@ -3,8 +3,8 @@ import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js"
 import { describe, expect, it } from "vitest";
 
 import { renderManualConfigSnippet } from "@/lib/install-mcp";
+import { loadInstallContract } from "@/lib/install-contract";
 import { loadLandingPage } from "@/lib/landing-page";
-import { loadInstallContract } from "@/lib/product-surface";
 import type { InstallContract, InstallContractClient } from "@/lib/types";
 
 function withTimeout<T>(promise: Promise<T>, timeoutMs: number) {
