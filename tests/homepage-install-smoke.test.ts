@@ -2,8 +2,8 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { describe, expect, it } from "vitest";
 
-import { GET } from "@/app/install/route";
-import { CANONICAL_INSTALL_URL } from "@/lib/constants";
+import { GET } from "@/app/install.json/route";
+import { renderManualConfigSnippet } from "@/lib/install-mcp";
 import { loadLandingPage } from "@/lib/landing-page";
 import type { InstallContract, InstallContractClient } from "@/lib/types";
 
@@ -73,14 +73,8 @@ function parseJsonConfigSnippet(snippet: string) {
   };
 }
 
-function parseClientConnection(
-  contract: InstallContract,
-  clientConfig: InstallContractClient,
-) {
-  const materializedSnippet = materializeLocalPath(
-    clientConfig.config_snippet,
-    contract,
-  );
+function parseClientConnection(clientConfig: InstallContractClient) {
+  const materializedSnippet = renderManualConfigSnippet(clientConfig, process.cwd());
 
   if (clientConfig.config_format === "toml") {
     return parseCodexConfigSnippet(materializedSnippet);
@@ -113,7 +107,7 @@ async function verifyClientInstall(
   contract: InstallContract,
   clientConfig: InstallContractClient,
 ) {
-  const configuredConnection = parseClientConnection(contract, clientConfig);
+  const configuredConnection = parseClientConnection(clientConfig);
   const expectedConnection = materializeConnection(contract);
 
   expect(configuredConnection).toEqual(expectedConnection);
@@ -172,17 +166,14 @@ describe("homepage install smoke", () => {
     const content = loadLandingPage();
 
     expect(content.install_command).toBe(
-      "curl -fsSL https://judgmentkit.ai/install/bootstrap | bash -s -- --client <codex|claude|cursor>",
-    );
-    expect(content.install_prompt).toBe(
-      `If the hosted installer cannot edit this client, use the manual fallback at ${CANONICAL_INSTALL_URL}`,
+      "curl -fsSL https://judgmentkit.ai/install | bash -s -- --client <codex|claude|cursor>",
     );
     expect(content.verify_prompt).toBe(
       "Call MCP tools/list against the local judgmentkit server",
     );
   });
 
-  it("turns each published client snippet into a working local MCP connection", async () => {
+  it("turns each supported client config into a working local MCP connection", async () => {
     const contract = await loadInstallContractFromRoute();
 
     expect(contract.supported_clients).toEqual(

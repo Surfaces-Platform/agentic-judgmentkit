@@ -112,23 +112,14 @@ export type InstallerClientId = "codex" | "claude" | "cursor";
 export type ProductSurfaceInstallTarget = {
   id: InstallerClientId;
   label: string;
-  transport: ProductSurfaceTransport;
-  connection_label: string;
-  connection_value: string;
   config_path: string;
-  install_note: string;
-  config_snippet: string;
-  starter_call: string;
 };
 
 export type InstallContractClient = {
   id: InstallerClientId;
   label: string;
-  transport: ProductSurfaceTransport;
   config_path: string;
   config_format: "json" | "toml";
-  config_snippet: string;
-  install_note: string;
 };
 
 export type InstallContractInstaller = {
@@ -174,7 +165,7 @@ export type InstallContractVerification = {
 export type InstallContract = {
   version: string;
   product_name: string;
-  canonical_install_url: string;
+  manifest_url: string;
   command_reference_url: string;
   warning: string;
   installer: InstallContractInstaller;
@@ -263,7 +254,6 @@ export type ProductSurfaceContent = {
   context_support: string;
   install_targets: ProductSurfaceInstallTarget[];
   install_command: string;
-  install_prompt: string;
   verify_prompt: string;
   install_contract: InstallContract;
   tool_reference: InstallContractCommandReference[];
@@ -338,7 +328,6 @@ export type LandingPageContent = {
   headline: string;
   subhead: string;
   install_command: string;
-  install_prompt: string;
   verify_prompt: string;
   inspect: ProductSurfaceInspectLink;
 };

@@ -2,8 +2,8 @@ import { z } from "zod";
 
 import rawProductSurface from "@/content/product-surface.json";
 import {
+  CANONICAL_INSTALL_MANIFEST_URL,
   CANONICAL_INSTALL_URL,
-  CANONICAL_INSTALL_BOOTSTRAP_URL,
   CANONICAL_SITE_URL,
   DEFAULT_LOCAL_JUDGMENTKIT_CHECKOUT_PATH,
   HOSTED_MCP_REFERENCE_URL,
@@ -40,13 +40,7 @@ const installClientIdSchema = z.enum(["codex", "claude", "cursor"]);
 const installTargetSchema = z.object({
   id: installClientIdSchema,
   label: z.string(),
-  transport: z.enum(["http", "stdio"]),
-  connection_label: z.string(),
-  connection_value: z.string(),
   config_path: z.string(),
-  install_note: z.string(),
-  config_snippet: z.string(),
-  starter_call: z.string(),
 });
 
 const productSurfaceSchema = z.object({
@@ -126,10 +120,6 @@ function toRelativeUrl(url: string) {
   return url.startsWith(ROOT_URL) ? url.replace(ROOT_URL, "") : url;
 }
 
-function createHomepageInstallPrompt() {
-  return `If the hosted installer cannot edit this client, use the manual fallback at ${CANONICAL_INSTALL_URL}`;
-}
-
 function createHomepageInstallCommand() {
   return HOSTED_JUDGMENTKIT_BOOTSTRAP_COMMAND;
 }
@@ -160,7 +150,7 @@ function getPublishedItemFormat(link: ProductSurfaceReferenceLink): ProductSurfa
   }
 
   if (link.url === "/install") {
-    return "html";
+    return "text";
   }
 
   return "text";
@@ -200,7 +190,9 @@ Task:
 function createPublishedPromptText(link: ProductSurfaceReferenceLink) {
   switch (link.url) {
     case "/install":
-      return "Use this when you need the exact local stdio install contract an agent should follow. It is the authoritative install surface for cloning JudgmentKit, installing dependencies, and wiring the local MCP server.";
+      return "Use this when you want the hosted bootstrap script that clones JudgmentKit, installs dependencies, and delegates to the repo-local installer.";
+    case "/install.json":
+      return "Use this when you need the machine-readable bootstrap manifest for JudgmentKit. It describes the hosted install script, the local stdio runtime contract, supported clients, and post-install verification.";
     case "/mcp-inventory.json":
       return "Use this when you want the published command inventory and inspect anchors. It is the fastest way to verify which tools and prompts the deployed JudgmentKit surface exposes.";
     case "/llms.txt":
@@ -326,14 +318,14 @@ export function loadInstallContract(): InstallContract {
   const promptReference = createPromptReferences(CANONICAL_SITE_URL);
 
   return {
-    version: "2.0.0",
+    version: "3.0.0",
     product_name: content.product_name,
-    canonical_install_url: CANONICAL_INSTALL_URL,
+    manifest_url: CANONICAL_INSTALL_MANIFEST_URL,
     command_reference_url: createCommandReferenceUrl(CANONICAL_SITE_URL),
-    warning: `Install JudgmentKit from a local checkout over stdio. ${HOSTED_MCP_REFERENCE_URL} is a hosted reference/debug endpoint, not the install target.`,
+    warning: `Install JudgmentKit from a local checkout over stdio via the hosted bootstrap script at ${CANONICAL_INSTALL_URL}. ${HOSTED_MCP_REFERENCE_URL} is a hosted reference/debug endpoint, not the install target.`,
     installer: {
       mode: "hosted-bootstrap",
-      bootstrap_url: CANONICAL_INSTALL_BOOTSTRAP_URL,
+      bootstrap_url: CANONICAL_INSTALL_URL,
       bootstrap_command: HOSTED_JUDGMENTKIT_BOOTSTRAP_COMMAND,
       local_script_command: LOCAL_JUDGMENTKIT_INSTALLER_COMMAND,
       default_checkout_path: DEFAULT_LOCAL_JUDGMENTKIT_CHECKOUT_PATH,
@@ -356,11 +348,8 @@ export function loadInstallContract(): InstallContract {
     clients: content.install_targets.map((target) => ({
       id: target.id,
       label: target.label,
-      transport: target.transport,
       config_path: target.config_path,
       config_format: resolveConfigFormat(target),
-      config_snippet: target.config_snippet,
-      install_note: target.install_note,
     })),
     verification: {
       method: "tools/list",
@@ -416,7 +405,6 @@ export function loadProductSurface(): ProductSurfaceContent {
     ...content,
     install_targets: content.install_targets,
     install_command: createHomepageInstallCommand(),
-    install_prompt: createHomepageInstallPrompt(),
     verify_prompt: createHomepageVerifyPrompt(),
     install_contract: installContract,
     tool_reference: createToolReferences(),

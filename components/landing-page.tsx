@@ -13,11 +13,6 @@ export function LandingPage({ content }: LandingPageProps) {
       value: content.install_command,
     },
     {
-      title: "Manual fallback",
-      copyLabel: "Copy manual fallback prompt",
-      value: content.install_prompt,
-    },
-    {
       title: "Verify locally",
       copyLabel: "Copy verify prompt",
       value: content.verify_prompt,

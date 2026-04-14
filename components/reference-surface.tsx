@@ -86,7 +86,7 @@ function inferReferenceFormat(url: string): ProductSurfaceInspectFormat {
   }
 
   if (url === "/install") {
-    return "html";
+    return "text";
   }
 
   return "html";

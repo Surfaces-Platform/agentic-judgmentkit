@@ -8,7 +8,6 @@ import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js"
 
 import {
   JUDGMENTKIT_REPOSITORY_CLONE_URL,
-  LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER,
 } from "@/lib/constants";
 import { loadInstallContract } from "@/lib/product-surface";
 import type { InstallContract, InstallContractClient, InstallerClientId } from "@/lib/types";
@@ -221,10 +220,23 @@ function getClientContract(
 }
 
 export function renderManualConfigSnippet(client: InstallContractClient, checkoutPath: string) {
-  return client.config_snippet.replaceAll(
-    LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER,
-    checkoutPath,
-  );
+  const connection = materializeConnection(loadInstallContract(), checkoutPath);
+
+  if (client.config_format === "toml") {
+    return `[mcp_servers.judgmentkit]
+command = "${connection.command}"
+args = ${JSON.stringify(connection.args)}`;
+  }
+
+  return `${JSON.stringify(
+    {
+      mcpServers: {
+        judgmentkit: connection,
+      },
+    },
+    null,
+    2,
+  )}\n`;
 }
 
 export function upsertCodexTomlConfig(existingText: string, judgmentKitBlock: string) {

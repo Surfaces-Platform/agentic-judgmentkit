@@ -2,7 +2,7 @@ import path from "node:path";
 
 export const CANONICAL_SITE_URL = "https://judgmentkit.ai";
 export const CANONICAL_INSTALL_URL = `${CANONICAL_SITE_URL}/install`;
-export const CANONICAL_INSTALL_BOOTSTRAP_URL = `${CANONICAL_INSTALL_URL}/bootstrap`;
+export const CANONICAL_INSTALL_MANIFEST_URL = `${CANONICAL_SITE_URL}/install.json`;
 export const HOSTED_MCP_REFERENCE_URL = `${CANONICAL_SITE_URL}/mcp`;
 export const DEFAULT_LOCAL_SITE_URL = "http://localhost:3000";
 export const JUDGMENTKIT_REPOSITORY_CLONE_URL =
@@ -20,7 +20,7 @@ export const LOCAL_JUDGMENTKIT_STDIO_ARGS = [
 export const LOCAL_JUDGMENTKIT_STDIO_COMMAND = `npm --prefix ${LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER} run mcp:stdio`;
 export const LOCAL_JUDGMENTKIT_INSTALLER_COMMAND =
   "node --import tsx ./scripts/install-mcp.ts";
-export const HOSTED_JUDGMENTKIT_BOOTSTRAP_COMMAND = `curl -fsSL ${CANONICAL_INSTALL_BOOTSTRAP_URL} | bash -s -- --client <codex|claude|cursor>`;
+export const HOSTED_JUDGMENTKIT_BOOTSTRAP_COMMAND = `curl -fsSL ${CANONICAL_INSTALL_URL} | bash -s -- --client <codex|claude|cursor>`;
 
 function normalizeSiteUrl(value: string) {
   const trimmed = value.trim();

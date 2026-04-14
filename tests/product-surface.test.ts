@@ -12,7 +12,7 @@ import {
   formatReferenceSourceText,
 } from "@/components/reference-surface";
 import {
-  CANONICAL_INSTALL_URL,
+  CANONICAL_INSTALL_MANIFEST_URL,
   HOSTED_JUDGMENTKIT_BOOTSTRAP_COMMAND,
   JUDGMENTKIT_REPOSITORY_CLONE_URL,
   LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER,
@@ -34,38 +34,17 @@ describe("product surface content", () => {
       "cursor",
     ]);
     expect(content.install_targets[0]).toMatchObject({
-      transport: "stdio",
-      connection_label: "Command",
-      connection_value:
-        "npm --prefix <ABSOLUTE_PATH_TO_LOCAL_JUDGMENTKIT_CHECKOUT> run mcp:stdio",
       config_path: "~/.codex/config.toml",
-      install_note:
-        "Save the file and restart Codex. Use the packaged mcp:stdio script and avoid wrappers that open auxiliary IPC listeners before stdio starts.",
     });
     expect(content.install_targets[1]).toMatchObject({
-      transport: "stdio",
-      connection_label: "Command",
-      connection_value:
-        "npm --prefix <ABSOLUTE_PATH_TO_LOCAL_JUDGMENTKIT_CHECKOUT> run mcp:stdio",
       config_path: ".mcp.json",
-      install_note:
-        "Save the file and restart Claude. Use the packaged mcp:stdio script and avoid wrappers that open auxiliary IPC listeners before stdio starts.",
     });
     expect(content.install_targets[2]).toMatchObject({
-      transport: "stdio",
-      connection_label: "Command",
-      connection_value:
-        "npm --prefix <ABSOLUTE_PATH_TO_LOCAL_JUDGMENTKIT_CHECKOUT> run mcp:stdio",
       config_path: "~/.cursor/mcp.json",
-      install_note:
-        "Save the file and reload Cursor. Use the packaged mcp:stdio script and avoid wrappers that open auxiliary IPC listeners before stdio starts.",
     });
-    expect(content.install_targets[0].config_snippet).toContain(
-      `args = ["--prefix", "${LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER}", "run", "mcp:stdio"]`,
-    );
-    expect(content.install_targets[1].config_snippet).toContain(
-      `"args": ["--prefix", "${LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER}", "run", "mcp:stdio"]`,
-    );
+    expect(content.install_targets[0]).not.toHaveProperty("config_snippet");
+    expect(content.install_targets[0]).not.toHaveProperty("install_note");
+    expect(content.install_targets[0]).not.toHaveProperty("connection_value");
     expect(content.install_contract.supported_clients).toEqual([
       "codex",
       "claude",
@@ -88,23 +67,22 @@ describe("product surface content", () => {
     ]);
   });
 
-  it("derives client-agnostic install and verify prompts", () => {
+  it("derives bootstrap-only install and verify prompts", () => {
     const content = loadProductSurface();
 
     expect(content.install_command).toBe(HOSTED_JUDGMENTKIT_BOOTSTRAP_COMMAND);
-    expect(content.install_prompt).toBe(
-      `If the hosted installer cannot edit this client, use the manual fallback at ${CANONICAL_INSTALL_URL}`,
-    );
     expect(content.verify_prompt).toBe(
       "Call MCP tools/list against the local judgmentkit server",
     );
   });
 
-  it("builds a canonical /install contract for agents", () => {
+  it("builds a canonical /install.json manifest for agents", () => {
     const contract = loadInstallContract();
 
-    expect(contract.canonical_install_url).toBe(CANONICAL_INSTALL_URL);
+    expect(contract.version).toBe("3.0.0");
+    expect(contract.manifest_url).toBe(CANONICAL_INSTALL_MANIFEST_URL);
     expect(contract.command_reference_url).toBe("https://judgmentkit.ai/inspect#commands");
+    expect(contract.installer.bootstrap_url).toBe("https://judgmentkit.ai/install");
     expect(contract.installer.local_script_command).toBe(
       LOCAL_JUDGMENTKIT_INSTALLER_COMMAND,
     );
@@ -119,22 +97,28 @@ describe("product surface content", () => {
     });
     expect(contract.supported_clients).toEqual(["codex", "claude", "cursor"]);
     expect(contract.clients).toEqual([
-      expect.objectContaining({
+      {
         id: "codex",
+        label: "Codex",
         config_path: "~/.codex/config.toml",
         config_format: "toml",
-      }),
-      expect.objectContaining({
+      },
+      {
         id: "claude",
+        label: "Claude",
         config_path: ".mcp.json",
         config_format: "json",
-      }),
-      expect.objectContaining({
+      },
+      {
         id: "cursor",
+        label: "Cursor",
         config_path: "~/.cursor/mcp.json",
         config_format: "json",
-      }),
+      },
     ]);
+    expect(contract.clients[0]).not.toHaveProperty("config_snippet");
+    expect(contract.clients[0]).not.toHaveProperty("install_note");
+    expect(contract.clients[0]).not.toHaveProperty("transport");
     expect(contract.verification.method).toBe("tools/list");
     expect(contract.verification.server_name).toBe("judgmentkit");
     expect(contract.verification.instructions).toContain("tools/list");
@@ -170,9 +154,10 @@ describe("product surface content", () => {
       href: "/reference",
       label: "Open JudgmentKit reference",
       description:
-        "Use the install contract, command anchors, published artifacts, and hosted debug surfaces when you need to verify what is deployed or inspect the machine-facing materials outside the inline browser.",
+        "Use the install script, install manifest, command anchors, published artifacts, and hosted debug surfaces when you need to verify what is deployed or inspect the machine-facing materials outside the inline browser.",
     });
     expect(urls).toContain("/install");
+    expect(urls).toContain("/install.json");
     expect(urls).toContain("/mcp");
     expect(urls).toContain("/mcp-inventory.json");
     expect(urls).toContain("/llms.txt");
@@ -193,8 +178,9 @@ describe("product surface content", () => {
     const exampleItem = content.inspect_primary_items.find(
       (item) => item.id === "example.ui-generation.embellishment-drift",
     );
-    const referenceItem = content.inspect_reference_items.find(
-      (item) => item.url === "/install",
+    const installScriptItem = content.inspect_reference_items.find((item) => item.url === "/install");
+    const installManifestItem = content.inspect_reference_items.find(
+      (item) => item.url === "/install.json",
     );
 
     expect(content.inspect_primary_items[0]?.id).toBe(
@@ -211,12 +197,18 @@ describe("product surface content", () => {
     expect(guardrailItem?.prompt_text).toContain("Draft:");
     expect(exampleItem?.prompt_text).toContain("Use JudgmentKit example");
     expect(exampleItem?.prompt_text).toContain("Task:");
-    expect(referenceItem).toMatchObject({
+    expect(installScriptItem).toMatchObject({
+      group: "Install and discovery",
+      type: "script",
+      raw_format: "text",
+    });
+    expect(installScriptItem?.summary).toContain("hosted bootstrap script");
+    expect(installManifestItem).toMatchObject({
       group: "Install and discovery",
       type: "install",
-      raw_format: "html",
+      raw_format: "json",
     });
-    expect(referenceItem?.summary).toContain("authoritative install surface");
+    expect(installManifestItem?.summary).toContain("machine-readable bootstrap manifest");
   });
 
   it("sources the proof from the published example artifact", () => {
@@ -267,7 +259,7 @@ describe("product surface content", () => {
     expect(markup).not.toContain("Reference");
     expect(markup).not.toContain("Published artifacts and command anchors");
     expect(markup).not.toContain("Implementation reference");
-    expect(markup).not.toContain("Install contract");
+    expect(markup).not.toContain("Install manifest");
     expect(markup).not.toContain("Command inventory");
     expect(markup.indexOf(">Examples<")).toBeLessThan(markup.indexOf(">Workflows<"));
     expect(markup.indexOf(">Examples<")).toBeLessThan(markup.indexOf(">Guardrails<"));
@@ -292,7 +284,8 @@ describe("product surface content", () => {
     expect(markup).toContain("Published artifacts and command anchors");
     expect(markup).toContain('placeholder="Search reference"');
     expect(markup).toContain("Implementation reference");
-    expect(markup).toContain("Install contract");
+    expect(markup).toContain("Install script");
+    expect(markup).toContain("Install manifest");
     expect(markup).toContain("Command inventory");
     expect(markup).toContain("get_workflow_bundle");
     expect(markup).toContain("start_design_workflow");

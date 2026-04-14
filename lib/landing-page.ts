@@ -18,7 +18,6 @@ export function loadLandingPage(): LandingPageContent {
   return {
     ...content,
     install_command: productSurface.install_command,
-    install_prompt: productSurface.install_prompt,
     verify_prompt: productSurface.verify_prompt,
     inspect: productSurface.inspect,
   };

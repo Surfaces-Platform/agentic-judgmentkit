@@ -1,85 +1,26 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  CANONICAL_INSTALL_URL,
-  CANONICAL_INSTALL_BOOTSTRAP_URL,
   DEFAULT_LOCAL_JUDGMENTKIT_CHECKOUT_PATH,
-  HOSTED_MCP_REFERENCE_URL,
-  HOSTED_JUDGMENTKIT_BOOTSTRAP_COMMAND,
   JUDGMENTKIT_REPOSITORY_CLONE_URL,
-  LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER,
-  LOCAL_JUDGMENTKIT_INSTALL_COMMAND,
-  LOCAL_JUDGMENTKIT_INSTALLER_COMMAND,
-  LOCAL_JUDGMENTKIT_STDIO_ARGS,
 } from "@/lib/constants";
 import { GET } from "@/app/install/route";
 
 describe("install route", () => {
-  it("returns the canonical install contract for agents", async () => {
+  it("returns the hosted bootstrap script", async () => {
     const response = await GET();
-    const result = await response.json();
+    const script = await response.text();
 
-    expect(result.product_name).toBe("JudgmentKit");
-    expect(result.canonical_install_url).toBe(CANONICAL_INSTALL_URL);
-    expect(result.command_reference_url).toBe("https://judgmentkit.ai/inspect#commands");
-    expect(result.warning).toContain(HOSTED_MCP_REFERENCE_URL);
-    expect(result.installer).toEqual({
-      mode: "hosted-bootstrap",
-      bootstrap_url: CANONICAL_INSTALL_BOOTSTRAP_URL,
-      bootstrap_command: HOSTED_JUDGMENTKIT_BOOTSTRAP_COMMAND,
-      local_script_command: LOCAL_JUDGMENTKIT_INSTALLER_COMMAND,
-      default_checkout_path: DEFAULT_LOCAL_JUDGMENTKIT_CHECKOUT_PATH,
-      edits_config_by_default: true,
-      supports_dry_run: true,
-      supports_no_verify: true,
-    });
-    expect(result.repository).toEqual({
-      clone_url: JUDGMENTKIT_REPOSITORY_CLONE_URL,
-      local_path_placeholder: LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER,
-      install_command: LOCAL_JUDGMENTKIT_INSTALL_COMMAND,
-    });
-    expect(result.connection).toEqual({
-      command: "npm",
-      args: LOCAL_JUDGMENTKIT_STDIO_ARGS,
-    });
-    expect(result.supported_clients).toEqual(["codex", "claude", "cursor"]);
-    expect(result.clients).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          id: "codex",
-          config_path: "~/.codex/config.toml",
-          config_format: "toml",
-        }),
-        expect.objectContaining({
-          id: "claude",
-          config_path: ".mcp.json",
-          config_format: "json",
-        }),
-        expect.objectContaining({
-          id: "cursor",
-          config_path: "~/.cursor/mcp.json",
-          config_format: "json",
-        }),
-      ]),
-    );
-    expect(result.verification.method).toBe("tools/list");
-    expect(result.verification.instructions).toContain("tools/list");
-    expect(result.verification.tool_reference).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          name: "get_workflow_bundle",
-          docs_url: "https://judgmentkit.ai/inspect#tool-get_workflow_bundle",
-        }),
-      ]),
-    );
-    expect(result.verification.prompt_reference).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          name: "start_design_workflow",
-          docs_url: "https://judgmentkit.ai/inspect#prompt-start_design_workflow",
-        }),
-      ]),
-    );
-    expect(result.verification.expected_tools).toContain("get_workflow_bundle");
+    expect(response.headers.get("content-type")).toContain("text/x-shellscript");
+    expect(script).toContain("#!/usr/bin/env bash");
+    expect(script).toContain(JUDGMENTKIT_REPOSITORY_CLONE_URL);
+    expect(script).toContain(DEFAULT_LOCAL_JUDGMENTKIT_CHECKOUT_PATH.replace("$HOME", "${HOME}"));
+    expect(script).toContain("npm install");
+    expect(script).toContain("scripts/install-mcp.ts");
+    expect(script).toContain('--path "$CHECKOUT_PATH"');
+    expect(script).not.toContain("install/bootstrap");
+    expect(script).not.toContain("install.json");
+    expect(script).not.toContain('"mcpServers"');
+    expect(script).not.toContain("~/.codex/config.toml");
   });
 });
