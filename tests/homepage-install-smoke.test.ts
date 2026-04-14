@@ -164,6 +164,20 @@ describe("homepage install smoke", () => {
   it("keeps the homepage prompts pointed at the canonical install flow", () => {
     const content = loadLandingPage();
 
+    expect(content.install_options).toEqual([
+      expect.objectContaining({
+        id: "codex",
+        command: "curl -fsSL https://judgmentkit.ai/install | bash -s -- --client codex",
+      }),
+      expect.objectContaining({
+        id: "claude",
+        command: "curl -fsSL https://judgmentkit.ai/install | bash -s -- --client claude",
+      }),
+      expect.objectContaining({
+        id: "cursor",
+        command: "curl -fsSL https://judgmentkit.ai/install | bash -s -- --client cursor",
+      }),
+    ]);
     expect(content.install_command).toBe(
       "curl -fsSL https://judgmentkit.ai/install | bash -s -- --client <codex|claude|cursor>",
     );

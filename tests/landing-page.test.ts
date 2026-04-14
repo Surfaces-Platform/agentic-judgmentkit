@@ -13,6 +13,23 @@ describe("landing page", () => {
     expect(content.headline).toBe(
       "JudgmentKit gives your agent workflow guidance, guardrails, and verification.",
     );
+    expect(content.install_options).toEqual([
+      {
+        id: "codex",
+        label: "Codex",
+        command: "curl -fsSL https://judgmentkit.ai/install | bash -s -- --client codex",
+      },
+      {
+        id: "claude",
+        label: "Claude",
+        command: "curl -fsSL https://judgmentkit.ai/install | bash -s -- --client claude",
+      },
+      {
+        id: "cursor",
+        label: "Cursor",
+        command: "curl -fsSL https://judgmentkit.ai/install | bash -s -- --client cursor",
+      },
+    ]);
     expect(content.install_command).toBe(
       "curl -fsSL https://judgmentkit.ai/install | bash -s -- --client <codex|claude|cursor>",
     );
@@ -21,30 +38,40 @@ describe("landing page", () => {
     );
   });
 
-  it("renders the install and verify prompts without client cards", () => {
+  it("keeps the centered stack while right-aligning client selectors with the installer heading", () => {
     const content = loadLandingPage();
     const markup = renderToStaticMarkup(createElement(LandingPage, { content }));
 
     expect(markup).toContain(
       "JudgmentKit gives your agent workflow guidance, guardrails, and verification.",
     );
+    expect(markup).toContain("Codex");
+    expect(markup).toContain("Claude");
+    expect(markup).toContain("Cursor");
     expect(markup).toContain("Run the installer");
     expect(markup).toContain("Verify locally");
-    expect(markup).toContain('aria-label="Copy install command"');
+    expect(markup).toContain('aria-label="Copy Codex install command"');
     expect(markup).toContain('aria-label="Copy verify prompt"');
+    expect(markup).toContain('class="mx-auto flex w-full max-w-[42rem] flex-col items-center text-center"');
     expect(markup).toContain(
-      "curl -fsSL https://judgmentkit.ai/install | bash -s -- --client &lt;codex|claude|cursor&gt;",
+      'class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"',
+    );
+    expect(markup).toContain('class="flex flex-wrap gap-1.5 sm:justify-end"');
+    expect(markup).toContain(
+      "curl -fsSL https://judgmentkit.ai/install | bash -s -- --client codex",
     );
     expect(markup).toContain("Call MCP tools/list against the local judgmentkit server");
     expect(markup).not.toContain("Manual fallback");
     expect(markup).not.toContain("through MCP");
-    expect(markup).not.toContain("Codex");
-    expect(markup).not.toContain("Claude");
-    expect(markup).not.toContain("Cursor");
     expect(markup).not.toContain("~/.codex/config.toml");
     expect(markup).not.toContain(".mcp.json");
     expect(markup).not.toContain("~/.cursor/mcp.json");
     expect(markup).not.toContain("&lt;ABSOLUTE_PATH_TO_LOCAL_JUDGMENTKIT_CHECKOUT&gt;");
+    expect(markup).not.toContain(
+      "curl -fsSL https://judgmentkit.ai/install | bash -s -- --client &lt;codex|claude|cursor&gt;",
+    );
+    expect(markup).not.toContain("landing-flat-panel");
+    expect(markup).not.toContain("lg:grid-cols-[minmax(0,1fr)_minmax(22rem,30rem)]");
     expect(markup).not.toContain("Two prompts. That is the whole setup.");
     expect(markup).not.toContain("Open JudgmentKit reference");
   });

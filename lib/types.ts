@@ -321,11 +321,18 @@ export type LandingPageSupportStep = {
   body: string;
 };
 
+export type LandingPageInstallOption = {
+  id: InstallerClientId;
+  label: string;
+  command: string;
+};
+
 export type LandingPageContent = {
   product_name: string;
   eyebrow: string;
   headline: string;
   subhead: string;
+  install_options: LandingPageInstallOption[];
   install_command: string;
   verify_prompt: string;
   inspect: ProductSurfaceInspectLink;
