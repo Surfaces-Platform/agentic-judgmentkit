@@ -34,7 +34,7 @@
   "inspect": {
     "href": "/reference",
     "label": "Open JudgmentKit reference",
-    "description": "Use the install script, install manifest, command anchors, published artifacts, and hosted debug surfaces when you need to verify what is deployed or inspect the machine-facing materials outside the inline browser."
+    "description": "Use the install script, command anchors, published artifacts, and hosted debug surfaces when you need to verify what is deployed or inspect the machine-facing materials outside the inline browser."
   },
   "reference_links": [
     {
@@ -42,12 +42,6 @@
       "label": "Install script",
       "url": "/install",
       "kind": "script"
-    },
-    {
-      "group": "Install and discovery",
-      "label": "Install manifest",
-      "url": "/install.json",
-      "kind": "install"
     },
     {
       "group": "Install and discovery",

@@ -165,7 +165,6 @@ export type InstallContractVerification = {
 export type InstallContract = {
   version: string;
   product_name: string;
-  manifest_url: string;
   command_reference_url: string;
   warning: string;
   installer: InstallContractInstaller;

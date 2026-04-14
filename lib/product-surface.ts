@@ -2,7 +2,6 @@ import { z } from "zod";
 
 import rawProductSurface from "@/content/product-surface.json";
 import {
-  CANONICAL_INSTALL_MANIFEST_URL,
   CANONICAL_INSTALL_URL,
   CANONICAL_SITE_URL,
   DEFAULT_LOCAL_JUDGMENTKIT_CHECKOUT_PATH,
@@ -191,8 +190,6 @@ function createPublishedPromptText(link: ProductSurfaceReferenceLink) {
   switch (link.url) {
     case "/install":
       return "Use this when you want the hosted bootstrap script that clones JudgmentKit, installs dependencies, and delegates to the repo-local installer.";
-    case "/install.json":
-      return "Use this when you need the machine-readable bootstrap manifest for JudgmentKit. It describes the hosted install script, the local stdio runtime contract, supported clients, and post-install verification.";
     case "/mcp-inventory.json":
       return "Use this when you want the published command inventory and inspect anchors. It is the fastest way to verify which tools and prompts the deployed JudgmentKit surface exposes.";
     case "/llms.txt":
@@ -320,7 +317,6 @@ export function loadInstallContract(): InstallContract {
   return {
     version: "3.0.0",
     product_name: content.product_name,
-    manifest_url: CANONICAL_INSTALL_MANIFEST_URL,
     command_reference_url: createCommandReferenceUrl(CANONICAL_SITE_URL),
     warning: `Install JudgmentKit from a local checkout over stdio via the hosted bootstrap script at ${CANONICAL_INSTALL_URL}. ${HOSTED_MCP_REFERENCE_URL} is a hosted reference/debug endpoint, not the install target.`,
     installer: {

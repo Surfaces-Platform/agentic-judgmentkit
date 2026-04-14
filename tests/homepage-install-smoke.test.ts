@@ -2,9 +2,9 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { describe, expect, it } from "vitest";
 
-import { GET } from "@/app/install.json/route";
 import { renderManualConfigSnippet } from "@/lib/install-mcp";
 import { loadLandingPage } from "@/lib/landing-page";
+import { loadInstallContract } from "@/lib/product-surface";
 import type { InstallContract, InstallContractClient } from "@/lib/types";
 
 function withTimeout<T>(promise: Promise<T>, timeoutMs: number) {
@@ -98,9 +98,8 @@ function createFailure(
   );
 }
 
-async function loadInstallContractFromRoute() {
-  const response = await GET();
-  return (await response.json()) as InstallContract;
+function loadInternalInstallContract(): InstallContract {
+  return loadInstallContract();
 }
 
 async function verifyClientInstall(
@@ -174,7 +173,7 @@ describe("homepage install smoke", () => {
   });
 
   it("turns each supported client config into a working local MCP connection", async () => {
-    const contract = await loadInstallContractFromRoute();
+    const contract = loadInternalInstallContract();
 
     expect(contract.supported_clients).toEqual(
       contract.clients.map((clientConfig) => clientConfig.id),

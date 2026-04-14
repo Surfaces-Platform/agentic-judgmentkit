@@ -12,7 +12,6 @@ import {
   formatReferenceSourceText,
 } from "@/components/reference-surface";
 import {
-  CANONICAL_INSTALL_MANIFEST_URL,
   HOSTED_JUDGMENTKIT_BOOTSTRAP_COMMAND,
   JUDGMENTKIT_REPOSITORY_CLONE_URL,
   LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER,
@@ -76,11 +75,10 @@ describe("product surface content", () => {
     );
   });
 
-  it("builds a canonical /install.json manifest for agents", () => {
+  it("builds the internal install contract for the hosted installer", () => {
     const contract = loadInstallContract();
 
     expect(contract.version).toBe("3.0.0");
-    expect(contract.manifest_url).toBe(CANONICAL_INSTALL_MANIFEST_URL);
     expect(contract.command_reference_url).toBe("https://judgmentkit.ai/inspect#commands");
     expect(contract.installer.bootstrap_url).toBe("https://judgmentkit.ai/install");
     expect(contract.installer.local_script_command).toBe(
@@ -154,10 +152,9 @@ describe("product surface content", () => {
       href: "/reference",
       label: "Open JudgmentKit reference",
       description:
-        "Use the install script, install manifest, command anchors, published artifacts, and hosted debug surfaces when you need to verify what is deployed or inspect the machine-facing materials outside the inline browser.",
+        "Use the install script, command anchors, published artifacts, and hosted debug surfaces when you need to verify what is deployed or inspect the machine-facing materials outside the inline browser.",
     });
     expect(urls).toContain("/install");
-    expect(urls).toContain("/install.json");
     expect(urls).toContain("/mcp");
     expect(urls).toContain("/mcp-inventory.json");
     expect(urls).toContain("/llms.txt");
@@ -179,9 +176,6 @@ describe("product surface content", () => {
       (item) => item.id === "example.ui-generation.embellishment-drift",
     );
     const installScriptItem = content.inspect_reference_items.find((item) => item.url === "/install");
-    const installManifestItem = content.inspect_reference_items.find(
-      (item) => item.url === "/install.json",
-    );
 
     expect(content.inspect_primary_items[0]?.id).toBe(
       "example.ui-generation.embellishment-drift",
@@ -203,12 +197,6 @@ describe("product surface content", () => {
       raw_format: "text",
     });
     expect(installScriptItem?.summary).toContain("hosted bootstrap script");
-    expect(installManifestItem).toMatchObject({
-      group: "Install and discovery",
-      type: "install",
-      raw_format: "json",
-    });
-    expect(installManifestItem?.summary).toContain("machine-readable bootstrap manifest");
   });
 
   it("sources the proof from the published example artifact", () => {
@@ -259,7 +247,6 @@ describe("product surface content", () => {
     expect(markup).not.toContain("Reference");
     expect(markup).not.toContain("Published artifacts and command anchors");
     expect(markup).not.toContain("Implementation reference");
-    expect(markup).not.toContain("Install manifest");
     expect(markup).not.toContain("Command inventory");
     expect(markup.indexOf(">Examples<")).toBeLessThan(markup.indexOf(">Workflows<"));
     expect(markup.indexOf(">Examples<")).toBeLessThan(markup.indexOf(">Guardrails<"));
@@ -285,7 +272,6 @@ describe("product surface content", () => {
     expect(markup).toContain('placeholder="Search reference"');
     expect(markup).toContain("Implementation reference");
     expect(markup).toContain("Install script");
-    expect(markup).toContain("Install manifest");
     expect(markup).toContain("Command inventory");
     expect(markup).toContain("get_workflow_bundle");
     expect(markup).toContain("start_design_workflow");
