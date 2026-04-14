@@ -22,11 +22,16 @@ require_cmd npm
 
 CHECKOUT_PATH="${DEFAULT_LOCAL_JUDGMENTKIT_CHECKOUT_PATH.replace("$HOME", "${HOME}")}"
 ARGS=("$@")
+FORWARDED_ARGS=()
 
 for ((index = 0; index < \${#ARGS[@]}; index += 1)); do
   if [[ "\${ARGS[$index]}" == "--path" ]]; then
     CHECKOUT_PATH="\${ARGS[$((index + 1))]}"
+    index=$((index + 1))
+    continue
   fi
+
+  FORWARDED_ARGS+=("\${ARGS[$index]}")
 done
 
 if [[ ! -d "$CHECKOUT_PATH/.git" ]]; then
@@ -36,7 +41,7 @@ fi
 
 cd "$CHECKOUT_PATH"
 npm install
-exec node --import tsx ./scripts/install-mcp.ts --path "$CHECKOUT_PATH" "$@"
+exec node --import tsx ./scripts/install-mcp.ts --path "$CHECKOUT_PATH" "\${FORWARDED_ARGS[@]}"
 `;
 }
 
