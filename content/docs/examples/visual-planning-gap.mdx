@@ -1,0 +1,64 @@
+---
+title: Visual planning gap
+slug: /docs/examples/visual-planning-gap
+page_type: example
+summary: A vague premium/modern request is rewritten into mode, visual thesis, content plan, and interaction thesis.
+agent_summary: >
+  This example shows how JudgmentKit turns vague visual adjectives into an
+  actionable planning contract before implementation starts.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+workflows:
+  - workflow.ai-ui-generation
+guardrails:
+  - guardrail.visual-planning-contract
+owners:
+  primary: Design Systems
+  risk: Product
+  operational: Frontend Platform
+status: active
+last_reviewed: 2026-04-23
+related_pages:
+  - /docs/workflows/ai-ui-generation
+  - /docs/guardrails/visual-planning-contract
+related_resources:
+  - /resources/examples/visual-planning-gap.v1.json
+related_schemas:
+  - /schemas/example.schema.json
+  - /schemas/verdict.schema.json
+toc: true
+---
+
+## Scenario
+
+A model receives a short brief to make an existing product page feel more premium and modern.
+
+## Raw decision or output
+
+`Make the page pop with glass panels, a bold gradient background, large rounded corners, soft shadows, animated stats, and modern cards.`
+
+## What JudgmentKit detected
+
+- premium and modern were not translated into concrete hierarchy, composition, or motion decisions
+- decoration was selected before a visual thesis or content plan existed
+- the output could not be implemented without reinterpreting the intended direction
+
+## What action was taken
+
+JudgmentKit rewrote the answer into a compact planning contract before implementation details.
+
+## Corrected result
+
+`Mode: hybrid demo. Visual Thesis: quiet editorial confidence using strong typography, one real product proof plane, and restrained contrast. Content Plan: branded entry, product proof, one workflow detail, final install action. Interaction Thesis: a short entrance sequence for the entry text, hover reveal for the proof plane, and reduced-motion-safe opacity transitions only.`
+
+## Why the correction matters
+
+Visual adjectives do not give implementation teams enough to build or evaluate. The plan must name the actual hierarchy, composition, and motion choices.
+
+## JSON artifact links
+
+- Example resource: `/resources/examples/visual-planning-gap.v1.json`
+- Schema: `/schemas/example.schema.json`

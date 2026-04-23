@@ -1,0 +1,69 @@
+---
+title: Frontend output contract
+slug: /docs/guardrails/frontend-output-contract
+page_type: guardrail
+summary: Require visually led UI implementation or direction to return the selected mode, visual thesis, motion plan, and disclosed constraints.
+agent_summary: >
+  This guardrail keeps the final response for visual UI work auditable by
+  requiring the implementation result or direction headings to carry the
+  visual contract evidence.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+workflows:
+  - workflow.ai-ui-generation
+guardrails:
+  - guardrail.frontend-output-contract
+owners:
+  primary: Design Systems
+  risk: Product
+  operational: AI Application Developers
+status: active
+last_reviewed: 2026-04-23
+related_pages:
+  - /docs/workflows/ai-ui-generation
+  - /docs/examples/output-contract-gap
+related_resources:
+  - /resources/guardrails/frontend-output-contract.v1.json
+related_schemas:
+  - /schemas/guardrail.schema.json
+toc: true
+---
+
+## Why this matters
+
+The final response is part of the handoff. If visually led work ends with "updated the styling" and no thesis, mode, or motion plan, reviewers cannot tell whether the work followed the intended contract or simply applied decorative polish.
+
+## What decision is being governed
+
+This guardrail governs whether a visually led implementation or direction-only response includes the required evidence for review.
+
+## What good judgment looks like
+
+- implementation work updates the actual UI
+- implementation responses include a short summary, `Visual Thesis`, `Mode`, and `Motion Plan`
+- direction-only work uses exactly `Visual Thesis`, `Structure`, `Motion Plan`, `Asset Needs`, and `Risks`
+- any failed accessibility, mobile, asset, runtime, or motion check is disclosed
+
+## What drift looks like
+
+1. The final response omits the selected mode.
+2. Motion is absent without a downgrade reason.
+3. Direction-only output uses custom headings and hides asset needs.
+4. The answer describes intent while files remain unchanged.
+
+## How JudgmentKit responds
+
+Small gaps get completed before returning. Medium gaps get reviewed for traceability. Severe gaps block the response until the required implementation evidence or direction headings are present.
+
+## Technical reference
+
+- Resource: `/resources/guardrails/frontend-output-contract.v1.json`
+- Schema: `/schemas/guardrail.schema.json`
+
+## Related pages
+
+- /docs/workflows/ai-ui-generation
+- /docs/examples/output-contract-gap

@@ -1,0 +1,47 @@
+{
+  "id": "example.ui-generation.hand-authored-preview-drift",
+  "type": "example",
+  "version": "1.0.0",
+  "title": "Hand-authored preview drift rewritten into source-derived preview evidence",
+  "summary": "A preview HTML file drifts away from the response and contract, then gets rewritten into a deterministic preview derived from component evidence.",
+  "status": "active",
+  "workflow_id": "workflow.ai-ui-generation",
+  "guardrail_ids": [
+    "guardrail.spec-completeness",
+    "guardrail.provenance-escalation"
+  ],
+  "scenario": "An evaluator run includes convincing screenshots, but the preview HTML was designed manually and no longer matches the response or component recipes.",
+  "raw_output": "Save a polished preview.html that looks like the intended design and use screenshots from that preview in the summary.",
+  "verdict": {
+    "verdict_id": "ver_015",
+    "decision_id": "dec_015",
+    "evaluated_at": "2026-04-14T00:00:00Z",
+    "status": "warn",
+    "severity": "medium",
+    "guardrails_triggered": [
+      "guardrail.spec-completeness",
+      "guardrail.provenance-escalation"
+    ],
+    "reasons": [
+      "visual evidence is no longer traceable back to the component contract",
+      "the judge can no longer trust that screenshots and response describe the same UI"
+    ],
+    "drift_score": 0.47,
+    "recommended_action": "rewrite",
+    "rewrite_hint": "Generate preview.html from preview-source.tsx and implementation-contract.json instead of treating preview HTML as a separate authored artifact.",
+    "ownership": {
+      "decision_owner": "Frontend Platform",
+      "risk_owner": "AI Application Developers",
+      "operational_owner": "Design Systems"
+    },
+    "incident_required": false
+  },
+  "corrected_output": "Store reusable recipes and screen composition in implementation-contract.json, render preview.html from preview-source.tsx using that contract, and fail the run if preview HTML is hand-authored or not derivable from the contract.",
+  "lesson": "Screenshots are only trustworthy when they are derived from the same component evidence the judge reads.",
+  "links": {
+    "docs_url": "https://judgmentkit.ai/docs/workflows/ai-ui-generation",
+    "markdown_url": "https://judgmentkit.ai/docs/workflows/ai-ui-generation.md",
+    "schema_url": "https://judgmentkit.ai/schemas/example.schema.json"
+  },
+  "last_reviewed": "2026-04-14"
+}

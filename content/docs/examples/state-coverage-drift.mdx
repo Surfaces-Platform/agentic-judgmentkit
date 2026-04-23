@@ -1,0 +1,66 @@
+---
+title: State coverage drift
+slug: /docs/examples/state-coverage-drift
+page_type: example
+summary: A review flow spec names the ready state only, then gets rewritten into the required portable state matrix.
+agent_summary: >
+  This example shows how JudgmentKit rewrites happy-path-only UI specs into a
+  full loading, empty, error, review-needed, and disabled state contract.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+workflows:
+  - workflow.ai-ui-generation
+guardrails:
+  - guardrail.spec-completeness
+  - guardrail.surface-theme-parity
+owners:
+  primary: Frontend Platform
+  risk: Design Systems
+  operational: AI Application Developers
+status: active
+last_reviewed: 2026-04-14
+related_pages:
+  - /docs/workflows/ai-ui-generation
+  - /docs/reference/portable-no-design-system-pack
+  - /docs/guardrails/spec-completeness
+  - /docs/guardrails/surface-theme-parity
+related_resources:
+  - /resources/examples/state-coverage-drift.v1.json
+related_schemas:
+  - /schemas/example.schema.json
+  - /schemas/verdict.schema.json
+toc: true
+---
+
+## Scenario
+
+A model proposes an artifact review flow and assumes a record is always present and valid.
+
+## Raw decision or output
+
+`Show the artifact in the center panel, add approve and request changes actions, and place the supporting notes in a right-side inspector.`
+
+## What JudgmentKit detected
+
+- ready-state-only thinking
+- missing empty, error, review-needed, and disabled behavior for the artifact panel
+
+## What action was taken
+
+JudgmentKit attached the required state matrix to the local artifact panel and its decision controls.
+
+## Corrected result
+
+`State coverage: loading uses structural placeholders in the artifact panel; empty explains that no artifact is selected and offers one next action; ready shows the artifact plus adjacent decision buttons; error keeps the layout stable while exposing retry and details; review-needed adds the unresolved owner callout beside the affected artifact; disabled explains why approve or export actions are unavailable.`
+
+## Why the correction matters
+
+State coverage is part of the surface contract, not an implementation detail left for later.
+
+## JSON artifact links
+
+- Example resource: `/resources/examples/state-coverage-drift.v1.json`
+- Schema: `/schemas/example.schema.json`

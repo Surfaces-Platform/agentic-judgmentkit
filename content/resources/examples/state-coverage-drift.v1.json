@@ -1,0 +1,47 @@
+{
+  "id": "example.ui-generation.state-coverage-drift",
+  "type": "example",
+  "version": "1.0.0",
+  "title": "Ambiguous state coverage rewritten into the required matrix",
+  "summary": "A portable UI draft names the happy path only, then gets rewritten to include required loading, empty, error, review-needed, and disabled states.",
+  "status": "active",
+  "workflow_id": "workflow.ai-ui-generation",
+  "guardrail_ids": [
+    "guardrail.spec-completeness",
+    "guardrail.surface-theme-parity"
+  ],
+  "scenario": "A model proposes an artifact review flow and assumes a record is always present and valid.",
+  "raw_output": "Show the artifact in the center panel, add approve and request changes actions, and place the supporting notes in a right-side inspector.",
+  "verdict": {
+    "verdict_id": "ver_012",
+    "decision_id": "dec_012",
+    "evaluated_at": "2026-04-14T00:00:00Z",
+    "status": "warn",
+    "severity": "medium",
+    "guardrails_triggered": [
+      "guardrail.spec-completeness",
+      "guardrail.surface-theme-parity"
+    ],
+    "reasons": [
+      "state coverage is limited to the ready state",
+      "artifact-panel behavior in empty or error states is unspecified"
+    ],
+    "drift_score": 0.34,
+    "recommended_action": "rewrite",
+    "rewrite_hint": "Attach the portable state matrix to the artifact panel and its nearby actions.",
+    "ownership": {
+      "decision_owner": "Frontend Platform",
+      "risk_owner": "Design Systems",
+      "operational_owner": "AI Application Developers"
+    },
+    "incident_required": false
+  },
+  "corrected_output": "State coverage: loading uses structural placeholders in the artifact panel; empty explains that no artifact is selected and offers one next action; ready shows the artifact plus adjacent decision buttons; error keeps the layout stable while exposing retry and details; review-needed adds the unresolved owner callout beside the affected artifact; disabled explains why approve or export actions are unavailable.",
+  "lesson": "Portable UI governance fails when only the happy path is specified. State coverage must be explicit and local to the surface it affects.",
+  "links": {
+    "docs_url": "https://judgmentkit.ai/docs/examples/state-coverage-drift",
+    "markdown_url": "https://judgmentkit.ai/docs/examples/state-coverage-drift.md",
+    "schema_url": "https://judgmentkit.ai/schemas/example.schema.json"
+  },
+  "last_reviewed": "2026-04-14"
+}

@@ -1,0 +1,45 @@
+{
+  "id": "example.ui-generation.non-reusable-recipe-drift",
+  "type": "example",
+  "version": "1.0.0",
+  "title": "Screen-only markup rewritten into reusable recipes",
+  "summary": "A draft emits one-off screen markup instead of reusable primitives, then gets normalized into a portable kit plus screen composition.",
+  "status": "active",
+  "workflow_id": "workflow.ai-ui-generation",
+  "guardrail_ids": [
+    "guardrail.spec-completeness"
+  ],
+  "scenario": "A no-design-system run produces a convincing screen layout but every section is custom markup with no reusable primitive abstraction.",
+  "raw_output": "The review screen has a prompt panel on the left, a floating preview box in the center, and a sticky note cluster on the right. Use this exact arrangement for the first pass.",
+  "verdict": {
+    "verdict_id": "ver_013",
+    "decision_id": "dec_013",
+    "evaluated_at": "2026-04-14T00:00:00Z",
+    "status": "warn",
+    "severity": "medium",
+    "guardrails_triggered": [
+      "guardrail.spec-completeness"
+    ],
+    "reasons": [
+      "the output describes a screen but not a reusable kit",
+      "implementation would recreate one-off markup instead of portable primitives"
+    ],
+    "drift_score": 0.35,
+    "recommended_action": "rewrite",
+    "rewrite_hint": "Split one-off layout markup into reusable component_recipes plus a screen_composition section.",
+    "ownership": {
+      "decision_owner": "Frontend Platform",
+      "risk_owner": "Design Systems",
+      "operational_owner": "AI Application Developers"
+    },
+    "incident_required": false
+  },
+  "corrected_output": "Define PromptStudioCard, ReviewArtifactPanel, and OwnershipInspector as reusable recipes with slots, states, and accessibility expectations. Under screen_composition, compose Prompt Studio from LayoutShell + PromptStudioCard + ReviewArtifactPanel + OwnershipInspector.",
+  "lesson": "Portable authority requires reusable recipes, not only screen-specific markup.",
+  "links": {
+    "docs_url": "https://judgmentkit.ai/docs/workflows/ai-ui-generation",
+    "markdown_url": "https://judgmentkit.ai/docs/workflows/ai-ui-generation.md",
+    "schema_url": "https://judgmentkit.ai/schemas/example.schema.json"
+  },
+  "last_reviewed": "2026-04-14"
+}

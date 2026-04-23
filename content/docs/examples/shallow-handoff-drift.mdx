@@ -1,0 +1,65 @@
+---
+title: Shallow handoff drift
+slug: /docs/examples/shallow-handoff-drift
+page_type: example
+summary: A clean-looking UI brief omits the implementation contract, then gets rewritten into the required portable handoff sections.
+agent_summary: >
+  This example shows how JudgmentKit rewrites aesthetic summaries into a real
+  token, recipe, composition, state, theme, accessibility, and escalation
+  handoff packet.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+workflows:
+  - workflow.ai-ui-generation
+guardrails:
+  - guardrail.spec-completeness
+owners:
+  primary: Frontend Platform
+  risk: Design Systems
+  operational: AI Application Developers
+status: active
+last_reviewed: 2026-04-14
+related_pages:
+  - /docs/workflows/ai-ui-generation
+  - /docs/reference/portable-no-design-system-pack
+  - /docs/guardrails/spec-completeness
+related_resources:
+  - /resources/examples/shallow-handoff-drift.v1.json
+related_schemas:
+  - /schemas/example.schema.json
+  - /schemas/verdict.schema.json
+toc: true
+---
+
+## Scenario
+
+A team asks for an implementation-ready export flow, but the first pass only describes how the interface should feel.
+
+## Raw decision or output
+
+`The export page should feel simple and trustworthy, with clear cards, obvious hierarchy, and a polished summary area before the final handoff action.`
+
+## What JudgmentKit detected
+
+- a visual summary with no token, component, or theme contract
+- no explicit state coverage or escalation list
+
+## What action was taken
+
+JudgmentKit rewrote the handoff into the required portable sections.
+
+## Corrected result
+
+`Return core_screens, token_spec, component_recipes, screen_composition, state_coverage, theme_contract, accessibility_contract, and escalation_items. Map the summary region to card plus artifact-panel recipes, include React+Tailwind composition snippets with slots and interaction rules, define loading, empty, ready, error, review-needed, and disabled states, bind light-dark tokens explicitly, and list the export edge cases that still require review.`
+
+## Why the correction matters
+
+Portable UI authority only helps implementation when the handoff survives beyond the model run itself.
+
+## JSON artifact links
+
+- Example resource: `/resources/examples/shallow-handoff-drift.v1.json`
+- Schema: `/schemas/example.schema.json`

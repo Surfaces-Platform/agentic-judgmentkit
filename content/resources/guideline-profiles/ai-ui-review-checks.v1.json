@@ -1,0 +1,65 @@
+{
+  "id": "guideline-profile.ai-ui-review-checks",
+  "type": "guideline_profile",
+  "version": "1.0.0",
+  "title": "AI UI review-only checks",
+  "summary": "JudgmentKit-owned review checks derived from the Vercel web interface guidelines for implementation details that should validate generated output but not dominate first-pass generation.",
+  "status": "active",
+  "workflow_id": "workflow.ai-ui-generation",
+  "scope": "review_checks",
+  "origin": {
+    "source_name": "Vercel Web Interface Guidelines",
+    "source_url": "https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md",
+    "derivative_policy": "Vendored and split into a review-only profile so implementation checks remain available without bloating the generation contract."
+  },
+  "categories": [
+    {
+      "id": "hydration-runtime",
+      "title": "Hydration and runtime safety",
+      "rules": [
+        "Inputs using value need onChange or must become uncontrolled with defaultValue.",
+        "Date and time rendering must avoid server-client hydration drift.",
+        "suppressHydrationWarning is a last resort, not a default pattern.",
+        "Preview recipes should avoid layout reads during render."
+      ],
+      "anti_patterns": [
+        "Hydration mismatches hidden behind suppressHydrationWarning",
+        "DOM measurements performed in render"
+      ]
+    },
+    {
+      "id": "performance-images-lists",
+      "title": "Performance, images, and lists",
+      "rules": [
+        "Images need dimensions and below-fold media should be lazy by default.",
+        "Large lists should declare virtualization or a bounded item-count strategy.",
+        "Critical fonts and assets should define loading strategy rather than assuming network magic.",
+        "Controlled inputs must stay cheap per keystroke."
+      ],
+      "anti_patterns": [
+        "Large arrays rendered directly with no virtualization strategy",
+        "Images without width and height"
+      ]
+    },
+    {
+      "id": "locale-navigation-state",
+      "title": "Locale, navigation, and state",
+      "rules": [
+        "Dates, numbers, and currency should use Intl formatting rather than hard-coded locale strings.",
+        "State-heavy UI should describe URL or router synchronization for tabs, filters, or pagination when applicable.",
+        "Destructive actions need confirmation or undo language in the contract.",
+        "Unsaved changes should define warning behavior before navigation."
+      ],
+      "anti_patterns": [
+        "Hard-coded date or number formats",
+        "Stateful navigation with no deep-link or recovery model"
+      ]
+    }
+  ],
+  "links": {
+    "docs_url": "https://judgmentkit.ai/docs/workflows/ai-ui-generation",
+    "markdown_url": "https://judgmentkit.ai/docs/workflows/ai-ui-generation.md",
+    "schema_url": "https://judgmentkit.ai/schemas/guideline_profile.schema.json"
+  },
+  "last_reviewed": "2026-04-14"
+}

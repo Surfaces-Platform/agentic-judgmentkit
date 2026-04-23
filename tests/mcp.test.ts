@@ -11,9 +11,6 @@ import {
   setPublicDirOverrideForTests,
 } from "@/lib/mcp";
 
-const GENERIC_START_DESIGN_WORKFLOW_PROMPT =
-  'Use JudgmentKit for this design task. Call get_workflow_bundle({ workflow_id: "workflow.ai-ui-generation" }) first. Treat any referenced design system as the source of truth for components, tokens, radius, elevation, surfaces, and theme behavior. If a design system is present, ask whether it has an accessibility baseline or owner-approved review status before generating UI; if that status is unknown, pause and ask first. If the brief conflicts with the design system, surface review questions and escalation items instead of silently overriding it. Only when the design system and the brief are both silent, use restrained fallback defaults: approved primitives, a tight 6px radius scale, no decorative gradients, no gratuitous shadows, and both light and dark mode by default. If the interface includes code blocks, inline viewers, inspectors, or artifact panels, also call get_resource({ id: "guardrail.surface-theme-parity" }) and use get_example({ id: "example.ui-generation.surface-theme-parity-drift" }) as calibration so those surfaces stay inside the active light/dark theme model instead of defaulting to a dark terminal treatment. Keep local controls inside or directly adjacent to the surface they govern so ownership stays obvious. Keep runtime bounded and surface review questions before inventing new patterns.';
-
 describe("mcp tools", () => {
   afterEach(() => {
     setPublicDirOverrideForTests();
@@ -27,7 +24,38 @@ describe("mcp tools", () => {
       return;
     }
 
-    expect(result.resources).toHaveLength(8);
+    expect(result.resources).toHaveLength(13);
+  });
+
+  it("lists constraint pack resources", async () => {
+    const result = await handleToolCall("list_resources", {
+      type: "constraint_pack",
+    });
+
+    expect("error" in result).toBe(false);
+    if ("error" in result) {
+      return;
+    }
+
+    expect(result.resources).toHaveLength(1);
+    expect(result.resources[0]?.id).toBe("constraint-pack.ai-ui-no-design-system");
+  });
+
+  it("lists guideline profile resources", async () => {
+    const result = await handleToolCall("list_resources", {
+      type: "guideline_profile",
+    });
+
+    expect("error" in result).toBe(false);
+    if ("error" in result) {
+      return;
+    }
+
+    expect(result.resources).toHaveLength(2);
+    expect(result.resources.map((resource) => resource.id)).toEqual([
+      "guideline-profile.ai-ui-generation-authority",
+      "guideline-profile.ai-ui-review-checks",
+    ]);
   });
 
   it("returns markdown mirrors for docs pages", async () => {
@@ -55,7 +83,47 @@ describe("mcp tools", () => {
 
     expect(result.bundle.workflow.id).toBe("workflow.ai-ui-generation");
     expect(result.bundle.guardrails.length).toBeGreaterThan(0);
+    expect(result.bundle.constraint_packs).toHaveLength(1);
+    expect(result.bundle.guideline_profiles).toHaveLength(2);
     expect(result.bundle.examples.length).toBeGreaterThan(0);
+    expect(result.bundle.constraint_packs[0].id).toBe(
+      "constraint-pack.ai-ui-no-design-system",
+    );
+    expect(result.bundle.guideline_profiles[0].id).toBe(
+      "guideline-profile.ai-ui-generation-authority",
+    );
+    expect(result.bundle.guideline_profiles[1].id).toBe(
+      "guideline-profile.ai-ui-review-checks",
+    );
+    expect(
+      result.bundle.guardrails.some(
+        (guardrail: { id: string }) => guardrail.id === "guardrail.spec-completeness",
+      ),
+    ).toBe(true);
+    expect(
+      result.bundle.guardrails.some(
+        (guardrail: { id: string }) =>
+          guardrail.id === "guardrail.surface-mode-structure",
+      ),
+    ).toBe(true);
+    expect(
+      result.bundle.guardrails.some(
+        (guardrail: { id: string }) =>
+          guardrail.id === "guardrail.visual-planning-contract",
+      ),
+    ).toBe(true);
+    expect(
+      result.bundle.guardrails.some(
+        (guardrail: { id: string }) =>
+          guardrail.id === "guardrail.motion-media-purpose",
+      ),
+    ).toBe(true);
+    expect(
+      result.bundle.guardrails.some(
+        (guardrail: { id: string }) =>
+          guardrail.id === "guardrail.frontend-output-contract",
+      ),
+    ).toBe(true);
     expect(
       result.bundle.examples.some(
         (example: { id: string }) =>
@@ -66,6 +134,30 @@ describe("mcp tools", () => {
       result.bundle.examples.some(
         (example: { id: string }) =>
           example.id === "example.ui-generation.embellishment-drift",
+      ),
+    ).toBe(true);
+    expect(
+      result.bundle.examples.some(
+        (example: { id: string }) =>
+          example.id === "example.ui-generation.mode-structure-drift",
+      ),
+    ).toBe(true);
+    expect(
+      result.bundle.examples.some(
+        (example: { id: string }) =>
+          example.id === "example.ui-generation.visual-planning-gap",
+      ),
+    ).toBe(true);
+    expect(
+      result.bundle.examples.some(
+        (example: { id: string }) =>
+          example.id === "example.ui-generation.motion-media-drift",
+      ),
+    ).toBe(true);
+    expect(
+      result.bundle.examples.some(
+        (example: { id: string }) =>
+          example.id === "example.ui-generation.output-contract-gap",
       ),
     ).toBe(true);
     expect(
@@ -86,6 +178,60 @@ describe("mcp tools", () => {
           example.id === "example.ui-generation.surface-theme-parity-drift",
       ),
     ).toBe(true);
+    expect(
+      result.bundle.examples.some(
+        (example: { id: string }) =>
+          example.id === "example.ui-generation.token-vagueness-drift",
+      ),
+    ).toBe(true);
+    expect(
+      result.bundle.examples.some(
+        (example: { id: string }) =>
+          example.id === "example.ui-generation.primitive-sprawl-drift",
+      ),
+    ).toBe(true);
+    expect(
+      result.bundle.examples.some(
+        (example: { id: string }) =>
+          example.id === "example.ui-generation.shallow-handoff-drift",
+      ),
+    ).toBe(true);
+    expect(
+      result.bundle.examples.some(
+        (example: { id: string }) =>
+          example.id === "example.ui-generation.state-coverage-drift",
+      ),
+    ).toBe(true);
+    expect(
+      result.bundle.examples.some(
+        (example: { id: string }) =>
+          example.id === "example.ui-generation.component-mapping-name-only-drift",
+      ),
+    ).toBe(true);
+    expect(
+      result.bundle.examples.some(
+        (example: { id: string }) =>
+          example.id === "example.ui-generation.non-reusable-recipe-drift",
+      ),
+    ).toBe(true);
+    expect(
+      result.bundle.examples.some(
+        (example: { id: string }) =>
+          example.id === "example.ui-generation.missing-accessibility-api-drift",
+      ),
+    ).toBe(true);
+    expect(
+      result.bundle.examples.some(
+        (example: { id: string }) =>
+          example.id === "example.ui-generation.hand-authored-preview-drift",
+      ),
+    ).toBe(true);
+    expect(
+      result.bundle.examples.some(
+        (example: { id: string }) =>
+          example.id === "example.ui-generation.theme-binding-recipe-drift",
+      ),
+    ).toBe(true);
     expect(result.bundle.starter_instructions).toContain(
       "design system as the source of truth",
     );
@@ -93,8 +239,18 @@ describe("mcp tools", () => {
       "accessibility baseline or owner-approved review status",
     );
     expect(result.bundle.starter_instructions).toContain(
-      "tight 6px radius scale",
+      "constraint-pack.ai-ui-no-design-system",
     );
+    expect(result.bundle.starter_instructions).toContain(
+      "guideline-profile.ai-ui-generation-authority",
+    );
+    expect(result.bundle.starter_instructions).toContain(
+      "guardrail.surface-mode-structure",
+    );
+    expect(result.bundle.starter_instructions).toContain(
+      "example.ui-generation.mode-structure-drift",
+    );
+    expect(result.bundle.starter_instructions).toContain("Visual Thesis");
     expect(result.bundle.starter_instructions).toContain(
       "Keep headings, labels, helper text, and CTA copy distinct in role.",
     );
@@ -107,6 +263,15 @@ describe("mcp tools", () => {
     expect(result.bundle.starter_instructions).toContain(
       "example.ui-generation.surface-theme-parity-drift",
     );
+    expect(result.bundle.starter_instructions).toContain(
+      "design_system_bindings, component_recipes, screen_composition, state_coverage, theme_contract, accessibility_contract, escalation_items",
+    );
+    expect(result.bundle.starter_instructions).toContain(
+      "token_spec, component_recipes, screen_composition, state_coverage, theme_contract, accessibility_contract, escalation_items",
+    );
+    expect(result.bundle.starter_instructions).toContain(
+      "guardrail.spec-completeness",
+    );
   });
 
   it("returns the designer starter prompt", () => {
@@ -117,7 +282,47 @@ describe("mcp tools", () => {
       return;
     }
 
-    expect(prompt.template).toBe(GENERIC_START_DESIGN_WORKFLOW_PROMPT);
+    expect(prompt.template).toContain(
+      'Call get_workflow_bundle({ workflow_id: "workflow.ai-ui-generation" }) first.',
+    );
+    expect(prompt.template).toContain(
+      "constraint-pack.ai-ui-no-design-system",
+    );
+    expect(prompt.template).toContain(
+      "guideline-profile.ai-ui-generation-authority",
+    );
+    expect(prompt.template).toContain(
+      "guardrail.surface-mode-structure",
+    );
+    expect(prompt.template).toContain(
+      "example.ui-generation.visual-planning-gap",
+    );
+    expect(prompt.template).toContain(
+      "design_system_bindings, component_recipes, screen_composition, state_coverage, theme_contract, accessibility_contract, escalation_items",
+    );
+  });
+
+  it("returns the no-design-system starter prompt", () => {
+    const prompt = getPrompt("start_no_design_system_workflow");
+
+    expect("error" in prompt).toBe(false);
+    if ("error" in prompt) {
+      return;
+    }
+
+    expect(prompt.template).toContain(
+      "Use JudgmentKit for this no-design-system design task.",
+    );
+    expect(prompt.template).toContain(
+      "Assume the portable JudgmentKit constraint pack is the only approved authority",
+    );
+    expect(prompt.template).toContain(
+      "guideline-profile.ai-ui-generation-authority",
+    );
+    expect(prompt.template).toContain(
+      "guardrail.frontend-output-contract",
+    );
+    expect(prompt.template).toContain("guardrail.spec-completeness");
   });
 
   it("renders a task-specific design workflow prompt when feature_intent is provided", () => {
@@ -139,6 +344,11 @@ describe("mcp tools", () => {
     expect(prompt.template).toContain("guardrail.surface-theme-parity");
     expect(prompt.template).toContain(
       "example.ui-generation.surface-theme-parity-drift",
+    );
+    expect(prompt.template).toContain("guardrail.spec-completeness");
+    expect(prompt.template).toContain("guardrail.surface-mode-structure");
+    expect(prompt.template).toContain(
+      "example.ui-generation.output-contract-gap",
     );
     expect(prompt.template).not.toContain("ignored_arg");
   });
@@ -167,7 +377,13 @@ describe("mcp tools", () => {
       "design system",
     );
     expect(result.bundle.starter_instructions).toContain(
-      "tight 6px radius scale",
+      "constraint-pack.ai-ui-no-design-system",
+    );
+    expect(result.bundle.starter_instructions).toContain(
+      "guideline-profile.ai-ui-review-checks",
+    );
+    expect(result.bundle.starter_instructions).toContain(
+      "guardrail.motion-media-purpose",
     );
     expect(result.bundle.starter_instructions).toContain(
       "Collapse near-duplicate UI copy before adding more language.",
@@ -177,6 +393,9 @@ describe("mcp tools", () => {
     );
     expect(result.bundle.starter_instructions).toContain(
       "guardrail.surface-theme-parity",
+    );
+    expect(result.bundle.starter_instructions).toContain(
+      "token_spec, component_recipes, screen_composition, state_coverage, theme_contract, accessibility_contract, escalation_items",
     );
     expect(prompt.template).toContain(featureIntent);
   });
@@ -231,6 +450,33 @@ describe("mcp tools", () => {
       'get_resource({ id: "guardrail.brand-tone" })',
     );
     expect(prompt.template).toContain(
+      'get_resource({ id: "guardrail.spec-completeness" })',
+    );
+    expect(prompt.template).toContain(
+      'get_resource({ id: "guardrail.surface-mode-structure" })',
+    );
+    expect(prompt.template).toContain(
+      'get_resource({ id: "guardrail.visual-planning-contract" })',
+    );
+    expect(prompt.template).toContain(
+      'get_resource({ id: "guardrail.motion-media-purpose" })',
+    );
+    expect(prompt.template).toContain(
+      'get_resource({ id: "guardrail.frontend-output-contract" })',
+    );
+    expect(prompt.template).toContain(
+      'get_example({ id: "example.ui-generation.mode-structure-drift" })',
+    );
+    expect(prompt.template).toContain(
+      'get_example({ id: "example.ui-generation.visual-planning-gap" })',
+    );
+    expect(prompt.template).toContain(
+      'get_example({ id: "example.ui-generation.motion-media-drift" })',
+    );
+    expect(prompt.template).toContain(
+      'get_example({ id: "example.ui-generation.output-contract-gap" })',
+    );
+    expect(prompt.template).toContain(
       'get_example({ id: "example.ui-generation.onboarding-clarity-drift" })',
     );
     expect(prompt.template).toContain(
@@ -255,11 +501,41 @@ describe("mcp tools", () => {
       'get_example({ id: "example.ui-generation.surface-theme-parity-drift" })',
     );
     expect(prompt.template).toContain(
+      'get_example({ id: "example.ui-generation.token-vagueness-drift" })',
+    );
+    expect(prompt.template).toContain(
+      'get_example({ id: "example.ui-generation.primitive-sprawl-drift" })',
+    );
+    expect(prompt.template).toContain(
+      'get_example({ id: "example.ui-generation.shallow-handoff-drift" })',
+    );
+    expect(prompt.template).toContain(
+      'get_example({ id: "example.ui-generation.state-coverage-drift" })',
+    );
+    expect(prompt.template).toContain(
+      'get_example({ id: "example.ui-generation.component-mapping-name-only-drift" })',
+    );
+    expect(prompt.template).toContain(
+      'get_example({ id: "example.ui-generation.non-reusable-recipe-drift" })',
+    );
+    expect(prompt.template).toContain(
+      'get_example({ id: "example.ui-generation.missing-accessibility-api-drift" })',
+    );
+    expect(prompt.template).toContain(
+      'get_example({ id: "example.ui-generation.hand-authored-preview-drift" })',
+    );
+    expect(prompt.template).toContain(
+      'get_example({ id: "example.ui-generation.theme-binding-recipe-drift" })',
+    );
+    expect(prompt.template).toContain(
       "accessibility baseline or owner-approved review status",
     );
     expect(prompt.template).toContain("pause and ask first");
     expect(prompt.template).toContain("place the conflict under escalate");
     expect(prompt.template).toContain("keep, fix_now, escalate, v2_brief, v2_generation_prompt, review_checklist");
+    expect(prompt.template).toContain(
+      "The v2_generation_prompt must require exactly these no-design-system output sections",
+    );
     expect(prompt.template).not.toContain("Must keep:");
     expect(prompt.template).not.toContain("Known issues:");
   });
@@ -295,7 +571,31 @@ describe("mcp tools", () => {
     expect(
       result.related.resources.some(
         (resource: { id: string }) =>
+          resource.id === "constraint-pack.ai-ui-no-design-system",
+      ),
+    ).toBe(true);
+    expect(
+      result.related.resources.some(
+        (resource: { id: string }) =>
+          resource.id === "guideline-profile.ai-ui-generation-authority",
+      ),
+    ).toBe(true);
+    expect(
+      result.related.resources.some(
+        (resource: { id: string }) =>
           resource.id === "guardrail.design-system-integrity",
+      ),
+    ).toBe(true);
+    expect(
+      result.related.resources.some(
+        (resource: { id: string }) =>
+          resource.id === "guardrail.spec-completeness",
+      ),
+    ).toBe(true);
+    expect(
+      result.related.resources.some(
+        (resource: { id: string }) =>
+          resource.id === "guardrail.surface-mode-structure",
       ),
     ).toBe(true);
     expect(
@@ -338,6 +638,18 @@ describe("mcp tools", () => {
       result.related.resources.some(
         (resource: { id: string }) =>
           resource.id === "example.ui-generation.surface-theme-parity-drift",
+      ),
+    ).toBe(true);
+    expect(
+      result.related.resources.some(
+        (resource: { id: string }) =>
+          resource.id === "example.ui-generation.token-vagueness-drift",
+      ),
+    ).toBe(true);
+    expect(
+      result.related.resources.some(
+        (resource: { id: string }) =>
+          resource.id === "example.ui-generation.mode-structure-drift",
       ),
     ).toBe(true);
     expect(result.related.resources.length).toBeGreaterThan(0);
@@ -390,6 +702,6 @@ describe("mcp tools", () => {
     expect(workflowResult.error.code).toBe("generated_artifacts_missing");
     expect(relatedResult.error.code).toBe("generated_artifacts_missing");
     expect(workflowResult.error.message).toContain("public/graph.json");
-    expect(relatedResult.error.suggested_action).toContain("restart the stdio server");
+    expect(relatedResult.error.suggested_action).toContain("restart the local MCP server");
   });
 });

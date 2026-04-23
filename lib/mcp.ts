@@ -13,14 +13,51 @@ type PromptDefinition = {
   template: string;
 };
 
-const GENERIC_START_DESIGN_WORKFLOW_PROMPT =
-  'Use JudgmentKit for this design task. Call get_workflow_bundle({ workflow_id: "workflow.ai-ui-generation" }) first. Treat any referenced design system as the source of truth for components, tokens, radius, elevation, surfaces, and theme behavior. If a design system is present, ask whether it has an accessibility baseline or owner-approved review status before generating UI; if that status is unknown, pause and ask first. If the brief conflicts with the design system, surface review questions and escalation items instead of silently overriding it. Only when the design system and the brief are both silent, use restrained fallback defaults: approved primitives, a tight 6px radius scale, no decorative gradients, no gratuitous shadows, and both light and dark mode by default. If the interface includes code blocks, inline viewers, inspectors, or artifact panels, also call get_resource({ id: "guardrail.surface-theme-parity" }) and use get_example({ id: "example.ui-generation.surface-theme-parity-drift" }) as calibration so those surfaces stay inside the active light/dark theme model instead of defaulting to a dark terminal treatment. Keep local controls inside or directly adjacent to the surface they govern so ownership stays obvious. Keep runtime bounded and surface review questions before inventing new patterns.';
-
 const REFINE_DESIGN_FIRST_PASS_PROMPT_NAME = "refine_design_first_pass";
+const START_NO_DESIGN_SYSTEM_WORKFLOW_PROMPT_NAME =
+  "start_no_design_system_workflow";
+const AI_UI_GENERATION_CONSTRAINT_PACK_ID =
+  "constraint-pack.ai-ui-no-design-system";
+const AI_UI_GENERATION_GUIDELINE_PROFILE_IDS = [
+  "guideline-profile.ai-ui-generation-authority",
+  "guideline-profile.ai-ui-review-checks",
+] as const;
+const AI_UI_FRONTEND_VISUAL_GUARDRAIL_IDS = [
+  "guardrail.surface-mode-structure",
+  "guardrail.visual-planning-contract",
+  "guardrail.motion-media-purpose",
+  "guardrail.frontend-output-contract",
+] as const;
+const AI_UI_FRONTEND_VISUAL_EXAMPLE_IDS = [
+  "example.ui-generation.mode-structure-drift",
+  "example.ui-generation.visual-planning-gap",
+  "example.ui-generation.motion-media-drift",
+  "example.ui-generation.output-contract-gap",
+] as const;
+const AI_UI_PORTABLE_OUTPUT_CONTRACT_SECTIONS = [
+  "core_screens",
+  "token_spec",
+  "component_recipes",
+  "screen_composition",
+  "state_coverage",
+  "theme_contract",
+  "accessibility_contract",
+  "escalation_items",
+] as const;
+const AI_UI_DESIGN_SYSTEM_OUTPUT_CONTRACT_SECTIONS = [
+  "core_screens",
+  "design_system_bindings",
+  "component_recipes",
+  "screen_composition",
+  "state_coverage",
+  "theme_contract",
+  "accessibility_contract",
+  "escalation_items",
+] as const;
 const GENERATED_ARTIFACTS_MISSING_MESSAGE =
   "Generated public artifacts missing; run `npm run generate`.";
 const GENERATED_ARTIFACTS_MISSING_ACTION =
-  "Run `npm run generate`, then restart the stdio server and retry the tool call.";
+  "Run `npm run generate`, then restart the local MCP server and retry the tool call.";
 const REQUIRED_PUBLIC_ARTIFACTS = [
   { parts: ["resources", "index.json"], label: "public/resources/index.json" },
   { parts: ["graph.json"], label: "public/graph.json" },
@@ -155,6 +192,143 @@ function getResourceRelativePath(url: string) {
   return url.replace(`${ROOT_URL}/resources/`, "");
 }
 
+function formatListForPrompt(values: readonly string[]) {
+  return values.filter(Boolean).join(", ");
+}
+
+function renderToolCalls(toolName: string, ids: readonly string[]) {
+  return ids
+    .map((id) => `${toolName}({ id: "${id}" })`)
+    .join(", ");
+}
+
+function getConstraintPackIds(resourceOrLinks: JsonRecord) {
+  const links = isRecord(resourceOrLinks.links)
+    ? resourceOrLinks.links
+    : resourceOrLinks;
+  const constraintPackIds = stringArray(
+    isRecord(links) ? links.constraint_pack_ids : undefined,
+  );
+
+  return constraintPackIds.length > 0
+    ? constraintPackIds
+    : [AI_UI_GENERATION_CONSTRAINT_PACK_ID];
+}
+
+function renderConstraintPackAuthorityLine(constraintPackIds: string[]) {
+  return `If no external design system is present, pull ${formatListForPrompt(
+    constraintPackIds,
+  )} from the workflow bundle and treat it as the authority for primitives, tokens, reusable recipes, layout archetypes, required states, theme parity, accessibility API, and handoff depth.`;
+}
+
+function renderPortableOutputContractLine() {
+  return `For no-design-system output, return exactly these sections: ${AI_UI_PORTABLE_OUTPUT_CONTRACT_SECTIONS.join(
+    ", ",
+  )}.`;
+}
+
+function renderDesignSystemOutputContractLine() {
+  return `For design-system output, return exactly these sections: ${AI_UI_DESIGN_SYSTEM_OUTPUT_CONTRACT_SECTIONS.join(
+    ", ",
+  )}.`;
+}
+
+function renderSelfNormalizationLine() {
+  return "Before finalizing, self-normalize the draft against the active design system or JudgmentKit constraint pack and rewrite any wrong surface mode, missing visual planning, ornamental motion or media, missing output contract evidence, name-only component mapping, vague tokens, invented primitives, missing light-dark pairs, missing accessibility API, shallow handoff, or incomplete state coverage.";
+}
+
+function renderConstraintPackGapEscalationLine() {
+  return "If the active design system or the JudgmentKit constraint pack does not cover a required primitive, recipe, token, accessibility rule, or state, surface it under escalation instead of improvising it.";
+}
+
+function renderGuidelineProfileLine(guidelineProfileIds: string[]) {
+  return `Use ${formatListForPrompt(
+    guidelineProfileIds,
+  )} as JudgmentKit-owned derivative rules for semantics, focus, labels, motion, theming, touch, layout, output shape, hydration, performance, locale, and state validation before finalizing.`;
+}
+
+function renderFrontendVisualDirectionLine() {
+  return `When the task is visually led, such as a landing page, product surface redesign, premium/modern/polish request, game or immersive UI, visual art direction request, imagery request, motion request, rich media task, or first-pass UI generation where look and interaction quality are central, also pull ${renderToolCalls(
+    "get_resource",
+    AI_UI_FRONTEND_VISUAL_GUARDRAIL_IDS,
+  )}, and use ${renderToolCalls(
+    "get_example",
+    AI_UI_FRONTEND_VISUAL_EXAMPLE_IDS,
+  )} as calibration; require one selected mode, Visual Thesis, Content Plan, Interaction Thesis, motion/media purpose, downgrade rules, and the final output shape before first-pass UI generation or refinement.`;
+}
+
+function renderFrontendVisualBundleLine() {
+  return `When the task is visually led, activate ${formatListForPrompt(
+    AI_UI_FRONTEND_VISUAL_GUARDRAIL_IDS,
+  )}; use ${formatListForPrompt(
+    AI_UI_FRONTEND_VISUAL_EXAMPLE_IDS,
+  )} as calibration for mode structure, visual planning, motion/media purpose, and final output shape; require one selected mode, Visual Thesis, Content Plan, Interaction Thesis, motion/media purpose, downgrade rules, and the final output shape before first-pass UI generation or refinement.`;
+}
+
+function renderStartDesignWorkflowPromptText(
+  workflowBundleCall: string,
+  constraintPackIds: string[],
+  guidelineProfileIds: string[],
+  featureIntent?: string,
+) {
+  const taskPrefix = featureIntent
+    ? `Use JudgmentKit for this design task: ${featureIntent}.`
+    : "Use JudgmentKit for this design task.";
+
+  return [
+    taskPrefix,
+    `Call ${workflowBundleCall} first.`,
+    "Treat any referenced design system as the source of truth for components, tokens, radius, elevation, surfaces, and theme behavior.",
+    "If a design system is present, ask whether it has an accessibility baseline or owner-approved review status before generating UI; if that status is unknown, pause and ask first.",
+    "If the brief conflicts with the design system, surface review questions and escalation items instead of silently overriding it.",
+    renderGuidelineProfileLine(guidelineProfileIds),
+    renderFrontendVisualDirectionLine(),
+    renderConstraintPackAuthorityLine(constraintPackIds),
+    renderDesignSystemOutputContractLine(),
+    renderPortableOutputContractLine(),
+    renderSelfNormalizationLine(),
+    renderConstraintPackGapEscalationLine(),
+    'If the interface includes code blocks, inline viewers, inspectors, or artifact panels, also call get_resource({ id: "guardrail.surface-theme-parity" }) and use get_example({ id: "example.ui-generation.surface-theme-parity-drift" }) as calibration so those surfaces stay inside the active light-dark theme model instead of defaulting to a dark terminal treatment.',
+    'If the output leaves recipes, tokens, state coverage, accessibility API, or handoff depth implicit, also call get_resource({ id: "guardrail.spec-completeness" }) and use get_example({ id: "example.ui-generation.token-vagueness-drift" }), get_example({ id: "example.ui-generation.primitive-sprawl-drift" }), get_example({ id: "example.ui-generation.shallow-handoff-drift" }), get_example({ id: "example.ui-generation.state-coverage-drift" }), get_example({ id: "example.ui-generation.component-mapping-name-only-drift" }), get_example({ id: "example.ui-generation.non-reusable-recipe-drift" }), get_example({ id: "example.ui-generation.missing-accessibility-api-drift" }), and get_example({ id: "example.ui-generation.theme-binding-recipe-drift" }) as calibration.',
+    "Keep local controls inside or directly adjacent to the surface they govern so ownership stays obvious.",
+    "Keep runtime bounded and surface review questions before inventing new patterns.",
+  ].join(" ");
+}
+
+function renderStartNoDesignSystemWorkflowPrompt(featureIntent?: string) {
+  const workflowBundleCall = renderWorkflowBundleCall(
+    "workflow.ai-ui-generation",
+    featureIntent,
+  );
+  const taskPrefix = featureIntent
+    ? `Use JudgmentKit for this no-design-system design task: ${featureIntent}.`
+    : "Use JudgmentKit for this no-design-system design task.";
+
+  return [
+    taskPrefix,
+    `Call ${workflowBundleCall} first.`,
+    renderGuidelineProfileLine([
+      ...AI_UI_GENERATION_GUIDELINE_PROFILE_IDS,
+    ]),
+    renderFrontendVisualDirectionLine(),
+    renderConstraintPackAuthorityLine([AI_UI_GENERATION_CONSTRAINT_PACK_ID]),
+    "Assume the portable JudgmentKit constraint pack is the only approved authority unless the repo or brief clearly names an accessibility-reviewed external design system.",
+    "Map the surface only to the published primitive inventory, token contract, reusable recipes, layout archetypes, required state matrix, and handoff contract.",
+    renderPortableOutputContractLine(),
+    renderSelfNormalizationLine(),
+    renderConstraintPackGapEscalationLine(),
+    'Also pull get_resource({ id: "guardrail.spec-completeness" }) plus get_example({ id: "example.ui-generation.token-vagueness-drift" }), get_example({ id: "example.ui-generation.primitive-sprawl-drift" }), get_example({ id: "example.ui-generation.shallow-handoff-drift" }), get_example({ id: "example.ui-generation.state-coverage-drift" }), get_example({ id: "example.ui-generation.component-mapping-name-only-drift" }), get_example({ id: "example.ui-generation.non-reusable-recipe-drift" }), get_example({ id: "example.ui-generation.missing-accessibility-api-drift" }), get_example({ id: "example.ui-generation.hand-authored-preview-drift" }), and get_example({ id: "example.ui-generation.theme-binding-recipe-drift" }) before finalizing the draft.',
+    'If the interface includes code blocks, inline viewers, inspectors, or artifact panels, also call get_resource({ id: "guardrail.surface-theme-parity" }) and get_example({ id: "example.ui-generation.surface-theme-parity-drift" }).',
+    "Escalate any requirement that cannot be expressed with the published pack instead of inventing a new primitive or vague visual language.",
+  ].join(" ");
+}
+
+const GENERIC_START_DESIGN_WORKFLOW_PROMPT = renderStartDesignWorkflowPromptText(
+  renderWorkflowBundleCall("workflow.ai-ui-generation"),
+  [AI_UI_GENERATION_CONSTRAINT_PACK_ID],
+  [...AI_UI_GENERATION_GUIDELINE_PROFILE_IDS],
+);
+
 async function readResourceFromEntry(entry: ResourceIndexEntry) {
   return readJson<JsonRecord>("resources", getResourceRelativePath(entry.url));
 }
@@ -170,6 +344,8 @@ function extractSemanticRelations(resource: JsonRecord) {
     ...stringArray(appliesTo.workflows),
     ...stringArray(resource.example_ids),
     ...stringArray(links.example_ids),
+    ...stringArray(links.constraint_pack_ids),
+    ...stringArray(links.guideline_profile_ids),
     ...stringArray(
       typeof resource.workflow_id === "string" ? [resource.workflow_id] : [],
     ),
@@ -188,14 +364,12 @@ function renderWorkflowBundleCall(workflowId: string, featureIntent?: string) {
 }
 
 function renderStartDesignWorkflowPrompt(featureIntent?: string) {
-  if (!featureIntent) {
-    return GENERIC_START_DESIGN_WORKFLOW_PROMPT;
-  }
-
-  return `Use JudgmentKit for this design task: ${featureIntent}. Call ${renderWorkflowBundleCall(
-    "workflow.ai-ui-generation",
+  return renderStartDesignWorkflowPromptText(
+    renderWorkflowBundleCall("workflow.ai-ui-generation", featureIntent),
+    [AI_UI_GENERATION_CONSTRAINT_PACK_ID],
+    [...AI_UI_GENERATION_GUIDELINE_PROFILE_IDS],
     featureIntent,
-  )} first. Treat any referenced design system as the source of truth for components, tokens, radius, elevation, surfaces, and theme behavior. If a design system is present, ask whether it has an accessibility baseline or owner-approved review status before generating UI; if that status is unknown, pause and ask first. If the brief conflicts with the design system, surface review questions and escalation items instead of silently overriding it. Only when the design system and the brief are both silent, use restrained fallback defaults: approved primitives, a tight 6px radius scale, no decorative gradients, no gratuitous shadows, and both light and dark mode by default. If the interface includes code blocks, inline viewers, inspectors, or artifact panels, also call get_resource({ id: "guardrail.surface-theme-parity" }) and use get_example({ id: "example.ui-generation.surface-theme-parity-drift" }) as calibration so those surfaces stay inside the active light/dark theme model instead of defaulting to a dark terminal treatment. Keep local controls inside or directly adjacent to the surface they govern so ownership stays obvious. Keep runtime bounded and surface review questions before inventing new patterns.`;
+  );
 }
 
 function renderPromptTemplate(prompt: PromptDefinition, args: ToolArgs = {}) {
@@ -226,6 +400,10 @@ function renderPromptTemplate(prompt: PromptDefinition, args: ToolArgs = {}) {
     }
     case "start_design_workflow":
       return renderStartDesignWorkflowPrompt(optionalStringValue(args.feature_intent));
+    case START_NO_DESIGN_SYSTEM_WORKFLOW_PROMPT_NAME:
+      return renderStartNoDesignSystemWorkflowPrompt(
+        optionalStringValue(args.feature_intent),
+      );
     default:
       return prompt.template;
   }
@@ -272,20 +450,27 @@ function renderRefineDesignFirstPassPrompt(args: ToolArgs) {
   return [
     `Use JudgmentKit to refine a first design pass for this task: ${featureIntent}.`,
     `Call ${renderWorkflowBundleCall("workflow.ai-ui-generation", featureIntent)} first.`,
-    "Review the draft against the workflow starter instructions and linked guardrails.",
+    "Review the draft against the workflow starter instructions, linked guardrails, linked constraint packs, linked guideline profiles, and linked examples.",
     "Check whether the current repo, prompt, or brief references a design system. If it does, treat that system as the source of truth for components, tokens, radius, elevation, surfaces, and theme behavior.",
     "Before proposing UI changes against a referenced design system, ask whether it has an accessibility baseline or owner-approved review status. If that status is unknown, pause and ask first.",
     "If the brief conflicts with the design system, place the conflict under escalate instead of silently overriding it.",
-    "Only when the design system and the brief are both silent, use restrained fallback defaults: approved primitives, a tight 6px radius scale, no decorative gradients, no gratuitous shadows, and both light and dark mode by default.",
+    renderGuidelineProfileLine([...AI_UI_GENERATION_GUIDELINE_PROFILE_IDS]),
+    renderFrontendVisualDirectionLine(),
+    renderConstraintPackAuthorityLine([AI_UI_GENERATION_CONSTRAINT_PACK_ID]),
+    renderConstraintPackGapEscalationLine(),
     'If the draft contains interface copy or product messaging, also call get_resource({ id: "guardrail.brand-tone" }).',
+    'If the draft leaves recipes, tokens, state coverage, accessibility API, or handoff depth implicit, also call get_resource({ id: "guardrail.spec-completeness" }) and use get_example({ id: "example.ui-generation.token-vagueness-drift" }), get_example({ id: "example.ui-generation.primitive-sprawl-drift" }), get_example({ id: "example.ui-generation.shallow-handoff-drift" }), get_example({ id: "example.ui-generation.state-coverage-drift" }), get_example({ id: "example.ui-generation.component-mapping-name-only-drift" }), get_example({ id: "example.ui-generation.non-reusable-recipe-drift" }), get_example({ id: "example.ui-generation.missing-accessibility-api-drift" }), get_example({ id: "example.ui-generation.hand-authored-preview-drift" }), and get_example({ id: "example.ui-generation.theme-binding-recipe-drift" }).',
     'If the draft repeats or semantically overlaps headings, CTA labels, helper text, or nearby control copy, also call get_resource({ id: "guardrail.ui-copy-clarity" }) and get_example({ id: "example.ui-generation.repetitive-copy-drift" }).',
     'If local controls are spatially detached from the viewer, panel, or artifact they affect, also call get_resource({ id: "guardrail.control-proximity" }) and get_example({ id: "example.ui-generation.control-proximity-drift" }).',
     'If the draft includes code blocks, inline viewers, inspectors, or artifact panels, also call get_resource({ id: "guardrail.surface-theme-parity" }) and get_example({ id: "example.ui-generation.surface-theme-parity-drift" }).',
-    'Use one or more calibration examples from the workflow bundle. If the draft resembles onboarding or artifact-exposure drift, pull get_example({ id: "example.ui-generation.onboarding-clarity-drift" }). If the draft shows decorative zero-shot chrome or misses dark/light mode readiness, pull get_example({ id: "example.ui-generation.embellishment-drift" }). If the draft keeps code or artifact surfaces on a mismatched theme, pull get_example({ id: "example.ui-generation.surface-theme-parity-drift" }).',
+    'Use one or more calibration examples from the workflow bundle. If the draft resembles onboarding or artifact-exposure drift, pull get_example({ id: "example.ui-generation.onboarding-clarity-drift" }). If the draft shows decorative zero-shot chrome or misses dark-light mode readiness, pull get_example({ id: "example.ui-generation.embellishment-drift" }). If the draft keeps code or artifact surfaces on a mismatched theme, pull get_example({ id: "example.ui-generation.surface-theme-parity-drift" }). If the draft is visually led and has mode, planning, motion/media, or output-shape gaps, pull the frontend visual examples before rewriting. If the draft sounds restrained but leaves concrete implementation gaps, pull the no-design-system examples before rewriting.',
     `Draft: ${JSON.stringify(draft)}.`,
     `Refinement goal: ${JSON.stringify(refinementGoal)}.`,
     additions,
     "Return a structured refinement packet with exactly these sections: keep, fix_now, escalate, v2_brief, v2_generation_prompt, review_checklist.",
+    `The v2_generation_prompt must require exactly these no-design-system output sections when applicable: ${AI_UI_PORTABLE_OUTPUT_CONTRACT_SECTIONS.join(", ")}.`,
+    `The v2_generation_prompt must require exactly these design-system output sections when a system is active: ${AI_UI_DESIGN_SYSTEM_OUTPUT_CONTRACT_SECTIONS.join(", ")}.`,
+    "The review_checklist must confirm that the final draft was self-normalized against the active design system or the JudgmentKit constraint pack.",
     "Favor first-time usability and clarity over novelty. If the request needs new primitives, unresolved accessibility gaps, or unclear tradeoffs, place them under escalate instead of improvising them.",
   ]
     .filter(Boolean)
@@ -295,12 +480,23 @@ function renderRefineDesignFirstPassPrompt(args: ToolArgs) {
 function createStarterInstructions(
   workflow: JsonRecord,
   guardrails: JsonRecord[],
+  constraintPacks: JsonRecord[],
+  guidelineProfiles: JsonRecord[],
   examples: JsonRecord[],
   featureIntent?: string,
 ) {
   const workflowId = stringValue(workflow.id);
   const workflowTitle = stringValue(workflow.title);
   const guardrailIds = guardrails.map((guardrail) => stringValue(guardrail.id)).filter(Boolean);
+  const constraintPackIds = constraintPacks
+    .map((constraintPack) => stringValue(constraintPack.id))
+    .filter(Boolean);
+  const guidelineProfileIds = guidelineProfiles
+    .map((guidelineProfile) => stringValue(guidelineProfile.id))
+    .filter(Boolean);
+  const resolvedGuidelineProfileIds = guidelineProfileIds.length
+    ? guidelineProfileIds
+    : [...AI_UI_GENERATION_GUIDELINE_PROFILE_IDS];
   const exampleIds = examples.map((example) => stringValue(example.id)).filter(Boolean);
   const workflowBundleCall = renderWorkflowBundleCall(workflowId, featureIntent);
 
@@ -312,11 +508,24 @@ function createStarterInstructions(
         "Treat any referenced design system as the source of truth for components, tokens, radius, elevation, surfaces, and theme behavior.",
         "If a design system is present, ask whether it has an accessibility baseline or owner-approved review status before generating UI. If that status is unknown, pause and ask first.",
         "If the brief conflicts with the design system, surface review questions instead of silently overriding the system.",
-        "Only when the design system and the brief are both silent, use restrained fallback defaults: approved primitives, a tight 6px radius scale, no decorative gradients, no gratuitous shadows, and both light and dark mode by default.",
+        renderGuidelineProfileLine(
+          resolvedGuidelineProfileIds,
+        ),
+        renderFrontendVisualBundleLine(),
+        renderConstraintPackAuthorityLine(
+          constraintPackIds.length ? constraintPackIds : [AI_UI_GENERATION_CONSTRAINT_PACK_ID],
+        ),
+        renderDesignSystemOutputContractLine(),
+        renderPortableOutputContractLine(),
+        renderSelfNormalizationLine(),
+        renderConstraintPackGapEscalationLine(),
         'If the interface includes code blocks, inline viewers, inspectors, or artifact panels, pull guardrail.surface-theme-parity and example.ui-generation.surface-theme-parity-drift so those surfaces stay inside the active theme model instead of defaulting to a dark terminal treatment.',
+        "Use guardrail.spec-completeness whenever a draft claims discipline without naming the actual recipe, token, accessibility contract, state, or handoff contract.",
         "Keep headings, labels, helper text, and CTA copy distinct in role. Collapse near-duplicate UI copy before adding more language.",
         "Keep local controls inside or directly adjacent to the surface they govern. Do not park them in a separate header or metadata zone.",
         `Stay inside ${guardrailIds.join(", ")}.`,
+        `Treat ${constraintPackIds.join(", ")} as published authority when no external design system exists.`,
+        `Use ${resolvedGuidelineProfileIds.join(", ")} as vendored derivative rules for generation and self-review.`,
         `Use ${exampleIds.join(", ")} as calibration for what should be rewritten or escalated.`,
         "If the request needs new primitives, unclear accessibility tradeoffs, or unlimited exploration, stop and surface review questions instead of improvising.",
       ].join(" ");
@@ -327,11 +536,24 @@ function createStarterInstructions(
       "Treat any referenced design system as the source of truth for components, tokens, radius, elevation, surfaces, and theme behavior.",
       "If a design system is present, ask whether it has an accessibility baseline or owner-approved review status before generating UI. If that status is unknown, pause and ask first.",
       "If the brief conflicts with the design system, surface review questions instead of silently overriding the system.",
-      "Only when the design system and the brief are both silent, use restrained fallback defaults: approved primitives, a tight 6px radius scale, no decorative gradients, no gratuitous shadows, and both light and dark mode by default.",
+      renderGuidelineProfileLine(
+        resolvedGuidelineProfileIds,
+      ),
+      renderFrontendVisualBundleLine(),
+      renderConstraintPackAuthorityLine(
+        constraintPackIds.length ? constraintPackIds : [AI_UI_GENERATION_CONSTRAINT_PACK_ID],
+      ),
+      renderDesignSystemOutputContractLine(),
+      renderPortableOutputContractLine(),
+      renderSelfNormalizationLine(),
+      renderConstraintPackGapEscalationLine(),
       'If the interface includes code blocks, inline viewers, inspectors, or artifact panels, pull guardrail.surface-theme-parity and example.ui-generation.surface-theme-parity-drift so those surfaces stay inside the active theme model instead of defaulting to a dark terminal treatment.',
+      "Use guardrail.spec-completeness whenever a draft claims discipline without naming the actual recipe, token, accessibility contract, state, or handoff contract.",
       "Keep headings, labels, helper text, and CTA copy distinct in role. Collapse near-duplicate UI copy before adding more language.",
       "Keep local controls inside or directly adjacent to the surface they govern. Do not park them in a separate header or metadata zone.",
       `Stay inside ${guardrailIds.join(", ")}.`,
+      `Treat ${constraintPackIds.join(", ")} as published authority when no external design system exists.`,
+      `Use ${resolvedGuidelineProfileIds.join(", ")} as vendored derivative rules for generation and self-review.`,
       `Use ${exampleIds.join(", ")} as calibration for what should be rewritten or escalated.`,
       "If the request needs new primitives, unclear accessibility tradeoffs, or unlimited exploration, stop and surface review questions instead of improvising.",
     ].join(" ");
@@ -435,19 +657,37 @@ async function getWorkflowBundle(args: ToolArgs) {
   const workflow = await readResourceFromEntry(workflowEntry);
   const links = isRecord(workflow.links) ? workflow.links : {};
   const guardrailIds = stringArray(workflow.common_guardrails);
+  const constraintPackIds = getConstraintPackIds(workflow);
+  const guidelineProfileIds = stringArray(links.guideline_profile_ids);
   const exampleIds = stringArray(links.example_ids);
 
   const guardrailEntries = index.resources.filter(
     (resource) =>
       resource.type === "guardrail" && guardrailIds.includes(resource.id),
   );
+  const constraintPackEntries = index.resources.filter(
+    (resource) =>
+      resource.type === "constraint_pack" &&
+      constraintPackIds.includes(resource.id),
+  );
+  const guidelineProfileEntries = index.resources.filter(
+    (resource) =>
+      resource.type === "guideline_profile" &&
+      guidelineProfileIds.includes(resource.id),
+  );
   const exampleEntries = index.resources.filter(
     (resource) =>
       resource.type === "example" && exampleIds.includes(resource.id),
   );
 
-  const [guardrails, examples] = await Promise.all([
+  const [guardrails, constraintPacks, guidelineProfiles, examples] = await Promise.all([
     Promise.all(guardrailEntries.map((entry) => readResourceFromEntry(entry))),
+    Promise.all(
+      constraintPackEntries.map((entry) => readResourceFromEntry(entry)),
+    ),
+    Promise.all(
+      guidelineProfileEntries.map((entry) => readResourceFromEntry(entry)),
+    ),
     Promise.all(exampleEntries.map((entry) => readResourceFromEntry(entry))),
   ]);
 
@@ -458,10 +698,14 @@ async function getWorkflowBundle(args: ToolArgs) {
     bundle: {
       workflow,
       guardrails,
+      constraint_packs: constraintPacks,
+      guideline_profiles: guidelineProfiles,
       examples,
       starter_instructions: createStarterInstructions(
         workflow,
         guardrails,
+        constraintPacks,
+        guidelineProfiles,
         examples,
         featureIntent,
       ),
@@ -587,6 +831,13 @@ const PROMPTS: Record<string, PromptDefinition> = {
     arguments: ["feature_intent"],
     template: GENERIC_START_DESIGN_WORKFLOW_PROMPT,
   },
+  start_no_design_system_workflow: {
+    name: START_NO_DESIGN_SYSTEM_WORKFLOW_PROMPT_NAME,
+    description:
+      "Start the portable JudgmentKit AI UI generation workflow for surfaces that do not have an external design system.",
+    arguments: ["feature_intent"],
+    template: renderStartNoDesignSystemWorkflowPrompt(),
+  },
   refine_design_first_pass: {
     name: REFINE_DESIGN_FIRST_PASS_PROMPT_NAME,
     description:
@@ -701,7 +952,7 @@ export function listTools() {
     {
       name: "get_workflow_bundle",
       description:
-        "Fetch a workflow with its linked guardrails, examples, and starter instructions.",
+        "Fetch a workflow with its linked guardrails, constraint packs, guideline profiles, examples, and starter instructions.",
       inputSchema: {
         type: "object",
         required: ["workflow_id"],
@@ -735,7 +986,8 @@ export function listTools() {
     },
     {
       name: "resolve_related",
-      description: "Return related workflows, guardrails, examples, and schemas.",
+      description:
+        "Return related workflows, guardrails, constraint packs, guideline profiles, examples, and schemas.",
       inputSchema: {
         type: "object",
         required: ["id"],

@@ -1,0 +1,450 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://judgmentkit.ai/schemas/constraint_pack.schema.json",
+  "title": "JudgmentKit Constraint Pack Resource",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "type",
+    "version",
+    "title",
+    "summary",
+    "status",
+    "workflows",
+    "guardrail_ids",
+    "guideline_profile_ids",
+    "authority",
+    "implementation_model",
+    "primitives",
+    "tokens",
+    "layout_archetypes",
+    "composition_patterns",
+    "state_matrix",
+    "handoff_contract",
+    "links",
+    "last_reviewed"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "type": {
+      "const": "constraint_pack"
+    },
+    "version": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "deprecated", "draft"]
+    },
+    "workflows": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "guardrail_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "guideline_profile_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["when_to_use", "priority_rules", "output_contract_sections"],
+      "properties": {
+        "when_to_use": {
+          "type": "string"
+        },
+        "priority_rules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "output_contract_sections": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "implementation_model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target_stack", "recipe_format", "preview_artifacts"],
+      "properties": {
+        "target_stack": {
+          "type": "string"
+        },
+        "recipe_format": {
+          "type": "string"
+        },
+        "preview_artifacts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "primitives": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["inventory", "composition_rules"],
+      "properties": {
+        "inventory": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "label",
+              "description",
+              "usage",
+              "component_recipe"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "usage": {
+                "type": "string"
+              },
+              "component_recipe": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "slots",
+                  "variants",
+                  "interaction_rules",
+                  "accessibility_contract",
+                  "react_tailwind"
+                ],
+                "properties": {
+                  "slots": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "variants": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "interaction_rules": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "accessibility_contract": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "react_tailwind": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "composition_rules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "tokens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "spacing_scale",
+        "radius_scale",
+        "border_rules",
+        "elevation_scale",
+        "typography_roles",
+        "color_roles",
+        "required_theme_pairs"
+      ],
+      "properties": {
+        "spacing_scale": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["token", "value", "usage"],
+            "properties": {
+              "token": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              },
+              "usage": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "radius_scale": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["token", "value", "usage"],
+            "properties": {
+              "token": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              },
+              "usage": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "border_rules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "elevation_scale": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["token", "value", "usage"],
+            "properties": {
+              "token": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              },
+              "usage": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "typography_roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["token", "value", "usage"],
+            "properties": {
+              "token": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              },
+              "usage": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "color_roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["role", "binding", "light_value", "dark_value", "usage"],
+            "properties": {
+              "role": {
+                "type": "string"
+              },
+              "binding": {
+                "type": "string"
+              },
+              "light_value": {
+                "type": "string"
+              },
+              "dark_value": {
+                "type": "string"
+              },
+              "usage": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required_theme_pairs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["binding", "purpose", "light_value", "dark_value"],
+            "properties": {
+              "binding": {
+                "type": "string"
+              },
+              "purpose": {
+                "type": "string"
+              },
+              "light_value": {
+                "type": "string"
+              },
+              "dark_value": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "composition_patterns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "surface_type", "recipe_ids", "rules"],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "surface_type": {
+            "type": "string"
+          },
+          "recipe_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "rules": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "layout_archetypes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["surface_type", "required_regions", "rules"],
+        "properties": {
+          "surface_type": {
+            "type": "string"
+          },
+          "required_regions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "rules": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "state_matrix": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["state", "expectations"],
+        "properties": {
+          "state": {
+            "type": "string"
+          },
+          "expectations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "handoff_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required_sections", "accessibility_notes", "escalation_triggers"],
+      "properties": {
+        "required_sections": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "accessibility_notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "escalation_triggers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "links": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["docs_url", "markdown_url", "schema_url"],
+      "properties": {
+        "docs_url": {
+          "type": "string"
+        },
+        "markdown_url": {
+          "type": "string"
+        },
+        "schema_url": {
+          "type": "string"
+        }
+      }
+    },
+    "last_reviewed": {
+      "type": "string",
+      "format": "date"
+    }
+  }
+}

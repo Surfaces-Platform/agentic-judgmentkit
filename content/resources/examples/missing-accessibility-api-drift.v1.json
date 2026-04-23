@@ -1,0 +1,46 @@
+{
+  "id": "example.ui-generation.missing-accessibility-api-drift",
+  "type": "example",
+  "version": "1.0.0",
+  "title": "Recipe without accessibility API rewritten into an accessible contract",
+  "summary": "A component recipe looks structured but omits focus, labels, keyboard behavior, and status semantics, then gets rewritten into an accessibility-complete recipe.",
+  "status": "active",
+  "workflow_id": "workflow.ai-ui-generation",
+  "guardrail_ids": [
+    "guardrail.spec-completeness",
+    "guardrail.control-proximity"
+  ],
+  "scenario": "A draft returns reusable components but treats accessibility as implied rather than explicit.",
+  "raw_output": "Use tabs for preview modes, a sheet for mobile details, and icon buttons in the toolbar. Keep the interaction accessible.",
+  "verdict": {
+    "verdict_id": "ver_014",
+    "decision_id": "dec_014",
+    "evaluated_at": "2026-04-14T00:00:00Z",
+    "status": "warn",
+    "severity": "medium",
+    "guardrails_triggered": [
+      "guardrail.spec-completeness"
+    ],
+    "reasons": [
+      "the recipe never names aria-label, keyboard behavior, focus-visible, or dialog semantics",
+      "accessibility is asserted but not encoded in the handoff contract"
+    ],
+    "drift_score": 0.41,
+    "recommended_action": "rewrite",
+    "rewrite_hint": "Add accessibility_contract details per recipe and a global accessibility_contract section.",
+    "ownership": {
+      "decision_owner": "Accessibility",
+      "risk_owner": "Frontend Platform",
+      "operational_owner": "Design Systems"
+    },
+    "incident_required": false
+  },
+  "corrected_output": "Tabs recipe must declare tablist, tab, and tabpanel semantics plus arrow-key behavior. Toolbar icon buttons require aria-label. Sheet recipe must declare dialog semantics, focus trap, overscroll containment, and focus restore on close.",
+  "lesson": "Accessible by implication is not accessible enough for implementation-ready output.",
+  "links": {
+    "docs_url": "https://judgmentkit.ai/docs/workflows/ai-ui-generation",
+    "markdown_url": "https://judgmentkit.ai/docs/workflows/ai-ui-generation.md",
+    "schema_url": "https://judgmentkit.ai/schemas/example.schema.json"
+  },
+  "last_reviewed": "2026-04-14"
+}

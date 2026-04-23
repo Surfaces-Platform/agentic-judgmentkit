@@ -1,0 +1,65 @@
+---
+title: Mode structure drift
+slug: /docs/examples/mode-structure-drift
+page_type: example
+summary: A product-surface request defaults to a marketing hero, then gets rewritten to lead with the working surface.
+agent_summary: >
+  This example calibrates visually led UI generation against the surface mode
+  contract, especially product surfaces that drift into marketing-page
+  structure.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+workflows:
+  - workflow.ai-ui-generation
+guardrails:
+  - guardrail.surface-mode-structure
+owners:
+  primary: Design Systems
+  risk: Product
+  operational: Frontend Platform
+status: active
+last_reviewed: 2026-04-23
+related_pages:
+  - /docs/workflows/ai-ui-generation
+  - /docs/guardrails/surface-mode-structure
+related_resources:
+  - /resources/examples/mode-structure-drift.v1.json
+related_schemas:
+  - /schemas/example.schema.json
+  - /schemas/verdict.schema.json
+toc: true
+---
+
+## Scenario
+
+A team asks for a calmer review workspace where operators triage generated UI candidates and compare evidence.
+
+## Raw decision or output
+
+`Start with a premium hero explaining the AI review platform, add three benefit cards, a stat strip, and a floating dashboard preview below the fold.`
+
+## What JudgmentKit detected
+
+- the task was operational but the first viewport used marketing structure
+- product proof was delayed behind generic hero, card, and stat patterns
+- no single surface mode was named before layout decisions were made
+
+## What action was taken
+
+JudgmentKit selected product-surface mode and moved the working review surface into the first viewport.
+
+## Corrected result
+
+`Mode: product surface. First viewport: a triage workspace with candidate list, active preview, evidence inspector, and local decision actions. Follow with orientation copy that explains scope and freshness, then secondary context for guideline coverage and unresolved review questions.`
+
+## Why the correction matters
+
+Visually led product surfaces still need to satisfy the operator's first job before they sell the product.
+
+## JSON artifact links
+
+- Example resource: `/resources/examples/mode-structure-drift.v1.json`
+- Schema: `/schemas/example.schema.json`

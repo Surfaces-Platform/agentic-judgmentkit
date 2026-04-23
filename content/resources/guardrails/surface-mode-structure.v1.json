@@ -1,0 +1,79 @@
+{
+  "id": "guardrail.surface-mode-structure",
+  "type": "guardrail",
+  "version": "1.0.0",
+  "title": "Surface mode structure",
+  "summary": "Choose one surface mode before generating UI so marketing, product, and hybrid demo structures do not collapse into a generic hero or card grid.",
+  "status": "active",
+  "audiences": [
+    "design-leaders",
+    "product-managers",
+    "platform-engineering",
+    "ai-application-developers"
+  ],
+  "applies_to": {
+    "workflows": ["workflow.ai-ui-generation"],
+    "surfaces": ["web", "mobile", "internal-tools"]
+  },
+  "decision": "Whether a visually led UI task selects exactly one mode and structures the first viewport and section order around that mode.",
+  "intent": {
+    "purpose": "Prevent generated UI from mixing marketing and product patterns until the surface no longer matches the user's actual job.",
+    "who_it_protects": ["end users", "product teams", "design systems"],
+    "failure_mode": "Generated output defaults to a marketing hero, card grid, stat strip, or floating-dashboard composition when the task needed a working product surface, or buries product proof behind a marketing shell when the task needed a hybrid demo.",
+    "good_judgment": "Select exactly one mode: marketing surface, product surface, or hybrid demo. Marketing surfaces lead with brand, promise, CTA, and one dominant visual. Product surfaces lead with the working surface, status, context, and actions. Hybrid demos create a brief branded entry and show believable product proof quickly.",
+    "acceptable_variation": [
+      "use a compact branded entry before product proof when the surface is a true hybrid demo",
+      "include marketing support sections after the working surface when the primary job remains operational",
+      "use cards when they are the interaction model rather than decorative default layout",
+      "adapt section order for mobile when the selected mode and primary action remain clear"
+    ],
+    "non_negotiables": [
+      "no marketing hero on an operational product surface unless the brief explicitly asks for one",
+      "no generic SaaS card grid as the first impression for a visually led surface",
+      "no mixed marketing/product hierarchy without naming a single governing mode",
+      "no hybrid demo that delays product proof behind multiple brand or promise sections"
+    ]
+  },
+  "detection": {
+    "decision_question": "Has the output selected one surface mode and structured the page or app around that mode's first job?",
+    "signals": [
+      "the first viewport uses campaign language for an operational workflow",
+      "marketing, product, and demo sections compete without a governing mode",
+      "a dashboard or tool starts with a hero instead of the working surface",
+      "a launch or venue page hides the brand or product behind generic template copy",
+      "cards, pills, logo clouds, or stat strips appear before the core surface job is clear"
+    ],
+    "thresholds": {
+      "pass": "one mode governs the first viewport and each section has one job that matches the user's actual task",
+      "warn": "the intended mode is recoverable but the section order or first viewport needs restructuring",
+      "fail": "the output uses the wrong mode or mixes modes so users cannot tell what kind of surface they are using"
+    }
+  },
+  "response": {
+    "low": {
+      "action": "auto_restructure",
+      "description": "Name the mode and reorder the first viewport and sections around that mode."
+    },
+    "medium": {
+      "action": "auto_restructure_and_review",
+      "description": "Rewrite the structure and route the result through design review for hierarchy and mode fit."
+    },
+    "high": {
+      "action": "block_and_escalate_to_design_review",
+      "description": "Block the output because the surface mode is wrong for the user's job or the first viewport misrepresents the product."
+    }
+  },
+  "ownership": {
+    "decision_owner": "Design Systems",
+    "risk_owner": "Product",
+    "operational_owner": "Frontend Platform",
+    "review_cadence": "monthly"
+  },
+  "links": {
+    "docs_url": "https://judgmentkit.ai/docs/guardrails/surface-mode-structure",
+    "markdown_url": "https://judgmentkit.ai/docs/guardrails/surface-mode-structure.md",
+    "schema_url": "https://judgmentkit.ai/schemas/guardrail.schema.json",
+    "example_ids": ["example.ui-generation.mode-structure-drift"]
+  },
+  "last_reviewed": "2026-04-23"
+}

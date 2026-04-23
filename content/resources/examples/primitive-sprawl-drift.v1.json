@@ -1,0 +1,47 @@
+{
+  "id": "example.ui-generation.primitive-sprawl-drift",
+  "type": "example",
+  "version": "1.0.0",
+  "title": "Primitive sprawl rewritten into the published portable inventory",
+  "summary": "A draft invents bespoke wrappers and decorative modules, then gets normalized into the approved JudgmentKit primitive set.",
+  "status": "active",
+  "workflow_id": "workflow.ai-ui-generation",
+  "guardrail_ids": [
+    "guardrail.design-system-integrity",
+    "guardrail.spec-completeness"
+  ],
+  "scenario": "A model drafts a review workspace for a team that has no design system and tries to make it feel high-end in one pass.",
+  "raw_output": "Build a floating insight ribbon, a holographic evidence capsule, a decision dock, and a metadata halo around the selected artifact.",
+  "verdict": {
+    "verdict_id": "ver_010",
+    "decision_id": "dec_010",
+    "evaluated_at": "2026-04-14T00:00:00Z",
+    "status": "warn",
+    "severity": "medium",
+    "guardrails_triggered": [
+      "guardrail.design-system-integrity",
+      "guardrail.spec-completeness"
+    ],
+    "reasons": [
+      "bespoke primitives are introduced without authority",
+      "the surface cannot be compared or implemented against a stable inventory"
+    ],
+    "drift_score": 0.44,
+    "recommended_action": "rewrite",
+    "rewrite_hint": "Recompose the surface from layout shell, header, artifact panel, inspector, card, and button primitives.",
+    "ownership": {
+      "decision_owner": "Design Systems",
+      "risk_owner": "Accessibility",
+      "operational_owner": "Frontend Platform"
+    },
+    "incident_required": false
+  },
+  "corrected_output": "Use a layout shell with a queue list on the left, a header plus artifact panel in the workspace center, and a persistent inspector on the right. Represent decision actions with buttons inside the artifact panel header instead of inventing a new decision dock primitive.",
+  "lesson": "Portable authority depends on a closed primitive vocabulary. Recomposition is allowed; silent primitive invention is not.",
+  "links": {
+    "docs_url": "https://judgmentkit.ai/docs/examples/primitive-sprawl-drift",
+    "markdown_url": "https://judgmentkit.ai/docs/examples/primitive-sprawl-drift.md",
+    "schema_url": "https://judgmentkit.ai/schemas/example.schema.json"
+  },
+  "last_reviewed": "2026-04-14"
+}

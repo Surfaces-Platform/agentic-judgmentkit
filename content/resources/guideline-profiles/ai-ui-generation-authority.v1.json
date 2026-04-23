@@ -1,0 +1,83 @@
+{
+  "id": "guideline-profile.ai-ui-generation-authority",
+  "type": "guideline_profile",
+  "version": "1.0.0",
+  "title": "AI UI generation authority rules",
+  "summary": "JudgmentKit-owned generation rules derived from the Vercel web interface guidelines and specialized for first-pass UI composition output.",
+  "status": "active",
+  "workflow_id": "workflow.ai-ui-generation",
+  "scope": "generation_authority",
+  "origin": {
+    "source_name": "Vercel Web Interface Guidelines",
+    "source_url": "https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md",
+    "derivative_policy": "Vendored and rewritten into JudgmentKit-owned wording so the generation contract is stable, reviewable, and evaluator-safe."
+  },
+  "categories": [
+    {
+      "id": "semantics-accessibility",
+      "title": "Semantics and accessibility",
+      "rules": [
+        "Use semantic HTML first; only add ARIA when native semantics do not cover the interaction.",
+        "Icon-only buttons require an aria-label and decorative icons should be aria-hidden.",
+        "Form controls need visible labels or an explicit aria-label plus meaningful name attributes.",
+        "Status, validation, and async updates need explicit semantics and aria-live when the update is not already in focus.",
+        "Disabled or blocked actions must explain why they are unavailable and may not rely on color alone."
+      ],
+      "anti_patterns": [
+        "Clickable divs or spans used as buttons",
+        "Form inputs without labels",
+        "Icon buttons without accessible names"
+      ]
+    },
+    {
+      "id": "focus-keyboard",
+      "title": "Focus and keyboard",
+      "rules": [
+        "Interactive elements must expose visible focus-visible treatment or equivalent focus replacement.",
+        "Compound controls should use focus-within grouping when the interaction is shared across multiple child elements.",
+        "Interactive behavior must remain keyboard reachable and keep focus order aligned with reading order.",
+        "Dialogs, sheets, tabs, and menus must name their keyboard expectations inside the accessibility contract."
+      ],
+      "anti_patterns": [
+        "outline-none without a focus-visible replacement",
+        "Pointer-only interaction rules"
+      ]
+    },
+    {
+      "id": "motion-theme-layout",
+      "title": "Motion, theme, and layout",
+      "rules": [
+        "Honor prefers-reduced-motion and downgrade to reduced or no motion in the default contract.",
+        "Animate opacity or transform only; do not use transition: all.",
+        "Dark and light mode must stay inside one token model across prompt, preview, inspector, and artifact surfaces.",
+        "Use flex or grid layout before any measurement-driven positioning.",
+        "Account for safe-area insets when the surface is full-bleed or anchored to viewport edges."
+      ],
+      "anti_patterns": [
+        "Artifact panels that default to a separate terminal theme",
+        "Theme-complete claims without explicit light and dark bindings"
+      ]
+    },
+    {
+      "id": "content-copy-touch",
+      "title": "Content, copy, and touch",
+      "rules": [
+        "Use active voice and specific button labels; do not hide intent behind generic Continue or Submit copy.",
+        "Use typographic ellipsis and concise second-person language in loading or guidance text.",
+        "Text containers must anticipate long content and define truncation, wrapping, or clamp behavior where needed.",
+        "Touch interactions should declare touch-action expectations and overscroll containment for drawers or sheets.",
+        "Placeholder text should be supportive rather than the only source of meaning."
+      ],
+      "anti_patterns": [
+        "Repeated labels across nearby controls with different meanings",
+        "Unbounded text regions with no truncation or wrap strategy"
+      ]
+    }
+  ],
+  "links": {
+    "docs_url": "https://judgmentkit.ai/docs/workflows/ai-ui-generation",
+    "markdown_url": "https://judgmentkit.ai/docs/workflows/ai-ui-generation.md",
+    "schema_url": "https://judgmentkit.ai/schemas/guideline_profile.schema.json"
+  },
+  "last_reviewed": "2026-04-14"
+}

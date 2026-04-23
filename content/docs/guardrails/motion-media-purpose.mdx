@@ -1,0 +1,71 @@
+---
+title: Motion and media purpose
+slug: /docs/guardrails/motion-media-purpose
+page_type: guardrail
+summary: Keep imagery and motion tied to narrative, hierarchy, or affordance instead of decorative load.
+agent_summary: >
+  This guardrail makes AI UI generation justify motion and media choices and
+  downgrade them before they harm readability, accessibility, mobile fit, or
+  runtime budget.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+workflows:
+  - workflow.ai-ui-generation
+guardrails:
+  - guardrail.motion-media-purpose
+owners:
+  primary: Design Systems
+  risk: Accessibility
+  operational: Frontend Platform
+status: active
+last_reviewed: 2026-04-23
+related_pages:
+  - /docs/workflows/ai-ui-generation
+  - /docs/examples/motion-media-drift
+related_resources:
+  - /resources/guardrails/motion-media-purpose.v1.json
+related_schemas:
+  - /schemas/guardrail.schema.json
+toc: true
+---
+
+## Why this matters
+
+Media and motion can make a surface feel deliberate, but they can also become a shortcut around structure. Abstract visuals, constant movement, and carousels with no narrative purpose make generated UI harder to read, operate, and review.
+
+## What decision is being governed
+
+This guardrail governs whether media and motion have a clear job and remain bounded by accessibility, readability, mobile, and runtime constraints.
+
+## What good judgment looks like
+
+- use imagery to reveal the product, place, object, state, workflow, or narrative
+- use motion for presence, hierarchy, affordance, or transition clarity
+- prefer opacity and transform motion
+- honor `prefers-reduced-motion`
+- pivot to typography, shape, contrast, or product UI when imagery is weak
+
+## What drift looks like
+
+1. Abstract media is treated as the primary proof.
+2. Motion is continuous decoration.
+3. A carousel or sticky effect has no narrative job.
+4. Text contrast or focus clarity depends on fragile media treatment.
+5. Runtime-heavy animation appears in a constrained first pass.
+
+## How JudgmentKit responds
+
+Small drift gets downgraded to purposeful transitions and a clearer media anchor. Medium drift receives design and accessibility review. Severe drift blocks the output when media or motion undermines usability, accessibility, or product truth.
+
+## Technical reference
+
+- Resource: `/resources/guardrails/motion-media-purpose.v1.json`
+- Schema: `/schemas/guardrail.schema.json`
+
+## Related pages
+
+- /docs/workflows/ai-ui-generation
+- /docs/examples/motion-media-drift

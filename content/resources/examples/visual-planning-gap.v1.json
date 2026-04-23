@@ -1,0 +1,42 @@
+{
+  "id": "example.ui-generation.visual-planning-gap",
+  "type": "example",
+  "version": "1.0.0",
+  "title": "Vague visual request rewritten into a planning contract",
+  "summary": "A request to make a surface feel premium jumps straight to decoration, then gets rewritten into mode, visual thesis, content plan, and interaction thesis.",
+  "status": "active",
+  "workflow_id": "workflow.ai-ui-generation",
+  "guardrail_ids": ["guardrail.visual-planning-contract"],
+  "scenario": "A model receives a short brief to make an existing product page feel more premium and modern.",
+  "raw_output": "Make the page pop with glass panels, a bold gradient background, large rounded corners, soft shadows, animated stats, and modern cards.",
+  "verdict": {
+    "verdict_id": "ver_018",
+    "decision_id": "dec_018",
+    "evaluated_at": "2026-04-23T00:00:00Z",
+    "status": "warn",
+    "severity": "medium",
+    "guardrails_triggered": ["guardrail.visual-planning-contract"],
+    "reasons": [
+      "premium and modern are not translated into concrete hierarchy, composition, or motion decisions",
+      "decoration is selected before a visual thesis or content plan exists",
+      "the output cannot be implemented without reinterpreting the intended direction"
+    ],
+    "drift_score": 0.44,
+    "recommended_action": "rewrite",
+    "rewrite_hint": "Define the mode, visual thesis, content plan, and interaction thesis before choosing styling details.",
+    "ownership": {
+      "decision_owner": "Design Systems",
+      "risk_owner": "Product",
+      "operational_owner": "Frontend Platform"
+    },
+    "incident_required": false
+  },
+  "corrected_output": "Mode: hybrid demo. Visual Thesis: quiet editorial confidence using strong typography, one real product proof plane, and restrained contrast. Content Plan: branded entry, product proof, one workflow detail, final install action. Interaction Thesis: a short entrance sequence for the entry text, hover reveal for the proof plane, and reduced-motion-safe opacity transitions only.",
+  "lesson": "Visual adjectives are not a plan. JudgmentKit converts them into hierarchy, composition, and motion decisions before implementation starts.",
+  "links": {
+    "docs_url": "https://judgmentkit.ai/docs/examples/visual-planning-gap",
+    "markdown_url": "https://judgmentkit.ai/docs/examples/visual-planning-gap.md",
+    "schema_url": "https://judgmentkit.ai/schemas/example.schema.json"
+  },
+  "last_reviewed": "2026-04-23"
+}

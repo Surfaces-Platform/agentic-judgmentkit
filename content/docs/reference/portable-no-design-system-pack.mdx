@@ -1,0 +1,147 @@
+---
+title: Portable no-design-system pack
+slug: /docs/reference/portable-no-design-system-pack
+page_type: reference
+summary: JudgmentKit's portable UI implementation authority for cases where no external design system is present.
+agent_summary: >
+  This reference defines the published primitive inventory, token contract,
+  reusable component recipes, state matrix, layout archetypes, vendored
+  guideline profiles, and handoff requirements for no-design-system AI UI
+  generation.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+workflows:
+  - workflow.ai-ui-generation
+guardrails:
+  - guardrail.design-system-integrity
+  - guardrail.spec-completeness
+owners:
+  primary: Design Systems
+  risk: Accessibility
+  operational: Frontend Platform
+status: active
+last_reviewed: 2026-04-14
+related_pages:
+  - /docs/workflows/ai-ui-generation
+  - /docs/guardrails/design-system-integrity
+  - /docs/guardrails/spec-completeness
+  - /docs/examples/token-vagueness-drift
+  - /docs/examples/primitive-sprawl-drift
+related_resources:
+  - /resources/constraint-packs/ai-ui-no-design-system.v1.json
+related_schemas:
+  - /schemas/constraint_pack.schema.json
+toc: true
+---
+
+## Why this pack exists
+
+JudgmentKit previously governed no-design-system UI generation mostly through restraint language and escalation rules. That reduced drift, but it still left too much room for vague tokens, invented primitives, and shallow handoff. This pack closes that gap by becoming the positive implementation authority when no external design system is available.
+
+## When to use it
+
+Use this pack when the repo, prompt, and brief do not supply an authoritative external design system, or when the task explicitly asks for a portable JudgmentKit-native UI authority.
+
+If a referenced external design system exists and has a confirmed accessibility baseline or owner-approved review status, that system still takes precedence.
+
+## What it governs
+
+- the approved primitive inventory
+- the default token contract
+- reusable React+Tailwind component recipes for every approved primitive
+- required light and dark theme pairs
+- layout archetypes by surface type
+- the required state matrix
+- the minimum implementation handoff contract
+- the vendored generation and review guideline profiles derived from the Vercel web interface guidelines
+
+## Primitive inventory
+
+The pack constrains no-design-system output to a closed primitive vocabulary:
+
+- layout shell
+- sidebar or rail
+- header
+- card
+- field
+- button
+- tabs
+- table or list
+- sheet or drawer
+- dialog
+- inspector
+- artifact panel
+
+The model may recombine these primitives, but it should not invent bespoke wrappers or visual modules unless that gap is escalated.
+
+## Token contract
+
+The pack publishes concrete spacing, radius, elevation, typography, and color bindings. The point is not visual branding. The point is implementation clarity.
+
+- spacing scale runs from `--jk-space-1 = 4px` through `--jk-space-6 = 32px`
+- radius scale runs from `--jk-radius-1 = 4px` through `--jk-radius-3 = 8px`
+- default stroke is `1px solid var(--jk-color-border-subtle)`
+- elevation is limited to none, raised cards, and modal-level elevation
+- color roles publish both light and dark values for canvas, surface, muted surface, border, text, accent, success, warning, and danger
+
+## Required output contract
+
+No-design-system output is not considered complete unless it includes these exact sections:
+
+- `core_screens`
+- `token_spec`
+- `component_recipes`
+- `screen_composition`
+- `state_coverage`
+- `theme_contract`
+- `accessibility_contract`
+- `escalation_items`
+
+These sections are the portable handoff contract. They give implementation teams something concrete to build and reviewers something concrete to judge.
+
+## Recipe and guideline model
+
+Every approved primitive now includes:
+
+- slot structure
+- allowed variants
+- interaction rules
+- accessibility contract
+- a React+Tailwind recipe snippet
+
+The pack also links two vendored guideline profiles:
+
+- `guideline-profile.ai-ui-generation-authority`
+- `guideline-profile.ai-ui-review-checks`
+
+## State and layout requirements
+
+The published state matrix requires explicit coverage for loading, empty, ready, error, review-needed, and disabled states.
+
+The published layout archetypes cover:
+
+- app workspace
+- settings form
+- dashboard
+- review flow
+- handoff or export flow
+
+## Boundaries
+
+This pack is not a substitute for a product-specific design system. It is a portable authority for situations where the alternative would otherwise be generic restraint language and hidden implementation assumptions.
+
+## Technical reference
+
+- Resource: `/resources/constraint-packs/ai-ui-no-design-system.v1.json`
+- Schema: `/schemas/constraint_pack.schema.json`
+
+## Related pages
+
+- /docs/workflows/ai-ui-generation
+- /docs/guardrails/design-system-integrity
+- /docs/guardrails/spec-completeness
+- /docs/examples/token-vagueness-drift
+- /docs/examples/primitive-sprawl-drift

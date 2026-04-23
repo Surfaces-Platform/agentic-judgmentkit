@@ -1,0 +1,69 @@
+---
+title: Visual planning contract
+slug: /docs/guardrails/visual-planning-contract
+page_type: guardrail
+summary: Require visually led UI work to define a visual thesis, content plan, and interaction thesis before implementation.
+agent_summary: >
+  This guardrail turns vague art-direction asks into concrete hierarchy,
+  composition, content, and motion decisions before UI generation starts.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+workflows:
+  - workflow.ai-ui-generation
+guardrails:
+  - guardrail.visual-planning-contract
+owners:
+  primary: Design Systems
+  risk: Product
+  operational: Frontend Platform
+status: active
+last_reviewed: 2026-04-23
+related_pages:
+  - /docs/workflows/ai-ui-generation
+  - /docs/examples/visual-planning-gap
+related_resources:
+  - /resources/guardrails/visual-planning-contract.v1.json
+related_schemas:
+  - /schemas/guardrail.schema.json
+toc: true
+---
+
+## Why this matters
+
+Prompts like "make it premium" or "make it feel modern" are not implementation contracts. Without a planning frame, the model usually adds gradients, shadows, radius, and cards before it decides what hierarchy or composition should change.
+
+## What decision is being governed
+
+This guardrail governs whether the generator has translated visual intent into actionable planning before it drafts layout, styling, or code.
+
+## What good judgment looks like
+
+- define `Visual Thesis` as mood, material, and energy
+- define `Content Plan` as ordered section jobs for the selected mode
+- define `Interaction Thesis` as purposeful motion or interaction ideas
+- translate vague asks into hierarchy, composition, and motion decisions
+- preserve existing design-system tokens and patterns unless the user requested a rework
+
+## What drift looks like
+
+1. The draft says premium, calm, or modern without concrete decisions.
+2. Decorative styling appears before structure is clear.
+3. Sections repeat the same job because no content plan exists.
+4. The motion plan is described as polish instead of a hierarchy or affordance decision.
+
+## How JudgmentKit responds
+
+Small gaps get filled with the missing planning frame. Medium gaps get rewritten before implementation. Severe gaps block the output until the visual direction can be made buildable.
+
+## Technical reference
+
+- Resource: `/resources/guardrails/visual-planning-contract.v1.json`
+- Schema: `/schemas/guardrail.schema.json`
+
+## Related pages
+
+- /docs/workflows/ai-ui-generation
+- /docs/examples/visual-planning-gap

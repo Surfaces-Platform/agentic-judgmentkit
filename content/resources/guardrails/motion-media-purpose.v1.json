@@ -1,0 +1,79 @@
+{
+  "id": "guardrail.motion-media-purpose",
+  "type": "guardrail",
+  "version": "1.0.0",
+  "title": "Motion and media purpose",
+  "summary": "Use imagery and motion only when they carry narrative, hierarchy, or affordance value, and downgrade them before they harm clarity, accessibility, or performance.",
+  "status": "active",
+  "audiences": [
+    "design-leaders",
+    "product-managers",
+    "platform-engineering",
+    "ai-application-developers"
+  ],
+  "applies_to": {
+    "workflows": ["workflow.ai-ui-generation"],
+    "surfaces": ["web", "mobile", "internal-tools"]
+  },
+  "decision": "Whether media and motion in a visually led UI task have a clear purpose and remain bounded by accessibility, readability, mobile, and runtime constraints.",
+  "intent": {
+    "purpose": "Prevent generated UI from using decorative imagery, texture, carousels, or animation as a substitute for structure and hierarchy.",
+    "who_it_protects": ["end users", "accessibility reviewers", "frontend teams"],
+    "failure_mode": "Generated output adds atmospheric imagery, gradients, scroll effects, hover animations, or carousels that do not improve understanding, affordance, or narrative and may reduce readability or performance.",
+    "good_judgment": "Use imagery to reveal the real product, place, object, state, or workflow. Use motion to create presence, hierarchy, or affordance. Prefer restrained opacity and transform motion, honor reduced-motion needs, and pivot to typography, shape, contrast, or product UI when imagery is weak.",
+    "acceptable_variation": [
+      "ship one meaningful CSS transition when the stack cannot support a richer motion system",
+      "use product UI as the primary media anchor when trustworthy photos or generated assets are unavailable",
+      "drop secondary motion on narrow screens or reduced-motion settings while preserving hierarchy",
+      "use decorative media only as subordinate support after the primary visual anchor is doing real work"
+    ],
+    "non_negotiables": [
+      "no motion that is ornamental only or depends on transition: all",
+      "no weak or placeholder imagery forced into the first viewport as if it were narrative media",
+      "no media or motion that reduces text contrast, focus visibility, tap target clarity, or mobile fit",
+      "no carousel, sticky effect, or scroll animation without a narrative or affordance purpose"
+    ]
+  },
+  "detection": {
+    "decision_question": "Do the media and motion choices make the surface easier to understand, feel, or operate, or are they decorative load?",
+    "signals": [
+      "imagery is abstract texture rather than a product, place, object, state, or workflow",
+      "motion is described as polish without a hierarchy or affordance job",
+      "animations ignore reduced-motion behavior",
+      "media competes with text or makes contrast fragile",
+      "runtime-heavy motion is proposed for a surface that needs restrained implementation"
+    ],
+    "thresholds": {
+      "pass": "media and motion each have a clear purpose and are bounded by accessibility, readability, mobile, and runtime constraints",
+      "warn": "the idea is useful but needs downgrade or retuning before implementation",
+      "fail": "media or motion is ornamental, misleading, inaccessible, or unjustified for the surface"
+    }
+  },
+  "response": {
+    "low": {
+      "action": "auto_downgrade",
+      "description": "Downgrade media or motion to a purposeful, accessible treatment."
+    },
+    "medium": {
+      "action": "auto_downgrade_and_review",
+      "description": "Retune the motion or media plan and route it through design and accessibility review."
+    },
+    "high": {
+      "action": "block_and_escalate_to_design_review",
+      "description": "Block the output because the media or motion choice undermines usability, accessibility, or product truth."
+    }
+  },
+  "ownership": {
+    "decision_owner": "Design Systems",
+    "risk_owner": "Accessibility",
+    "operational_owner": "Frontend Platform",
+    "review_cadence": "monthly"
+  },
+  "links": {
+    "docs_url": "https://judgmentkit.ai/docs/guardrails/motion-media-purpose",
+    "markdown_url": "https://judgmentkit.ai/docs/guardrails/motion-media-purpose.md",
+    "schema_url": "https://judgmentkit.ai/schemas/guardrail.schema.json",
+    "example_ids": ["example.ui-generation.motion-media-drift"]
+  },
+  "last_reviewed": "2026-04-23"
+}
