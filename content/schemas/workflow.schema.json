@@ -98,6 +98,18 @@
         "schema_url": {
           "type": "string"
         },
+        "constraint_pack_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "guideline_profile_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "example_ids": {
           "type": "array",
           "items": {

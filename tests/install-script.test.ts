@@ -98,12 +98,11 @@ describe("install script", () => {
     const next = upsertCodexTomlConfig(
       existing,
       `[mcp_servers.judgmentkit]
-command = "npm"
-args = ["--prefix", "/tmp/new-judgmentkit", "run", "mcp:stdio"]`,
+url = "http://127.0.0.1:18765/mcp"`,
     );
 
     expect(next).toContain('[mcp_servers.other]');
-    expect(next).toContain('/tmp/new-judgmentkit');
+    expect(next).toContain('url = "http://127.0.0.1:18765/mcp"');
     expect(next).not.toContain('/tmp/old-judgmentkit');
     expect(next).toContain('[projects.demo]');
   });
@@ -113,17 +112,16 @@ args = ["--prefix", "/tmp/new-judgmentkit", "run", "mcp:stdio"]`,
     const cursorExisting = await loadFixture("cursor-existing.json");
 
     const claudeNext = upsertJsonMcpConfig(claudeExisting, {
-      command: "npm",
-      args: ["--prefix", "/tmp/judgmentkit", "run", "mcp:stdio"],
+      url: "http://127.0.0.1:18766/mcp",
     });
     const cursorNext = upsertJsonMcpConfig(cursorExisting, {
-      command: "npm",
-      args: ["--prefix", "/tmp/judgmentkit", "run", "mcp:stdio"],
+      url: "http://127.0.0.1:18767/mcp",
     });
 
     expect(JSON.parse(claudeNext).mcpServers.other.command).toBe("node");
-    expect(JSON.parse(claudeNext).mcpServers.judgmentkit.args[1]).toBe("/tmp/judgmentkit");
+    expect(JSON.parse(claudeNext).mcpServers.judgmentkit.url).toBe("http://127.0.0.1:18766/mcp");
     expect(JSON.parse(cursorNext).mcpServers.other.command).toBe("node");
+    expect(JSON.parse(cursorNext).mcpServers.judgmentkit.url).toBe("http://127.0.0.1:18767/mcp");
     expect(JSON.parse(cursorNext).theme).toBe("dark");
   });
 
@@ -157,12 +155,14 @@ args = ["--prefix", "/tmp/new-judgmentkit", "run", "mcp:stdio"]`,
     const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "judgmentkit-workspace-"));
     const clients = ["codex", "claude", "cursor"] as const;
 
-    for (const client of clients) {
+    for (const [index, client] of clients.entries()) {
+      const port = 18_765 + index;
       const result = await installJudgmentKitMcp(
         {
           client,
           checkoutPath: process.cwd(),
           cwd: workspaceDir,
+          port,
         },
         {
           homeDir: () => homeDir,
@@ -172,10 +172,13 @@ args = ["--prefix", "/tmp/new-judgmentkit", "run", "mcp:stdio"]`,
 
       expect(result.wroteConfig).toBe(true);
       expect(result.verified).toBe(true);
-      expect(formatInstallerResult(result)).toContain("Manual fallback snippet:");
+      expect(result.endpoint).toBe(`http://127.0.0.1:${port}/mcp`);
+      expect(result.startCommand).toBe(`npm --prefix ${process.cwd()} run mcp:local`);
+      expect(result.bridgeFallbackSnippet).toContain("mcp-remote");
+      expect(formatInstallerResult(result)).toContain("Bridge fallback snippet");
       const writtenConfig = await fs.readFile(result.configPath, "utf8");
       expect(writtenConfig).toContain("judgmentkit");
-      expect(writtenConfig).toContain(process.cwd());
+      expect(writtenConfig).toContain(`http://127.0.0.1:${port}/mcp`);
     }
   });
 
@@ -199,8 +202,11 @@ args = ["--prefix", "/tmp/new-judgmentkit", "run", "mcp:stdio"]`,
     expect(stderr).toBe("");
     expect(stdout).toContain("JudgmentKit installer prepared client: codex");
     expect(stdout).toContain(`Checkout path: ${path.join(homeDir, "judgmentkit")}`);
+    expect(stdout).toContain("Endpoint: http://127.0.0.1:8765/mcp");
+    expect(stdout).toContain(`Start local MCP: npm --prefix ${path.join(homeDir, "judgmentkit")} run mcp:local`);
     expect(stdout).toContain("Mode: dry-run/manual");
-    expect(stdout).toContain("Manual fallback snippet:");
+    expect(stdout).toContain("Config snippet:");
+    expect(stdout).toContain("Bridge fallback snippet");
     expect(stdout).not.toContain("MODULE_NOT_FOUND");
   });
 });

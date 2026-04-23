@@ -1,0 +1,66 @@
+---
+title: Token vagueness drift
+slug: /docs/examples/token-vagueness-drift
+page_type: example
+summary: A no-design-system UI draft uses stylistic adjectives instead of actual token bindings, then gets rewritten into the portable JudgmentKit contract.
+agent_summary: >
+  This example shows how JudgmentKit rewrites vague design language into
+  concrete token values and light-dark bindings.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+workflows:
+  - workflow.ai-ui-generation
+guardrails:
+  - guardrail.design-system-integrity
+  - guardrail.spec-completeness
+owners:
+  primary: Frontend Platform
+  risk: Design Systems
+  operational: AI Application Developers
+status: active
+last_reviewed: 2026-04-14
+related_pages:
+  - /docs/workflows/ai-ui-generation
+  - /docs/reference/portable-no-design-system-pack
+  - /docs/guardrails/design-system-integrity
+  - /docs/guardrails/spec-completeness
+related_resources:
+  - /resources/examples/token-vagueness-drift.v1.json
+related_schemas:
+  - /schemas/example.schema.json
+  - /schemas/verdict.schema.json
+toc: true
+---
+
+## Scenario
+
+A team asks for a restrained, implementation-ready workspace UI without an external design system.
+
+## Raw decision or output
+
+`Use soft neutral surfaces, slightly darker side panels, roomy spacing, and modest rounding so the interface feels calm and premium.`
+
+## What JudgmentKit detected
+
+- token language that sounds disciplined but is not implementable
+- theme guidance implied without explicit light-dark bindings
+
+## What action was taken
+
+JudgmentKit rewrote the surface into named token bindings from the portable no-design-system pack.
+
+## Corrected result
+
+`Use --jk-color-canvas (#f6f5f2 / #121315) for the page background, --jk-color-surface (#ffffff / #1b1d21) for cards and drawers, --jk-space-4 (16px) for section padding, --jk-space-5 (24px) for inter-section gaps, and --jk-radius-2 (6px) for cards, inputs, and drawers.`
+
+## Why the correction matters
+
+Portable authority breaks if reviewers and implementation teams still need to translate adjectives into actual values.
+
+## JSON artifact links
+
+- Example resource: `/resources/examples/token-vagueness-drift.v1.json`
+- Schema: `/schemas/example.schema.json`

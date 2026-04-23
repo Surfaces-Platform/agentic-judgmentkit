@@ -32,7 +32,7 @@ Use JudgmentKit when you want an agent to do real work without making up its own
 
 ## Use it with agents
 
-Install JudgmentKit from a local checkout over stdio, fetch the workflow you care about, call `resolve_related` to pull the linked guardrails and examples, then run the model with those artifacts in context.
+Install JudgmentKit from a local checkout over loopback HTTP at `http://127.0.0.1:8765/mcp`, fetch the workflow you care about, call `resolve_related` to pull the linked guardrails and examples, then run the model with those artifacts in context.
 
 For example, for support you would:
 
@@ -40,7 +40,7 @@ For example, for support you would:
 - call `resolve_related` for `workflow.support-assistant`
 - call `get_example` for `example.brand-tone.support-coercive-copy`
 
-`/mcp` is not the install target. It is the hosted reference/debug endpoint that mirrors the same public truth as the local JudgmentKit checkout.
+Hosted `/mcp` is not the install target. It is the hosted reference/debug endpoint that mirrors the same public truth as the local JudgmentKit checkout.
 
 ## Problem in human terms
 
@@ -73,7 +73,7 @@ Without a shared judgment layer, product, design, governance, and engineering ma
 - two concrete workflows
 - three synthetic examples
 - a public artifact inventory and schema set
-- a hosted read-only MCP endpoint that mirrors the same public truth as the local stdio install
+- a hosted read-only MCP endpoint that mirrors the same public truth as the local loopback HTTP install
 
 ## Related pages
 

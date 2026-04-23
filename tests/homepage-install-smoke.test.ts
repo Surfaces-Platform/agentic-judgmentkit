@@ -1,76 +1,39 @@
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { describe, expect, it } from "vitest";
 
-import { renderManualConfigSnippet } from "@/lib/install-mcp";
+import { renderManualConfigSnippet, verifyInstalledMcp } from "@/lib/install-mcp";
 import { loadInstallContract } from "@/lib/install-contract";
 import { loadLandingPage } from "@/lib/landing-page";
 import type { InstallContract, InstallContractClient } from "@/lib/types";
-
-function withTimeout<T>(promise: Promise<T>, timeoutMs: number) {
-  return Promise.race([
-    promise,
-    new Promise<T>((_, reject) => {
-      setTimeout(() => reject(new Error(`Timed out after ${timeoutMs}ms.`)), timeoutMs);
-    }),
-  ]);
-}
-
-function materializeLocalPath(value: string, contract: InstallContract) {
-  return value.replaceAll(
-    contract.repository.local_path_placeholder,
-    process.cwd(),
-  );
-}
-
-function materializeConnection(contract: InstallContract) {
-  return {
-    command: contract.connection.command,
-    args: contract.connection.args.map((argument) =>
-      materializeLocalPath(argument, contract),
-    ),
-  };
-}
 
 function parseCodexConfigSnippet(snippet: string) {
   if (!snippet.includes("[mcp_servers.judgmentkit]")) {
     throw new Error("Codex install snippet is missing the judgmentkit server block.");
   }
 
-  const commandMatch = snippet.match(/^\s*command\s*=\s*"([^"]+)"\s*$/m);
-  const argsMatch = snippet.match(/^\s*args\s*=\s*(\[[^\n]+\])\s*$/m);
+  const urlMatch = snippet.match(/^\s*url\s*=\s*"([^"]+)"\s*$/m);
 
-  if (!commandMatch || !argsMatch) {
-    throw new Error("Codex install snippet is missing a command or args assignment.");
+  if (!urlMatch) {
+    throw new Error("Codex install snippet is missing a URL assignment.");
   }
 
-  const args = JSON.parse(argsMatch[1]) as string[];
-
-  return {
-    command: commandMatch[1],
-    args,
-  };
+  return { url: urlMatch[1] };
 }
 
 function parseJsonConfigSnippet(snippet: string) {
   const parsed = JSON.parse(snippet) as {
     mcpServers?: {
       judgmentkit?: {
-        command?: string;
-        args?: string[];
+        url?: string;
       };
     };
   };
   const serverConfig = parsed.mcpServers?.judgmentkit;
 
-  if (!serverConfig?.command || !Array.isArray(serverConfig.args)) {
-    throw new Error("JSON install snippet is missing mcpServers.judgmentkit command/args.");
+  if (!serverConfig?.url) {
+    throw new Error("JSON install snippet is missing mcpServers.judgmentkit url.");
   }
 
-  return {
-    command: serverConfig.command,
-    args: serverConfig.args,
-  };
+  return { url: serverConfig.url };
 }
 
 function parseClientConnection(clientConfig: InstallContractClient) {
@@ -83,21 +46,6 @@ function parseClientConnection(clientConfig: InstallContractClient) {
   return parseJsonConfigSnippet(materializedSnippet);
 }
 
-function createFailure(
-  clientId: string,
-  command: string,
-  args: string[],
-  stderrOutput: string,
-  error: unknown,
-) {
-  const reason = error instanceof Error ? error.message : String(error);
-  const stderr = stderrOutput.trim() || "<empty>";
-
-  return new Error(
-    `Homepage install smoke failed for ${clientId}.\nCommand: ${command} ${args.join(" ")}\nReason: ${reason}\nStderr:\n${stderr}`,
-  );
-}
-
 function loadInternalInstallContract(): InstallContract {
   return loadInstallContract();
 }
@@ -106,58 +54,13 @@ async function verifyClientInstall(
   contract: InstallContract,
   clientConfig: InstallContractClient,
 ) {
-  const configuredConnection = parseClientConnection(clientConfig);
-  const expectedConnection = materializeConnection(contract);
-
-  expect(configuredConnection).toEqual(expectedConnection);
-
-  const stderrOutput: string[] = [];
-  const transport = new StdioClientTransport({
-    command: configuredConnection.command,
-    args: configuredConnection.args,
-    cwd: process.cwd(),
-    stderr: "pipe",
-  });
-  const client = new Client({
-    name: `homepage-install-smoke-${clientConfig.id}`,
-    version: "1.0.0",
-  });
-
-  transport.stderr?.on("data", (chunk: Buffer | string) => {
-    stderrOutput.push(chunk.toString());
-  });
-
-  try {
-    await withTimeout(client.connect(transport), 5_000);
-
-    const toolsResponse = await withTimeout(client.listTools(), 5_000);
-    expect(toolsResponse.tools.map((tool) => tool.name)).toEqual(
-      contract.verification.expected_tools,
-    );
-
-    const promptsResponse = await withTimeout(client.listPrompts(), 5_000);
-    expect(promptsResponse.prompts.map((prompt) => prompt.name)).toEqual(
-      contract.verification.expected_prompts,
-    );
-
-    const promptResponse = await withTimeout(
-      client.getPrompt({ name: "start_design_workflow", arguments: {} }),
-      5_000,
-    );
-
-    expect(promptResponse.messages.length).toBeGreaterThan(0);
-    expect(promptResponse.messages[0]?.content.type).toBe("text");
-  } catch (error) {
-    throw createFailure(
-      clientConfig.id,
-      configuredConnection.command,
-      configuredConnection.args,
-      stderrOutput.join(""),
-      error,
-    );
-  } finally {
-    await transport.close();
+  if (contract.connection.transport !== "http") {
+    throw new Error("Expected HTTP install contract.");
   }
+
+  const configuredConnection = parseClientConnection(clientConfig);
+
+  expect(configuredConnection).toEqual({ url: contract.connection.url });
 }
 
 describe("homepage install smoke", () => {
@@ -182,7 +85,7 @@ describe("homepage install smoke", () => {
       "curl -fsSL https://judgmentkit.ai/install | bash -s -- --client <codex|claude|cursor>",
     );
     expect(content.verify_prompt).toBe(
-      "Call MCP tools/list against the local judgmentkit server",
+      "Start the local JudgmentKit loopback server, then call MCP tools/list against http://127.0.0.1:8765/mcp",
     );
   });
 
@@ -196,5 +99,15 @@ describe("homepage install smoke", () => {
     for (const clientConfig of contract.clients) {
       await verifyClientInstall(contract, clientConfig);
     }
+
+    if (contract.connection.transport !== "http") {
+      throw new Error("Expected HTTP install contract.");
+    }
+
+    await verifyInstalledMcp(process.cwd(), {
+      endpoint: contract.connection.url,
+      host: contract.connection.loopback_runtime.host,
+      port: contract.connection.loopback_runtime.port,
+    });
   });
 });

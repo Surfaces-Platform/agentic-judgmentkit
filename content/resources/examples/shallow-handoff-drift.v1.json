@@ -1,0 +1,45 @@
+{
+  "id": "example.ui-generation.shallow-handoff-drift",
+  "type": "example",
+  "version": "1.0.0",
+  "title": "Shallow handoff rewritten into the required portable contract",
+  "summary": "A clean-looking UI brief omits implementation sections, then gets rewritten into a concrete handoff packet.",
+  "status": "active",
+  "workflow_id": "workflow.ai-ui-generation",
+  "guardrail_ids": [
+    "guardrail.spec-completeness"
+  ],
+  "scenario": "A team wants an implementation-ready export flow, but the first pass only describes the appearance of the interface.",
+  "raw_output": "The export page should feel simple and trustworthy, with clear cards, obvious hierarchy, and a polished summary area before the final handoff action.",
+  "verdict": {
+    "verdict_id": "ver_011",
+    "decision_id": "dec_011",
+    "evaluated_at": "2026-04-14T00:00:00Z",
+    "status": "warn",
+    "severity": "medium",
+    "guardrails_triggered": [
+      "guardrail.spec-completeness"
+    ],
+    "reasons": [
+      "the output never names reusable component recipes, theme contract, or escalation boundaries",
+      "implementation handoff still depends on interpretation"
+    ],
+    "drift_score": 0.36,
+    "recommended_action": "rewrite",
+    "rewrite_hint": "Return the required portable handoff sections with reusable recipes and accessibility contract instead of a visual-only summary.",
+    "ownership": {
+      "decision_owner": "Frontend Platform",
+      "risk_owner": "Design Systems",
+      "operational_owner": "AI Application Developers"
+    },
+    "incident_required": false
+  },
+  "corrected_output": "Return core_screens, token_spec, component_recipes, screen_composition, state_coverage, theme_contract, accessibility_contract, and escalation_items. Map the summary region to card plus artifact-panel recipes, include React+Tailwind composition snippets with slots and interaction rules, define loading, empty, ready, error, review-needed, and disabled states, bind light-dark tokens explicitly, and list the export edge cases that still require review.",
+  "lesson": "A portable UI authority must carry enough handoff structure to survive beyond the original model run.",
+  "links": {
+    "docs_url": "https://judgmentkit.ai/docs/examples/shallow-handoff-drift",
+    "markdown_url": "https://judgmentkit.ai/docs/examples/shallow-handoff-drift.md",
+    "schema_url": "https://judgmentkit.ai/schemas/example.schema.json"
+  },
+  "last_reviewed": "2026-04-14"
+}

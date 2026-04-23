@@ -1,0 +1,65 @@
+---
+title: Output contract gap
+slug: /docs/examples/output-contract-gap
+page_type: example
+summary: A visual implementation summary omits mode, visual thesis, and motion plan, then gets completed with contract evidence.
+agent_summary: >
+  This example shows how JudgmentKit completes visually led implementation
+  responses so reviewers can audit the mode, thesis, motion plan, and any
+  downgrade.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+workflows:
+  - workflow.ai-ui-generation
+guardrails:
+  - guardrail.frontend-output-contract
+owners:
+  primary: Design Systems
+  risk: Product
+  operational: AI Application Developers
+status: active
+last_reviewed: 2026-04-23
+related_pages:
+  - /docs/workflows/ai-ui-generation
+  - /docs/guardrails/frontend-output-contract
+related_resources:
+  - /resources/examples/output-contract-gap.v1.json
+related_schemas:
+  - /schemas/example.schema.json
+  - /schemas/verdict.schema.json
+toc: true
+---
+
+## Scenario
+
+An agent updates a product UI to feel calmer and more deliberate, but the final response omits the visual contract evidence.
+
+## Raw decision or output
+
+`Updated the page styling, improved spacing, and made the interface feel more polished. Tests passed.`
+
+## What JudgmentKit detected
+
+- the final response did not state the selected mode
+- the final response omitted the visual thesis and motion plan
+- the implementation could not be audited from the response
+
+## What action was taken
+
+JudgmentKit completed the response with the required visual output contract and disclosed the motion downgrade.
+
+## Corrected result
+
+`Updated the actual product surface to lead with the workspace, reduce card chrome, and tighten copy. Visual Thesis: calm operational clarity with strong typography and low-chrome structure. Mode: product surface. Motion Plan: hover affordance on primary actions and reduced-motion-safe opacity transitions; richer scroll motion was intentionally skipped to preserve runtime budget.`
+
+## Why the correction matters
+
+Visual implementation needs review evidence. The final answer should make the mode, thesis, motion choices, and downgrades explicit without forcing the user to reconstruct intent.
+
+## JSON artifact links
+
+- Example resource: `/resources/examples/output-contract-gap.v1.json`
+- Schema: `/schemas/example.schema.json`

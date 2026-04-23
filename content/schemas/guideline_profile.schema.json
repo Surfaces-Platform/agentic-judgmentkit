@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://judgmentkit.ai/schemas/guideline_profile.schema.json",
+  "title": "JudgmentKit Guideline Profile Resource",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "type",
+    "version",
+    "title",
+    "summary",
+    "status",
+    "workflow_id",
+    "scope",
+    "origin",
+    "categories",
+    "links",
+    "last_reviewed"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "type": {
+      "const": "guideline_profile"
+    },
+    "version": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "deprecated", "draft"]
+    },
+    "workflow_id": {
+      "type": "string"
+    },
+    "scope": {
+      "type": "string",
+      "enum": ["generation_authority", "review_checks"]
+    },
+    "origin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_name", "source_url", "derivative_policy"],
+      "properties": {
+        "source_name": {
+          "type": "string"
+        },
+        "source_url": {
+          "type": "string"
+        },
+        "derivative_policy": {
+          "type": "string"
+        }
+      }
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "rules"],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "rules": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "anti_patterns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "links": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["docs_url", "markdown_url", "schema_url"],
+      "properties": {
+        "docs_url": {
+          "type": "string"
+        },
+        "markdown_url": {
+          "type": "string"
+        },
+        "schema_url": {
+          "type": "string"
+        }
+      }
+    },
+    "last_reviewed": {
+      "type": "string"
+    }
+  }
+}

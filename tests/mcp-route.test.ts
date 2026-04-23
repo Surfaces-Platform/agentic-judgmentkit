@@ -1,9 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { GET, POST } from "@/app/mcp/route";
-
-const GENERIC_START_DESIGN_WORKFLOW_PROMPT =
-  'Use JudgmentKit for this design task. Call get_workflow_bundle({ workflow_id: "workflow.ai-ui-generation" }) first. Treat any referenced design system as the source of truth for components, tokens, radius, elevation, surfaces, and theme behavior. If a design system is present, ask whether it has an accessibility baseline or owner-approved review status before generating UI; if that status is unknown, pause and ask first. If the brief conflicts with the design system, surface review questions and escalation items instead of silently overriding it. Only when the design system and the brief are both silent, use restrained fallback defaults: approved primitives, a tight 6px radius scale, no decorative gradients, no gratuitous shadows, and both light and dark mode by default. If the interface includes code blocks, inline viewers, inspectors, or artifact panels, also call get_resource({ id: "guardrail.surface-theme-parity" }) and use get_example({ id: "example.ui-generation.surface-theme-parity-drift" }) as calibration so those surfaces stay inside the active light/dark theme model instead of defaulting to a dark terminal treatment. Keep local controls inside or directly adjacent to the surface they govern so ownership stays obvious. Keep runtime bounded and surface review questions before inventing new patterns.';
+import { getPrompt } from "@/lib/mcp";
 
 async function postJsonRpc(payload: Record<string, unknown>) {
   const request = new Request("http://localhost:3002/mcp", {
@@ -55,6 +53,22 @@ describe("mcp route prompts", () => {
     ).toBe(true);
   });
 
+  it("lists the no-design-system starter prompt", async () => {
+    const result = await postJsonRpc({
+      jsonrpc: "2.0",
+      id: 10,
+      method: "prompts/list",
+    });
+
+    expect(result.error).toBeUndefined();
+    expect(
+      result.result.prompts.some(
+        (prompt: { name: string }) =>
+          prompt.name === "start_no_design_system_workflow",
+      ),
+    ).toBe(true);
+  });
+
   it("returns the generic start_design_workflow prompt when no arguments are provided", async () => {
     const result = await postJsonRpc({
       jsonrpc: "2.0",
@@ -67,9 +81,12 @@ describe("mcp route prompts", () => {
     });
 
     expect(result.error).toBeUndefined();
-    expect(result.result.messages[0].content.text).toBe(
-      GENERIC_START_DESIGN_WORKFLOW_PROMPT,
-    );
+    const directPrompt = getPrompt("start_design_workflow");
+    expect("error" in directPrompt).toBe(false);
+    if ("error" in directPrompt) {
+      return;
+    }
+    expect(result.result.messages[0].content.text).toBe(directPrompt.template);
   });
 
   it("returns a task-specific start_design_workflow prompt when feature_intent is provided", async () => {
@@ -91,6 +108,18 @@ describe("mcp route prompts", () => {
     );
     expect(result.result.messages[0].content.text).toContain(
       'get_workflow_bundle({ workflow_id: "workflow.ai-ui-generation", feature_intent: "Generate the JudgmentKit.com landing page" })',
+    );
+    expect(result.result.messages[0].content.text).toContain(
+      "constraint-pack.ai-ui-no-design-system",
+    );
+    expect(result.result.messages[0].content.text).toContain(
+      "guideline-profile.ai-ui-generation-authority",
+    );
+    expect(result.result.messages[0].content.text).toContain(
+      "guardrail.surface-mode-structure",
+    );
+    expect(result.result.messages[0].content.text).toContain(
+      "example.ui-generation.mode-structure-drift",
     );
   });
 
@@ -123,6 +152,21 @@ describe("mcp route prompts", () => {
       'get_resource({ id: "guardrail.ui-copy-clarity" })',
     );
     expect(result.result.messages[0].content.text).toContain(
+      'get_resource({ id: "guardrail.spec-completeness" })',
+    );
+    expect(result.result.messages[0].content.text).toContain(
+      'get_resource({ id: "guardrail.surface-mode-structure" })',
+    );
+    expect(result.result.messages[0].content.text).toContain(
+      'get_resource({ id: "guardrail.visual-planning-contract" })',
+    );
+    expect(result.result.messages[0].content.text).toContain(
+      'get_resource({ id: "guardrail.frontend-output-contract" })',
+    );
+    expect(result.result.messages[0].content.text).toContain(
+      'get_example({ id: "example.ui-generation.visual-planning-gap" })',
+    );
+    expect(result.result.messages[0].content.text).toContain(
       'get_example({ id: "example.ui-generation.repetitive-copy-drift" })',
     );
     expect(result.result.messages[0].content.text).toContain(
@@ -136,6 +180,24 @@ describe("mcp route prompts", () => {
     );
     expect(result.result.messages[0].content.text).toContain(
       'get_example({ id: "example.ui-generation.surface-theme-parity-drift" })',
+    );
+    expect(result.result.messages[0].content.text).toContain(
+      'get_example({ id: "example.ui-generation.token-vagueness-drift" })',
+    );
+    expect(result.result.messages[0].content.text).toContain(
+      'get_example({ id: "example.ui-generation.component-mapping-name-only-drift" })',
+    );
+    expect(result.result.messages[0].content.text).toContain(
+      'get_example({ id: "example.ui-generation.non-reusable-recipe-drift" })',
+    );
+    expect(result.result.messages[0].content.text).toContain(
+      'get_example({ id: "example.ui-generation.missing-accessibility-api-drift" })',
+    );
+    expect(result.result.messages[0].content.text).toContain(
+      'get_example({ id: "example.ui-generation.hand-authored-preview-drift" })',
+    );
+    expect(result.result.messages[0].content.text).toContain(
+      'get_example({ id: "example.ui-generation.theme-binding-recipe-drift" })',
     );
     expect(result.result.messages[0].content.text).toContain(
       "accessibility baseline or owner-approved review status",

@@ -4,10 +4,13 @@ import os from "node:os";
 import path from "node:path";
 
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 
 import {
+  createLocalMcpUrl,
   JUDGMENTKIT_REPOSITORY_CLONE_URL,
+  LOCAL_MCP_DEFAULT_HOST,
+  LOCAL_MCP_DEFAULT_PORT,
 } from "@/lib/constants";
 import { loadInstallContract } from "@/lib/install-contract";
 import type { InstallContract, InstallContractClient, InstallerClientId } from "@/lib/types";
@@ -30,6 +33,8 @@ export type InstallerCliOptions = {
   dryRun?: boolean;
   manual?: boolean;
   noVerify?: boolean;
+  host?: string;
+  port?: number;
   cwd?: string;
 };
 
@@ -40,11 +45,10 @@ export type InstallResult = {
   backupPath?: string;
   wroteConfig: boolean;
   verified: boolean;
-  manualSnippet: string;
-  command: {
-    command: string;
-    args: string[];
-  };
+  endpoint: string;
+  startCommand: string;
+  configSnippet: string;
+  bridgeFallbackSnippet: string;
 };
 
 export class InstallerError extends Error {
@@ -109,6 +113,18 @@ function normalizeClient(value: string | undefined): InstallerClientId {
   );
 }
 
+function normalizePort(value: string | undefined) {
+  const parsed = Number(value);
+  if (Number.isInteger(parsed) && parsed > 0 && parsed <= 65_535) {
+    return parsed;
+  }
+
+  throw new InstallerError(
+    "args",
+    "Missing or invalid --port. Provide a TCP port between 1 and 65535.",
+  );
+}
+
 function expandHomePath(value: string, homeDir: string) {
   return value.startsWith("~/") ? path.join(homeDir, value.slice(2)) : value;
 }
@@ -120,6 +136,8 @@ export function parseInstallerArgs(argv: string[]): InstallerCliOptions {
   let dryRun = false;
   let manual = false;
   let noVerify = false;
+  let host: string | undefined;
+  let port: number | undefined;
 
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
@@ -145,10 +163,18 @@ export function parseInstallerArgs(argv: string[]): InstallerCliOptions {
       case "--no-verify":
         noVerify = true;
         break;
+      case "--host":
+        host = argv[index + 1];
+        index += 1;
+        break;
+      case "--port":
+        port = normalizePort(argv[index + 1]);
+        index += 1;
+        break;
       case "--help":
         throw new InstallerError(
           "args",
-          "Usage: node --import tsx ./scripts/install-mcp.ts --client <codex|claude|cursor> [--path <checkout-path>] [--config-path <path>] [--dry-run] [--manual] [--no-verify]",
+          "Usage: node --import tsx ./scripts/install-mcp.ts --client <codex|claude|cursor> [--path <checkout-path>] [--config-path <path>] [--host <host>] [--port <port>] [--dry-run] [--manual] [--no-verify]",
         );
       default:
         if (argument.startsWith("--")) {
@@ -165,6 +191,8 @@ export function parseInstallerArgs(argv: string[]): InstallerCliOptions {
     dryRun,
     manual,
     noVerify,
+    host,
+    port,
   };
 }
 
@@ -198,15 +226,6 @@ function materializeLocalPath(value: string, contract: InstallContract, checkout
   return value.replaceAll(contract.repository.local_path_placeholder, checkoutPath);
 }
 
-function materializeConnection(contract: InstallContract, checkoutPath: string) {
-  return {
-    command: contract.connection.command,
-    args: contract.connection.args.map((argument) =>
-      materializeLocalPath(argument, contract, checkoutPath),
-    ),
-  };
-}
-
 function getClientContract(
   contract: InstallContract,
   client: InstallerClientId,
@@ -219,19 +238,90 @@ function getClientContract(
   return target;
 }
 
-export function renderManualConfigSnippet(client: InstallContractClient, checkoutPath: string) {
-  const connection = materializeConnection(loadInstallContract(), checkoutPath);
+function getHttpConnection(contract: InstallContract) {
+  if (contract.connection.transport !== "http") {
+    throw new InstallerError(
+      "config",
+      "JudgmentKit install contract does not expose an HTTP connection.",
+    );
+  }
 
+  return contract.connection;
+}
+
+function resolveHost(host: string | undefined) {
+  const trimmed = host?.trim();
+  return trimmed || LOCAL_MCP_DEFAULT_HOST;
+}
+
+function resolvePort(port: number | undefined) {
+  return port ?? LOCAL_MCP_DEFAULT_PORT;
+}
+
+function materializeLoopbackRuntime(
+  contract: InstallContract,
+  checkoutPath: string,
+  host: string,
+  port: number,
+) {
+  const connection = getHttpConnection(contract);
+
+  return {
+    endpoint: createLocalMcpUrl(host, port),
+    startCommand: materializeLocalPath(
+      connection.loopback_runtime.start_command,
+      contract,
+      checkoutPath,
+    ),
+  };
+}
+
+function createBridgeConfig(endpoint: string) {
+  return {
+    command: "npx",
+    args: ["-y", "mcp-remote", endpoint],
+  };
+}
+
+export function renderManualConfigSnippet(
+  client: InstallContractClient,
+  _checkoutPath: string,
+  endpoint = createLocalMcpUrl(),
+) {
   if (client.config_format === "toml") {
     return `[mcp_servers.judgmentkit]
-command = "${connection.command}"
-args = ${JSON.stringify(connection.args)}`;
+url = "${endpoint}"`;
   }
 
   return `${JSON.stringify(
     {
       mcpServers: {
-        judgmentkit: connection,
+        judgmentkit: {
+          url: endpoint,
+        },
+      },
+    },
+    null,
+    2,
+  )}\n`;
+}
+
+export function renderBridgeFallbackSnippet(
+  client: InstallContractClient,
+  endpoint = createLocalMcpUrl(),
+) {
+  const bridgeConfig = createBridgeConfig(endpoint);
+
+  if (client.config_format === "toml") {
+    return `[mcp_servers.judgmentkit]
+command = "${bridgeConfig.command}"
+args = ${JSON.stringify(bridgeConfig.args)}`;
+  }
+
+  return `${JSON.stringify(
+    {
+      mcpServers: {
+        judgmentkit: bridgeConfig,
       },
     },
     null,
@@ -276,7 +366,7 @@ export function upsertCodexTomlConfig(existingText: string, judgmentKitBlock: st
   return `${prefix}${prefix ? "\n\n" : ""}${judgmentKitBlock.trim()}\n`;
 }
 
-export function upsertJsonMcpConfig(existingText: string, serverConfig: { command: string; args: string[] }) {
+export function upsertJsonMcpConfig(existingText: string, serverConfig: { url: string }) {
   const trimmed = existingText.trim();
   const parsed = trimmed.length > 0 ? JSON.parse(trimmed) : {};
 
@@ -285,7 +375,7 @@ export function upsertJsonMcpConfig(existingText: string, serverConfig: { comman
   }
 
   const root = parsed as {
-    mcpServers?: Record<string, { command: string; args: string[] }>;
+    mcpServers?: Record<string, { url: string }>;
   };
 
   if (
@@ -353,10 +443,10 @@ async function writeClientConfig(
   client: InstallContractClient,
   configPath: string,
   checkoutPath: string,
+  endpoint: string,
   deps: InstallDependencies,
 ) {
-  const manualSnippet = renderManualConfigSnippet(client, checkoutPath);
-  const connection = materializeConnection(loadInstallContract(), checkoutPath);
+  const configSnippet = renderManualConfigSnippet(client, checkoutPath, endpoint);
   const existingText = (await pathExists(deps.fs, configPath))
     ? await deps.fs.readFile(configPath, "utf8")
     : "";
@@ -364,19 +454,19 @@ async function writeClientConfig(
   let nextText: string;
   try {
     if (client.config_format === "toml") {
-      nextText = upsertCodexTomlConfig(existingText, manualSnippet);
+      nextText = upsertCodexTomlConfig(existingText, configSnippet);
     } else {
-      nextText = upsertJsonMcpConfig(existingText, connection);
+      nextText = upsertJsonMcpConfig(existingText, { url: endpoint });
     }
   } catch (error) {
     if (error instanceof InstallerError) {
-      throw new InstallerError("config", error.message, manualSnippet);
+      throw new InstallerError("config", error.message, configSnippet);
     }
 
     throw new InstallerError(
       "config",
       `Failed to update ${configPath}: ${String(error)}`,
-      manualSnippet,
+      configSnippet,
     );
   }
 
@@ -395,30 +485,19 @@ async function writeClientConfig(
     throw new InstallerError(
       "config",
       `Failed to write client config at ${configPath}: ${String(error)}`,
-      manualSnippet,
+      configSnippet,
     );
   }
 
   return {
     backupPath,
-    manualSnippet,
+    configSnippet,
   };
 }
 
-export async function verifyInstalledMcp(checkoutPath: string) {
+async function verifyHttpToolsList(endpoint: string) {
   const contract = loadInstallContract();
-  const connection = materializeConnection(contract, checkoutPath);
-  const stderrOutput: string[] = [];
-  const transport = new StdioClientTransport({
-    command: connection.command,
-    args: connection.args,
-    cwd: checkoutPath,
-    stderr: "pipe",
-  });
-
-  transport.stderr?.on("data", (chunk: Buffer | string) => {
-    stderrOutput.push(chunk.toString());
-  });
+  const transport = new StreamableHTTPClientTransport(new URL(endpoint));
 
   const client = new Client({
     name: "judgmentkit-install-verifier",
@@ -435,13 +514,71 @@ export async function verifyInstalledMcp(checkoutPath: string) {
         `Unexpected tools/list response. Expected ${expected.join(", ")} but received ${toolNames.join(", ")}.`,
       );
     }
+  } finally {
+    await transport.close();
+  }
+}
+
+async function waitForHttpToolsList(endpoint: string, timeoutMs: number) {
+  const startedAt = Date.now();
+  let lastError: unknown;
+
+  while (Date.now() - startedAt < timeoutMs) {
+    try {
+      await verifyHttpToolsList(endpoint);
+      return;
+    } catch (error) {
+      lastError = error;
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+  }
+
+  throw lastError instanceof Error ? lastError : new Error(String(lastError));
+}
+
+export async function verifyInstalledMcp(
+  checkoutPath: string,
+  options: {
+    endpoint?: string;
+    host?: string;
+    port?: number;
+  } = {},
+) {
+  const host = resolveHost(options.host);
+  const port = resolvePort(options.port);
+  const endpoint = options.endpoint ?? createLocalMcpUrl(host, port);
+  const stderrOutput: string[] = [];
+
+  try {
+    await verifyHttpToolsList(endpoint);
+    return;
+  } catch {
+    // If no loopback server is already running, start one just for verification.
+  }
+
+  const child = spawn("npm", ["--prefix", checkoutPath, "run", "mcp:local"], {
+    cwd: checkoutPath,
+    env: {
+      ...process.env,
+      JUDGMENTKIT_MCP_HOST: host,
+      JUDGMENTKIT_MCP_PORT: String(port),
+    },
+    stdio: ["ignore", "ignore", "pipe"],
+  });
+
+  child.stderr.on("data", (chunk: Buffer | string) => {
+    stderrOutput.push(chunk.toString());
+  });
+
+  try {
+    await waitForHttpToolsList(endpoint, 10_000);
   } catch (error) {
     throw new InstallerError(
       "verify",
-      `Failed to verify the local JudgmentKit MCP install: ${String(error)} ${stderrOutput.join("").trim()}`.trim(),
+      `Failed to verify the local JudgmentKit MCP install at ${endpoint}: ${String(error)} ${stderrOutput.join("").trim()}`.trim(),
     );
   } finally {
-    await transport.close();
+    child.kill();
   }
 }
 
@@ -455,14 +592,22 @@ export async function installJudgmentKitMcp(
   };
   const contract = loadInstallContract();
   const checkoutPath = resolveCheckoutPath(options.checkoutPath, deps.homeDir());
+  const host = resolveHost(options.host);
+  const port = resolvePort(options.port);
+  const { endpoint, startCommand } = materializeLoopbackRuntime(
+    contract,
+    checkoutPath,
+    host,
+    port,
+  );
   const client = getClientContract(contract, options.client);
   const configPath = resolveClientConfigPath(client.id, {
     configPath: options.configPath,
     cwd: options.cwd,
     homeDir: deps.homeDir(),
   });
-  const manualSnippet = renderManualConfigSnippet(client, checkoutPath);
-  const connection = materializeConnection(contract, checkoutPath);
+  const configSnippet = renderManualConfigSnippet(client, checkoutPath, endpoint);
+  const bridgeFallbackSnippet = renderBridgeFallbackSnippet(client, endpoint);
 
   if (options.dryRun || options.manual) {
     return {
@@ -471,17 +616,25 @@ export async function installJudgmentKitMcp(
       configPath,
       wroteConfig: false,
       verified: false,
-      manualSnippet,
-      command: connection,
+      endpoint,
+      startCommand,
+      configSnippet,
+      bridgeFallbackSnippet,
     };
   }
 
   await ensureCheckout(checkoutPath, deps);
   await ensureDependencies(checkoutPath, deps);
-  const configResult = await writeClientConfig(client, configPath, checkoutPath, deps);
+  const configResult = await writeClientConfig(
+    client,
+    configPath,
+    checkoutPath,
+    endpoint,
+    deps,
+  );
 
   if (!options.noVerify) {
-    await verifyInstalledMcp(checkoutPath);
+    await verifyInstalledMcp(checkoutPath, { endpoint, host, port });
   }
 
   return {
@@ -491,8 +644,10 @@ export async function installJudgmentKitMcp(
     backupPath: configResult.backupPath,
     wroteConfig: true,
     verified: !options.noVerify,
-    manualSnippet,
-    command: connection,
+    endpoint,
+    startCommand,
+    configSnippet,
+    bridgeFallbackSnippet,
   };
 }
 
@@ -501,7 +656,8 @@ export function formatInstallerResult(result: InstallResult) {
     `JudgmentKit installer prepared client: ${result.client}`,
     `Checkout path: ${result.checkoutPath}`,
     `Config path: ${result.configPath}`,
-    `Command: ${result.command.command} ${result.command.args.join(" ")}`,
+    `Endpoint: ${result.endpoint}`,
+    `Start local MCP: ${result.startCommand}`,
   ];
 
   if (result.backupPath) {
@@ -516,6 +672,16 @@ export function formatInstallerResult(result: InstallResult) {
     lines.push("Verification: tools/list succeeded");
   }
 
-  lines.push("", "Manual fallback snippet:", result.manualSnippet);
+  lines.push(
+    "",
+    "Before using the configured client, run:",
+    result.startCommand,
+    "",
+    "Config snippet:",
+    result.configSnippet,
+    "",
+    "Bridge fallback snippet for URL-incompatible clients:",
+    result.bridgeFallbackSnippet,
+  );
   return `${lines.join("\n")}\n`;
 }

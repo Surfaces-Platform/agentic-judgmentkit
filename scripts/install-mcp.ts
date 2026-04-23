@@ -15,7 +15,7 @@ main().catch((error) => {
   if (error instanceof InstallerError) {
     process.stderr.write(`JudgmentKit installer failed during ${error.phase}: ${error.message}\n`);
     if (error.manualSnippet) {
-      process.stderr.write(`Manual fallback snippet:\n${error.manualSnippet}\n`);
+      process.stderr.write(`Manual config snippet:\n${error.manualSnippet}\n`);
     }
     process.exit(1);
   }

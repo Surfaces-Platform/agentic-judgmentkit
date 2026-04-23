@@ -34,7 +34,7 @@ describe("landing page", () => {
       "curl -fsSL https://judgmentkit.ai/install | bash -s -- --client <codex|claude|cursor>",
     );
     expect(content.verify_prompt).toBe(
-      "Call MCP tools/list against the local judgmentkit server",
+      "Start the local JudgmentKit loopback server, then call MCP tools/list against http://127.0.0.1:8765/mcp",
     );
   });
 
@@ -60,7 +60,8 @@ describe("landing page", () => {
     expect(markup).toContain(
       "curl -fsSL https://judgmentkit.ai/install | bash -s -- --client codex",
     );
-    expect(markup).toContain("Call MCP tools/list against the local judgmentkit server");
+    expect(markup).toContain("Start the local JudgmentKit loopback server");
+    expect(markup).toContain("http://127.0.0.1:8765/mcp");
     expect(markup).not.toContain("Manual fallback");
     expect(markup).not.toContain("through MCP");
     expect(markup).not.toContain("~/.codex/config.toml");

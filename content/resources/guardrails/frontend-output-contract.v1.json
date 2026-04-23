@@ -1,0 +1,79 @@
+{
+  "id": "guardrail.frontend-output-contract",
+  "type": "guardrail",
+  "version": "1.0.0",
+  "title": "Frontend output contract",
+  "summary": "Require visually led UI work to return the actual implementation result plus the selected mode, visual thesis, and motion plan or direction-only headings.",
+  "status": "active",
+  "audiences": [
+    "design-leaders",
+    "product-managers",
+    "platform-engineering",
+    "ai-application-developers"
+  ],
+  "applies_to": {
+    "workflows": ["workflow.ai-ui-generation"],
+    "surfaces": ["web", "mobile", "internal-tools"]
+  },
+  "decision": "Whether the final response for visually led UI work carries the required contract evidence instead of only summarizing styling changes.",
+  "intent": {
+    "purpose": "Make visual direction auditable by requiring the final output to state what changed, which mode governed the work, what visual thesis guided it, and what motion plan shipped or was downgraded.",
+    "who_it_protects": ["product teams", "design reviewers", "frontend teams"],
+    "failure_mode": "Generated implementation ends with a generic change summary, omits the mode and visual thesis, hides missing motion or asset constraints, or gives direction-only work without the required headings.",
+    "good_judgment": "For implementation work, update the actual UI and return a short summary, Visual Thesis, Mode, and Motion Plan. For direction-only work, use exactly Visual Thesis, Structure, Motion Plan, Asset Needs, and Risks. Disclose any required check that could not pass.",
+    "acceptable_variation": [
+      "keep the final response short when the implementation is narrow as long as the required fields are present",
+      "name a motion downgrade when the stack, accessibility, or performance budget blocks richer animation",
+      "state that visual-direction behavior was downgraded for a routine bug fix",
+      "reference existing design-system tokens instead of restating every token when the system already owns them"
+    ],
+    "non_negotiables": [
+      "no visually led implementation final response without Visual Thesis, Mode, and Motion Plan",
+      "no direction-only response missing Visual Thesis, Structure, Motion Plan, Asset Needs, or Risks",
+      "no silent omission of failed accessibility, mobile, asset, or motion checks",
+      "no final answer that describes intent while leaving the actual UI files unchanged for an implementation request"
+    ]
+  },
+  "detection": {
+    "decision_question": "Does the final visually led output include the required implementation or direction contract evidence?",
+    "signals": [
+      "the final response summarizes changes but does not state mode or visual thesis",
+      "motion is absent without a downgrade reason",
+      "direction-only output uses custom headings and omits asset needs or risks",
+      "the response says what should be built instead of confirming what was changed",
+      "known failed rubric checks are not disclosed"
+    ],
+    "thresholds": {
+      "pass": "the final response includes the required contract fields and discloses any downgrade or failed check",
+      "warn": "the final response can be repaired by adding missing contract evidence without changing the UI",
+      "fail": "the final response hides missing implementation, mode, motion, assets, or unresolved visual checks"
+    }
+  },
+  "response": {
+    "low": {
+      "action": "auto_complete_output",
+      "description": "Add the missing contract fields before returning."
+    },
+    "medium": {
+      "action": "auto_complete_and_review",
+      "description": "Complete the output contract and route the result through review for visual-direction traceability."
+    },
+    "high": {
+      "action": "block_until_contract_complete",
+      "description": "Block the response until required implementation evidence, headings, or disclosed constraints are present."
+    }
+  },
+  "ownership": {
+    "decision_owner": "Design Systems",
+    "risk_owner": "Product",
+    "operational_owner": "AI Application Developers",
+    "review_cadence": "monthly"
+  },
+  "links": {
+    "docs_url": "https://judgmentkit.ai/docs/guardrails/frontend-output-contract",
+    "markdown_url": "https://judgmentkit.ai/docs/guardrails/frontend-output-contract.md",
+    "schema_url": "https://judgmentkit.ai/schemas/guardrail.schema.json",
+    "example_ids": ["example.ui-generation.output-contract-gap"]
+  },
+  "last_reviewed": "2026-04-23"
+}

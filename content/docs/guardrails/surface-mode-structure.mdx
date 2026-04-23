@@ -1,0 +1,69 @@
+---
+title: Surface mode structure
+slug: /docs/guardrails/surface-mode-structure
+page_type: guardrail
+summary: Require visually led UI generation to choose one mode before structuring the first viewport and section order.
+agent_summary: >
+  This guardrail keeps marketing, product, and hybrid demo structures from
+  mixing into a generic hero or card grid when the user's job needs a specific
+  first-screen model.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+workflows:
+  - workflow.ai-ui-generation
+guardrails:
+  - guardrail.surface-mode-structure
+owners:
+  primary: Design Systems
+  risk: Product
+  operational: Frontend Platform
+status: active
+last_reviewed: 2026-04-23
+related_pages:
+  - /docs/workflows/ai-ui-generation
+  - /docs/examples/mode-structure-drift
+related_resources:
+  - /resources/guardrails/surface-mode-structure.v1.json
+related_schemas:
+  - /schemas/guardrail.schema.json
+toc: true
+---
+
+## Why this matters
+
+AI-generated UI often defaults to a familiar landing-page shell even when the requested surface is operational. That produces a good-looking first impression with the wrong job: the user sees campaign copy, cards, and proof claims before they can operate the product.
+
+## What decision is being governed
+
+This guardrail governs whether a visually led UI task chooses exactly one mode before layout work starts: `marketing surface`, `product surface`, or `hybrid demo`.
+
+## What good judgment looks like
+
+- marketing surfaces lead with brand or product, promise, CTA, and one dominant visual
+- product surfaces lead with the working surface, status, context, and action areas
+- hybrid demos move quickly from a branded entry into believable product proof
+- every section has one job and supports the selected mode
+
+## What drift looks like
+
+1. An operational tool starts with a marketing hero.
+2. A launch page hides the brand behind generic product copy.
+3. A hybrid demo spends multiple sections on promise before showing product proof.
+4. Card grids, stat strips, and floating dashboards appear before the surface job is clear.
+
+## How JudgmentKit responds
+
+Small mode gaps get restructured into the correct first viewport and section order. Medium gaps receive design review. Severe mode mismatch blocks the output until the surface structure matches the user's actual job.
+
+## Technical reference
+
+- Resource: `/resources/guardrails/surface-mode-structure.v1.json`
+- Schema: `/schemas/guardrail.schema.json`
+
+## Related pages
+
+- /docs/workflows/ai-ui-generation
+- /docs/examples/mode-structure-drift

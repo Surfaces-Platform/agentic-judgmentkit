@@ -1,0 +1,42 @@
+{
+  "id": "example.ui-generation.motion-media-drift",
+  "type": "example",
+  "version": "1.0.0",
+  "title": "Decorative media and motion rewritten into purposeful hierarchy",
+  "summary": "A visually led landing page adds atmospheric media and animation with no job, then gets downgraded to product proof, restrained transitions, and reduced-motion handling.",
+  "status": "active",
+  "workflow_id": "workflow.ai-ui-generation",
+  "guardrail_ids": ["guardrail.motion-media-purpose"],
+  "scenario": "A model is asked to make a launch page feel cinematic for a developer tool without supplied product imagery.",
+  "raw_output": "Use abstract animated blobs, parallax glow layers, a rotating carousel of screenshots, and continuous floating motion behind the headline.",
+  "verdict": {
+    "verdict_id": "ver_019",
+    "decision_id": "dec_019",
+    "evaluated_at": "2026-04-23T00:00:00Z",
+    "status": "warn",
+    "severity": "medium",
+    "guardrails_triggered": ["guardrail.motion-media-purpose"],
+    "reasons": [
+      "media is atmospheric rather than evidence of the product, state, or workflow",
+      "motion is continuous decoration rather than hierarchy or affordance",
+      "the output does not name reduced-motion or readability constraints"
+    ],
+    "drift_score": 0.5,
+    "recommended_action": "rewrite",
+    "rewrite_hint": "Use product UI or typography as the visual anchor, limit motion to purposeful entrance and affordance transitions, and specify reduced-motion behavior.",
+    "ownership": {
+      "decision_owner": "Design Systems",
+      "risk_owner": "Accessibility",
+      "operational_owner": "Frontend Platform"
+    },
+    "incident_required": false
+  },
+  "corrected_output": "Use the product UI state as the primary visual anchor. Motion plan: stagger the headline and install action once on entry, reveal the proof plane with opacity and translate, and use a small hover transition on the primary action. Honor prefers-reduced-motion by removing translate and keeping instant opacity changes.",
+  "lesson": "Motion and media should clarify hierarchy or proof. When imagery is weak, pivot to product UI, typography, shape, and contrast instead of forcing decorative atmosphere.",
+  "links": {
+    "docs_url": "https://judgmentkit.ai/docs/examples/motion-media-drift",
+    "markdown_url": "https://judgmentkit.ai/docs/examples/motion-media-drift.md",
+    "schema_url": "https://judgmentkit.ai/schemas/example.schema.json"
+  },
+  "last_reviewed": "2026-04-23"
+}

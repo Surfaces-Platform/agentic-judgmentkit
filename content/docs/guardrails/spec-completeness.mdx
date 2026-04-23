@@ -1,0 +1,84 @@
+---
+title: Spec completeness
+slug: /docs/guardrails/spec-completeness
+page_type: guardrail
+summary: Require AI-generated UI output to name concrete primitives, tokens, states, and handoff details instead of relying on vague design language.
+agent_summary: >
+  This guardrail explains how JudgmentKit blocks or rewrites underspecified UI
+  specs so they remain implementation-ready and comparable.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+workflows:
+  - workflow.ai-ui-generation
+guardrails:
+  - guardrail.spec-completeness
+owners:
+  primary: Frontend Platform
+  risk: Design Systems
+  operational: AI Application Developers
+status: active
+last_reviewed: 2026-04-14
+related_pages:
+  - /docs/workflows/ai-ui-generation
+  - /docs/reference/portable-no-design-system-pack
+  - /docs/guardrails/design-system-integrity
+  - /docs/examples/token-vagueness-drift
+  - /docs/examples/primitive-sprawl-drift
+  - /docs/examples/shallow-handoff-drift
+  - /docs/examples/state-coverage-drift
+related_resources:
+  - /resources/guardrails/spec-completeness.v1.json
+related_schemas:
+  - /schemas/guardrail.schema.json
+toc: true
+---
+
+## Why this matters
+
+A generated UI plan can sound disciplined while still forcing humans to infer the actual build. That is a cleanup cost. It also makes model-to-model comparisons unreliable because the judgment depends on whoever fills the missing pieces afterward.
+
+## What decision is being governed
+
+This guardrail governs whether a UI output is concrete enough to implement, review, or compare without hidden assumptions.
+
+## What good judgment looks like
+
+- names the concrete primitive inventory
+- names exact token bindings or values
+- names required light and dark theme pairs
+- names loading, empty, ready, error, review-needed, and disabled states when the surface can encounter them
+- carries the handoff sections needed for implementation and review
+
+## What drift looks like
+
+1. The output says clean, premium, neutral, slightly raised, or roomy instead of naming actual tokens.
+2. New component wrappers appear without mapping to a published primitive inventory.
+3. The happy path is specified, but error or empty states are left implicit.
+4. The model claims theme completeness without naming the light and dark bindings.
+5. Implementation teams receive a visual description instead of a real handoff packet.
+
+## How JudgmentKit responds
+
+Small gaps get auto-normalized into explicit tokens or sections. Medium gaps get rewritten into the full contract. Severe gaps block the spec until the missing sections are completed.
+
+## Boundaries
+
+Compact output is allowed. Vague output is not. The goal is not verbosity. The goal is enough specificity to build and judge the result without filling in hidden design decisions afterward.
+
+## Technical reference
+
+- Resource: `/resources/guardrails/spec-completeness.v1.json`
+- Schema: `/schemas/guardrail.schema.json`
+
+## Related pages
+
+- /docs/workflows/ai-ui-generation
+- /docs/reference/portable-no-design-system-pack
+- /docs/guardrails/design-system-integrity
+- /docs/examples/token-vagueness-drift
+- /docs/examples/primitive-sprawl-drift
+- /docs/examples/shallow-handoff-drift
+- /docs/examples/state-coverage-drift

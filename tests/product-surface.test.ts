@@ -17,7 +17,8 @@ import {
   LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER,
   LOCAL_JUDGMENTKIT_INSTALL_COMMAND,
   LOCAL_JUDGMENTKIT_INSTALLER_COMMAND,
-  LOCAL_JUDGMENTKIT_STDIO_ARGS,
+  LOCAL_JUDGMENTKIT_MCP_LOCAL_COMMAND,
+  LOCAL_MCP_DEFAULT_URL,
 } from "@/lib/constants";
 import { loadInstallContract } from "@/lib/install-contract";
 import { listPrompts, listTools } from "@/lib/mcp";
@@ -25,7 +26,7 @@ import { loadProductSurface } from "@/lib/product-surface";
 import rawExampleArtifact from "@/public/resources/examples/ui-generation-drift.v1.json";
 
 describe("product surface content", () => {
-  it("defines stdio install targets and the derived loaded context", () => {
+  it("defines HTTP install targets and the derived loaded context", () => {
     const content = loadProductSurface();
 
     expect(content.install_targets.map((target) => target.id)).toEqual([
@@ -52,7 +53,15 @@ describe("product surface content", () => {
     ]);
     expect(content.loaded_context.map((item) => item.id)).toEqual([
       "workflow.ai-ui-generation",
+      "constraint-pack.ai-ui-no-design-system",
+      "guideline-profile.ai-ui-generation-authority",
+      "guideline-profile.ai-ui-review-checks",
       "guardrail.design-system-integrity",
+      "guardrail.spec-completeness",
+      "guardrail.surface-mode-structure",
+      "guardrail.visual-planning-contract",
+      "guardrail.motion-media-purpose",
+      "guardrail.frontend-output-contract",
       "guardrail.ui-copy-clarity",
       "guardrail.control-proximity",
       "guardrail.surface-theme-parity",
@@ -60,10 +69,23 @@ describe("product surface content", () => {
       "guardrail.provenance-escalation",
       "example.ui-generation.component-drift",
       "example.ui-generation.embellishment-drift",
+      "example.ui-generation.mode-structure-drift",
+      "example.ui-generation.visual-planning-gap",
+      "example.ui-generation.motion-media-drift",
+      "example.ui-generation.output-contract-gap",
       "example.ui-generation.onboarding-clarity-drift",
       "example.ui-generation.repetitive-copy-drift",
       "example.ui-generation.control-proximity-drift",
       "example.ui-generation.surface-theme-parity-drift",
+      "example.ui-generation.token-vagueness-drift",
+      "example.ui-generation.primitive-sprawl-drift",
+      "example.ui-generation.shallow-handoff-drift",
+      "example.ui-generation.state-coverage-drift",
+      "example.ui-generation.component-mapping-name-only-drift",
+      "example.ui-generation.non-reusable-recipe-drift",
+      "example.ui-generation.missing-accessibility-api-drift",
+      "example.ui-generation.hand-authored-preview-drift",
+      "example.ui-generation.theme-binding-recipe-drift",
     ]);
   });
 
@@ -72,7 +94,7 @@ describe("product surface content", () => {
 
     expect(content.install_command).toBe(HOSTED_JUDGMENTKIT_BOOTSTRAP_COMMAND);
     expect(content.verify_prompt).toBe(
-      "Call MCP tools/list against the local judgmentkit server",
+      "Start the local JudgmentKit loopback server, then call MCP tools/list against http://127.0.0.1:8765/mcp",
     );
   });
 
@@ -91,8 +113,18 @@ describe("product surface content", () => {
       install_command: LOCAL_JUDGMENTKIT_INSTALL_COMMAND,
     });
     expect(contract.connection).toEqual({
-      command: "npm",
-      args: LOCAL_JUDGMENTKIT_STDIO_ARGS,
+      transport: "http",
+      url: LOCAL_MCP_DEFAULT_URL,
+      loopback_runtime: {
+        start_command: LOCAL_JUDGMENTKIT_MCP_LOCAL_COMMAND,
+        host: "127.0.0.1",
+        port: 8765,
+        endpoint: "/mcp",
+        env_overrides: {
+          host: "JUDGMENTKIT_MCP_HOST",
+          port: "JUDGMENTKIT_MCP_PORT",
+        },
+      },
     });
     expect(contract.supported_clients).toEqual(["codex", "claude", "cursor"]);
     expect(contract.clients).toEqual([
@@ -117,9 +149,12 @@ describe("product surface content", () => {
     ]);
     expect(contract.clients[0]).not.toHaveProperty("config_snippet");
     expect(contract.clients[0]).not.toHaveProperty("install_note");
-    expect(contract.clients[0]).not.toHaveProperty("transport");
     expect(contract.verification.method).toBe("tools/list");
     expect(contract.verification.server_name).toBe("judgmentkit");
+    expect(contract.verification.endpoint).toBe(LOCAL_MCP_DEFAULT_URL);
+    expect(contract.verification.start_command).toBe(
+      LOCAL_JUDGMENTKIT_MCP_LOCAL_COMMAND,
+    );
     expect(contract.verification.instructions).toContain("tools/list");
     expect(contract.verification.expected_tools).toEqual(
       listTools().map((tool) => tool.name),
@@ -176,6 +211,12 @@ describe("product surface content", () => {
     const exampleItem = content.inspect_primary_items.find(
       (item) => item.id === "example.ui-generation.embellishment-drift",
     );
+    const constraintPackItem = content.inspect_primary_items.find(
+      (item) => item.id === "constraint-pack.ai-ui-no-design-system",
+    );
+    const guidelineProfileItem = content.inspect_primary_items.find(
+      (item) => item.id === "guideline-profile.ai-ui-generation-authority",
+    );
     const installScriptItem = content.inspect_reference_items.find((item) => item.url === "/install");
 
     expect(content.inspect_primary_items[0]?.id).toBe(
@@ -188,6 +229,22 @@ describe("product surface content", () => {
     });
     expect(workflowItem?.prompt_text).toContain('Use JudgmentKit workflow "AI UI generation"');
     expect(workflowItem?.prompt_text).toContain("Task:");
+    expect(constraintPackItem).toMatchObject({
+      category: "Constraint packs",
+      available_view_modes: ["prompt", "json", "schema"],
+      default_view_mode: "prompt",
+    });
+    expect(constraintPackItem?.prompt_text).toContain(
+      'Use JudgmentKit constraint pack "Portable no-design-system implementation authority"',
+    );
+    expect(guidelineProfileItem).toMatchObject({
+      category: "Guideline profiles",
+      available_view_modes: ["prompt", "json", "schema"],
+      default_view_mode: "prompt",
+    });
+    expect(guidelineProfileItem?.prompt_text).toContain(
+      'Use JudgmentKit guideline profile "AI UI generation authority rules"',
+    );
     expect(guardrailItem?.prompt_text).toContain("Apply JudgmentKit guardrail");
     expect(guardrailItem?.prompt_text).toContain("Draft:");
     expect(exampleItem?.prompt_text).toContain("Use JudgmentKit example");
@@ -219,6 +276,8 @@ describe("product surface content", () => {
     expect(markup).toContain("inspect-browser-shell");
     expect(markup).toContain(">Examples<");
     expect(markup).toContain(">Workflows<");
+    expect(markup).toContain(">Constraint packs<");
+    expect(markup).toContain(">Guideline profiles<");
     expect(markup).toContain(">Guardrails<");
     expect(markup).toContain("Use JudgmentKit example");
     expect(markup).toContain("inspect-viewer-toolbar");
@@ -251,6 +310,9 @@ describe("product surface content", () => {
     expect(markup).not.toContain("Command inventory");
     expect(markup.indexOf(">Examples<")).toBeLessThan(markup.indexOf(">Workflows<"));
     expect(markup.indexOf(">Examples<")).toBeLessThan(markup.indexOf(">Guardrails<"));
+    expect(markup.indexOf(">Workflows<")).toBeLessThan(markup.indexOf(">Constraint packs<"));
+    expect(markup.indexOf(">Constraint packs<")).toBeLessThan(markup.indexOf(">Guideline profiles<"));
+    expect(markup.indexOf(">Guideline profiles<")).toBeLessThan(markup.indexOf(">Guardrails<"));
     expect(markup.indexOf("Zero-shot UI generation rewritten to design-system-first restrained output")).toBeLessThan(
       markup.indexOf("Landing page first pass rewritten for clearer onboarding"),
     );

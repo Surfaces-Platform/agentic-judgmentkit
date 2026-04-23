@@ -2,10 +2,12 @@
 title: AI UI generation
 slug: /docs/workflows/ai-ui-generation
 page_type: workflow
-summary: A builder workflow that turns product intent into interface proposals while staying inside design-system, accessibility, and budget constraints.
+summary: A builder workflow that turns product intent into interface proposals while staying inside design-system or portable implementation authority, frontend guardrails/examples, accessibility, and budget constraints.
 agent_summary: >
   This workflow explains how JudgmentKit governs AI-generated interface output
-  so that component choices, accessibility, and runtime budgets remain explicit.
+  so that visual direction, component choices, reusable recipes, token
+  contracts, state coverage, accessibility, and runtime budgets remain
+  explicit.
 audiences:
   - design-leaders
   - product-managers
@@ -17,24 +19,48 @@ owners:
   primary: Design Systems
   operational: Frontend Platform
 status: active
-last_reviewed: 2026-04-11
+last_reviewed: 2026-04-23
 related_pages:
   - /docs/guardrails/design-system-integrity
+  - /docs/guardrails/spec-completeness
+  - /docs/guardrails/surface-mode-structure
+  - /docs/guardrails/visual-planning-contract
+  - /docs/guardrails/motion-media-purpose
+  - /docs/guardrails/frontend-output-contract
   - /docs/guardrails/ui-copy-clarity
   - /docs/guardrails/control-proximity
   - /docs/guardrails/surface-theme-parity
   - /docs/guardrails/runtime-and-cost
   - /docs/guardrails/provenance-and-escalation
+  - /docs/reference/portable-no-design-system-pack
   - /docs/examples/ui-generation-drift
   - /docs/examples/embellishment-drift
+  - /docs/examples/mode-structure-drift
+  - /docs/examples/visual-planning-gap
+  - /docs/examples/motion-media-drift
+  - /docs/examples/output-contract-gap
   - /docs/examples/onboarding-clarity-drift
   - /docs/examples/repetitive-copy-drift
   - /docs/examples/control-proximity-drift
   - /docs/examples/surface-theme-parity-drift
+  - /docs/examples/token-vagueness-drift
+  - /docs/examples/primitive-sprawl-drift
+  - /docs/examples/shallow-handoff-drift
+  - /docs/examples/state-coverage-drift
 related_resources:
   - /resources/workflows/ai-ui-generation.v1.json
+  - /resources/constraint-packs/ai-ui-no-design-system.v1.json
+  - /resources/guideline-profiles/ai-ui-generation-authority.v1.json
+  - /resources/guideline-profiles/ai-ui-review-checks.v1.json
+  - /resources/guardrails/spec-completeness.v1.json
+  - /resources/guardrails/surface-mode-structure.v1.json
+  - /resources/guardrails/visual-planning-contract.v1.json
+  - /resources/guardrails/motion-media-purpose.v1.json
+  - /resources/guardrails/frontend-output-contract.v1.json
 related_schemas:
   - /schemas/workflow.schema.json
+  - /schemas/constraint_pack.schema.json
+  - /schemas/guideline_profile.schema.json
   - /schemas/decision-record.schema.json
   - /schemas/verdict.schema.json
 toc: true
@@ -42,24 +68,36 @@ toc: true
 
 ## Why this workflow matters
 
-Generated UI can look impressive and still create downstream cleanup. The main risk is not only visual quality. It is unapproved primitives, silent overrides of the design system, ornamental zero-shot styling, missing theme support, unclear provenance, and unnecessary runtime spend hiding inside a “creative” result.
+Generated UI can look impressive and still create downstream cleanup. The main risk is not only visual quality. It is the wrong surface mode, vague visual planning, ornamental media or motion, unapproved primitives, name-only component mapping, vague token language, incomplete state coverage, shallow handoff, missing theme support, inaccessible recipes, unclear provenance, and unnecessary runtime spend hiding inside a creative result.
 
 ## What decisions exist inside the workflow
 
-- which components and tokens may be used
+- which components, recipes, and tokens may be used
 - whether the referenced design system is authoritative for the requested surface
+- when the JudgmentKit portable no-design-system pack becomes the source of truth
+- which frontend visual mode governs the surface
+- when visual thesis, content plan, and interaction thesis are required before implementation
 - whether that design system has an accessibility baseline or owner-approved review status
 - how much variation is acceptable before review
+- whether imagery and motion have a clear purpose or should be downgraded
+- whether final output includes the required visual contract evidence
+- whether the current output is concrete enough to build without backfilling recipes, tokens, states, or handoff detail
 - when local controls are too detached from the surface they govern
 - when a first pass is too ornamental for zero-shot generation
 - when light and dark mode should be assumed by default
 - what accessibility baseline must hold
 - how much runtime complexity is justified
 - what evidence should travel with the implementation handoff
+- whether screenshots and previews are derived from the same component evidence the judge reads
 
 ## Which guardrails apply
 
 - `guardrail.design-system-integrity`
+- `guardrail.spec-completeness`
+- `guardrail.surface-mode-structure`
+- `guardrail.visual-planning-contract`
+- `guardrail.motion-media-purpose`
+- `guardrail.frontend-output-contract`
 - `guardrail.ui-copy-clarity`
 - `guardrail.control-proximity`
 - `guardrail.surface-theme-parity`
@@ -70,50 +108,116 @@ Generated UI can look impressive and still create downstream cleanup. The main r
 
 - feature intent
 - target surface and breakpoint expectations
-- approved component and token inventory
+- approved component and token inventory, or explicit no-design-system confirmation
+- visual-direction intent or explicit purely functional scope
 - accessibility rules or confirmed design-system review status
 - budget and latency target
 
 ## Examples in practice
 
-The workflow now includes six calibration patterns. One example shows an over-scoped request that asks for novelty, custom primitives, and unlimited reasoning in one pass. Another shows a zero-shot UI pass drifting toward decorative chrome and single-theme output while ignoring a referenced design system. A third shows a landing-page draft that over-exposes internals and proof before it makes onboarding obvious. A fourth shows a dense control cluster where headings, helper copy, and actions repeat the same words until the next step is unclear. A fifth shows local viewer controls drifting into a separate details zone, making it harder to tell what surface they govern. The sixth shows a dark terminal-style code block dropped into an otherwise light interface instead of using a theme-matched artifact surface. In each case JudgmentKit rewrites the request into a clearer, system-safe pass plus explicit review questions.
+The workflow now includes calibration patterns for visual direction, structural drift, and component-authority drift. The original system boundaries still apply: component drift, ornamental chrome, onboarding clarity, repetitive copy, control proximity, and surface-theme parity. The frontend visual direction case is calibrated with surface mode drift, visual planning gaps, motion/media drift, and missing output contract evidence. The no-design-system case is calibrated with token vagueness, primitive sprawl, shallow handoff, missing state coverage, name-only component mapping, non-reusable screen markup, missing accessibility API, hand-authored preview drift, and theme bindings that are not attached to real recipes. In each case JudgmentKit rewrites the request into a clearer, system-safe pass plus explicit review questions or a portable implementation contract.
+
+## Frontend visual direction
+
+When the task is visually led, JudgmentKit treats frontend visual direction as workflow guardrails plus calibration examples rather than a separate playbook collection or guideline profile. The frontend guardrails require:
+
+- exactly one mode: `marketing surface`, `product surface`, or `hybrid demo`
+- `Visual Thesis`, `Content Plan`, and `Interaction Thesis` before implementation
+- structure rules for first viewport, section jobs, product proof, and card usage
+- motion and media rules that tie animation and imagery to hierarchy, narrative, or affordance
+- downgrade rules for accessibility, mobile fit, runtime budget, missing assets, and existing design-system authority
+- final output shape for implementation work or direction-only work
+
+These frontend guardrails do not override the product model. If the surface is operational, it leads with the working product. If the repo has an established design system, the workflow improves hierarchy, spacing, composition, and emphasis before inventing new language.
+
+## Portable no-design-system authority
+
+When an external design system does not exist, JudgmentKit should not fall back to generic restraint language alone. It now publishes a portable implementation authority pack that becomes the source of truth for:
+
+- approved primitives
+- token bindings and light-dark pairs
+- reusable React+Tailwind component recipes
+- layout archetypes by surface type
+- required state coverage
+- the minimum handoff contract
+- vendored generation and review rules derived from the Vercel web interface guidelines
+
+The pack also defines the exact sections that no-design-system output must include:
+
+- `core_screens`
+- `token_spec`
+- `component_recipes`
+- `screen_composition`
+- `state_coverage`
+- `theme_contract`
+- `accessibility_contract`
+- `escalation_items`
 
 ## Common drift patterns
 
 1. The model invents new visual primitives instead of recombining approved ones.
 2. Decorative gradients, gratuitous shadows, and oversized radii become the default language of a first pass.
-3. The output assumes a single theme when dark and light mode should be present by default.
-4. A referenced design system is treated as authority without confirming whether it is accessibility-reviewed.
-5. Accessibility semantics disappear in the pursuit of style.
-6. Headings, helper text, and CTA labels reuse the same words until different UI elements sound interchangeable.
-7. Local controls drift into a separate header or metadata zone from the viewer, panel, or artifact they change.
-8. A code block or artifact viewer introduces a separate dark or light theme model that the surrounding interface does not use.
-9. Runtime cost grows because the prompt asks for open-ended refinement.
-10. The output leaves implementation teams guessing what is fixed versus exploratory.
-11. The page explains internal artifacts before it explains what the product is or how to start.
+3. A product surface starts with a marketing hero or generic SaaS card grid.
+4. Vague visual adjectives replace mode, thesis, content plan, and interaction thesis.
+5. Media and motion are ornamental instead of tied to hierarchy, narrative, or affordance.
+6. A visually led final response omits mode, visual thesis, motion plan, asset gaps, or downgrade notes.
+7. The output assumes a single theme when dark and light mode should be present by default.
+8. A referenced design system is treated as authority without confirming whether it is accessibility-reviewed.
+9. Accessibility semantics disappear in the pursuit of style.
+10. Headings, helper text, and CTA labels reuse the same words until different UI elements sound interchangeable.
+11. Local controls drift into a separate header or metadata zone from the viewer, panel, or artifact they change.
+12. A code block or artifact viewer introduces a separate dark or light theme model that the surrounding interface does not use.
+13. Runtime cost grows because the prompt asks for open-ended refinement.
+14. The output leaves implementation teams guessing what is fixed versus exploratory.
+15. The page explains internal artifacts before it explains what the product is or how to start.
+16. The output sounds restrained, but the recipes, tokens, states, and handoff sections are still implicit.
 
 ## Escalation points
 
-Escalate when the requested pattern cannot be expressed with approved primitives, when the brief conflicts with the design system, when the design system's accessibility status is unknown, when accessibility tradeoffs are unclear, or when the workflow is being used as a substitute for design review.
+Escalate when the requested pattern cannot be expressed with approved primitives, when the brief conflicts with the design system, when the design system's accessibility status is unknown, when accessibility tradeoffs are unclear, when the portable pack and the brief are both silent on a needed decision, or when the workflow is being used as a substitute for design review.
 
 ## Related resources and schemas
 
 - Resource: `/resources/workflows/ai-ui-generation.v1.json`
+- Portable pack: `/resources/constraint-packs/ai-ui-no-design-system.v1.json`
+- Generation authority profile: `/resources/guideline-profiles/ai-ui-generation-authority.v1.json`
+- Review checks profile: `/resources/guideline-profiles/ai-ui-review-checks.v1.json`
+- Spec completeness guardrail: `/resources/guardrails/spec-completeness.v1.json`
+- Surface mode guardrail: `/resources/guardrails/surface-mode-structure.v1.json`
+- Visual planning guardrail: `/resources/guardrails/visual-planning-contract.v1.json`
+- Motion/media guardrail: `/resources/guardrails/motion-media-purpose.v1.json`
+- Frontend output contract guardrail: `/resources/guardrails/frontend-output-contract.v1.json`
 - Schema: `/schemas/workflow.schema.json`
+- Constraint pack schema: `/schemas/constraint_pack.schema.json`
+- Guideline profile schema: `/schemas/guideline_profile.schema.json`
 - Decision schema: `/schemas/decision-record.schema.json`
 - Verdict schema: `/schemas/verdict.schema.json`
 
 ## Related pages
 
 - /docs/guardrails/design-system-integrity
+- /docs/guardrails/spec-completeness
+- /docs/guardrails/surface-mode-structure
+- /docs/guardrails/visual-planning-contract
+- /docs/guardrails/motion-media-purpose
+- /docs/guardrails/frontend-output-contract
 - /docs/guardrails/ui-copy-clarity
 - /docs/guardrails/control-proximity
 - /docs/guardrails/surface-theme-parity
 - /docs/guardrails/runtime-and-cost
 - /docs/guardrails/provenance-and-escalation
+- /docs/reference/portable-no-design-system-pack
 - /docs/examples/ui-generation-drift
 - /docs/examples/embellishment-drift
+- /docs/examples/mode-structure-drift
+- /docs/examples/visual-planning-gap
+- /docs/examples/motion-media-drift
+- /docs/examples/output-contract-gap
 - /docs/examples/onboarding-clarity-drift
 - /docs/examples/repetitive-copy-drift
 - /docs/examples/control-proximity-drift
 - /docs/examples/surface-theme-parity-drift
+- /docs/examples/token-vagueness-drift
+- /docs/examples/primitive-sprawl-drift
+- /docs/examples/shallow-handoff-drift
+- /docs/examples/state-coverage-drift

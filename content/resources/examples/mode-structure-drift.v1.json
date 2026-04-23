@@ -1,0 +1,42 @@
+{
+  "id": "example.ui-generation.mode-structure-drift",
+  "type": "example",
+  "version": "1.0.0",
+  "title": "Product surface hero drift rewritten into a working surface",
+  "summary": "A visually led operational UI request defaults to a marketing hero and card grid, then gets rewritten by selecting product-surface mode and leading with the working surface.",
+  "status": "active",
+  "workflow_id": "workflow.ai-ui-generation",
+  "guardrail_ids": ["guardrail.surface-mode-structure"],
+  "scenario": "A team asks for a calmer review workspace where operators triage generated UI candidates and compare evidence.",
+  "raw_output": "Start with a premium hero explaining the AI review platform, add three benefit cards, a stat strip, and a floating dashboard preview below the fold.",
+  "verdict": {
+    "verdict_id": "ver_017",
+    "decision_id": "dec_017",
+    "evaluated_at": "2026-04-23T00:00:00Z",
+    "status": "warn",
+    "severity": "medium",
+    "guardrails_triggered": ["guardrail.surface-mode-structure"],
+    "reasons": [
+      "the task is operational but the first viewport defaults to marketing structure",
+      "product proof is delayed behind generic hero, card, and stat patterns",
+      "no single surface mode is named before layout decisions are made"
+    ],
+    "drift_score": 0.48,
+    "recommended_action": "rewrite",
+    "rewrite_hint": "Select product-surface mode, lead with the review workspace itself, and move orientation and secondary proof behind the working surface.",
+    "ownership": {
+      "decision_owner": "Design Systems",
+      "risk_owner": "Product",
+      "operational_owner": "Frontend Platform"
+    },
+    "incident_required": false
+  },
+  "corrected_output": "Mode: product surface. First viewport: a triage workspace with candidate list, active preview, evidence inspector, and local decision actions. Follow with orientation copy that explains scope and freshness, then secondary context for guideline coverage and unresolved review questions.",
+  "lesson": "Visually led product surfaces should still lead with the working surface. Marketing proof can support the experience, but it should not replace the operator's first job.",
+  "links": {
+    "docs_url": "https://judgmentkit.ai/docs/examples/mode-structure-drift",
+    "markdown_url": "https://judgmentkit.ai/docs/examples/mode-structure-drift.md",
+    "schema_url": "https://judgmentkit.ai/schemas/example.schema.json"
+  },
+  "last_reviewed": "2026-04-23"
+}

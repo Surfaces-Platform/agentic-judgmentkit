@@ -4,7 +4,7 @@
   "utility_sentence": "Connect the MCP. Paste the first message. Run the first pass.",
   "run_sequence": ["Connect", "Paste", "Run"],
   "workbench_label": "Run the first pass",
-  "workbench_support": "Run the hosted installer to clone JudgmentKit, install dependencies, wire the client to the local stdio server, and verify the local tools/list response.",
+  "workbench_support": "Run the hosted installer to clone JudgmentKit, install dependencies, wire the client to the local loopback MCP endpoint, and verify the local tools/list response.",
   "proof_heading": "Generated UI proof",
   "proof_support": "Same brief. One uncontrolled pass and one JudgmentKit-guided pass.",
   "proof_notes": [

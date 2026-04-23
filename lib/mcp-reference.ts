@@ -37,6 +37,8 @@ function getPromptExampleCall(name: string) {
       return 'summarize_example_incident({ resource_id: "example.ui-generation.onboarding-clarity-drift" })';
     case "start_design_workflow":
       return 'start_design_workflow({ feature_intent: "Generate the JudgmentKit homepage" })';
+    case "start_no_design_system_workflow":
+      return 'start_no_design_system_workflow({ feature_intent: "Generate a JudgmentKit-native review workspace without an external design system" })';
     case "refine_design_first_pass":
       return 'refine_design_first_pass({ feature_intent: "Refine the JudgmentKit homepage", draft: "...", refinement_goal: "first-time usability" })';
     default:

@@ -1,0 +1,79 @@
+{
+  "id": "guardrail.visual-planning-contract",
+  "type": "guardrail",
+  "version": "1.0.0",
+  "title": "Visual planning contract",
+  "summary": "Require visually led UI generation to define a visual thesis, content plan, and interaction thesis before it turns vague style adjectives into implementation.",
+  "status": "active",
+  "audiences": [
+    "design-leaders",
+    "product-managers",
+    "platform-engineering",
+    "ai-application-developers"
+  ],
+  "applies_to": {
+    "workflows": ["workflow.ai-ui-generation"],
+    "surfaces": ["web", "mobile", "internal-tools"]
+  },
+  "decision": "Whether the generator has translated visual intent into concrete hierarchy, composition, content, and motion decisions before drafting layout or code.",
+  "intent": {
+    "purpose": "Prevent vague requests like premium, modern, calmer, or make it pop from turning into decorative styling without a governing visual direction.",
+    "who_it_protects": ["end users", "product teams", "frontend teams"],
+    "failure_mode": "Generated output jumps from adjectives to gradients, shadows, large radius, or generic cards without naming the surface mode, visual thesis, section jobs, or interaction thesis.",
+    "good_judgment": "Define Visual Thesis, Content Plan, and Interaction Thesis before implementation. Translate vague visual asks into one hierarchy change, one composition change, and one motion choice that can be built immediately.",
+    "acceptable_variation": [
+      "embed the planning decisions directly in the implementation brief when a separate planning section would slow a small edit",
+      "downgrade to local hierarchy and spacing changes for narrow edits inside an established design system",
+      "use product UI, typography, shape, or contrast as the visual anchor when trusted imagery is unavailable",
+      "keep the plan compact when the surface already has strong design-system direction"
+    ],
+    "non_negotiables": [
+      "no visually led implementation that skips mode, visual thesis, content plan, and interaction thesis",
+      "no vague premium or modern language left unresolved as the actual visual direction",
+      "no decorative styling added before hierarchy and composition decisions are named",
+      "no visual plan that overrides accessibility, readability, mobile fit, or an existing product system"
+    ]
+  },
+  "detection": {
+    "decision_question": "Does the output include a concrete planning frame for visual direction, content structure, and interaction before implementation?",
+    "signals": [
+      "the draft uses visual adjectives without concrete hierarchy, composition, or motion decisions",
+      "sections repeat the same job because no content plan was defined",
+      "motion is named as polish rather than as a hierarchy or affordance decision",
+      "imagery, color, or radius is chosen before the surface job is clear",
+      "the final plan cannot be implemented without reinterpretation"
+    ],
+    "thresholds": {
+      "pass": "mode, visual thesis, content plan, and interaction thesis are explicit or clearly reflected in immediately actionable implementation details",
+      "warn": "some planning pieces are present but vague enough to need rewrite before implementation",
+      "fail": "the output jumps from style adjectives to UI construction with no actionable visual planning"
+    }
+  },
+  "response": {
+    "low": {
+      "action": "auto_plan",
+      "description": "Add the missing visual thesis, content plan, and interaction thesis before drafting."
+    },
+    "medium": {
+      "action": "auto_plan_and_review",
+      "description": "Rewrite the planning frame and route the result through design review for visual direction fit."
+    },
+    "high": {
+      "action": "block_and_request_direction",
+      "description": "Block the output until the visual direction can be translated into buildable hierarchy, composition, and motion decisions."
+    }
+  },
+  "ownership": {
+    "decision_owner": "Design Systems",
+    "risk_owner": "Product",
+    "operational_owner": "Frontend Platform",
+    "review_cadence": "monthly"
+  },
+  "links": {
+    "docs_url": "https://judgmentkit.ai/docs/guardrails/visual-planning-contract",
+    "markdown_url": "https://judgmentkit.ai/docs/guardrails/visual-planning-contract.md",
+    "schema_url": "https://judgmentkit.ai/schemas/guardrail.schema.json",
+    "example_ids": ["example.ui-generation.visual-planning-gap"]
+  },
+  "last_reviewed": "2026-04-23"
+}

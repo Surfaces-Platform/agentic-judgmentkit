@@ -4,6 +4,7 @@ import rawProductSurface from "@/content/product-surface.json";
 import {
   CANONICAL_INSTALL_URL,
   CANONICAL_SITE_URL,
+  createLocalMcpUrl,
   DEFAULT_LOCAL_JUDGMENTKIT_CHECKOUT_PATH,
   HOSTED_MCP_REFERENCE_URL,
   HOSTED_JUDGMENTKIT_BOOTSTRAP_COMMAND,
@@ -11,7 +12,12 @@ import {
   LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER,
   LOCAL_JUDGMENTKIT_INSTALL_COMMAND,
   LOCAL_JUDGMENTKIT_INSTALLER_COMMAND,
-  LOCAL_JUDGMENTKIT_STDIO_ARGS,
+  LOCAL_JUDGMENTKIT_MCP_LOCAL_COMMAND,
+  LOCAL_MCP_DEFAULT_HOST,
+  LOCAL_MCP_DEFAULT_PORT,
+  LOCAL_MCP_ENDPOINT_PATH,
+  LOCAL_MCP_HOST_ENV,
+  LOCAL_MCP_PORT_ENV,
 } from "@/lib/constants";
 import {
   createCommandReferenceUrl,
@@ -55,7 +61,7 @@ export function loadInstallContract(): InstallContract {
     version: "3.0.0",
     product_name: content.product_name,
     command_reference_url: createCommandReferenceUrl(CANONICAL_SITE_URL),
-    warning: `Install JudgmentKit from a local checkout over stdio via the hosted bootstrap script at ${CANONICAL_INSTALL_URL}. ${HOSTED_MCP_REFERENCE_URL} is a hosted reference/debug endpoint, not the install target.`,
+    warning: `Install JudgmentKit from a local checkout over loopback HTTP via the hosted bootstrap script at ${CANONICAL_INSTALL_URL}. ${HOSTED_MCP_REFERENCE_URL} is a hosted reference/debug endpoint, not the install target.`,
     installer: {
       mode: "hosted-bootstrap",
       bootstrap_url: CANONICAL_INSTALL_URL,
@@ -72,10 +78,20 @@ export function loadInstallContract(): InstallContract {
       install_command: LOCAL_JUDGMENTKIT_INSTALL_COMMAND,
     },
     server_name: "judgmentkit",
-    install_transport: "stdio",
+    install_transport: "http",
     connection: {
-      command: "npm",
-      args: LOCAL_JUDGMENTKIT_STDIO_ARGS,
+      transport: "http",
+      url: createLocalMcpUrl(),
+      loopback_runtime: {
+        start_command: LOCAL_JUDGMENTKIT_MCP_LOCAL_COMMAND,
+        host: LOCAL_MCP_DEFAULT_HOST,
+        port: LOCAL_MCP_DEFAULT_PORT,
+        endpoint: LOCAL_MCP_ENDPOINT_PATH,
+        env_overrides: {
+          host: LOCAL_MCP_HOST_ENV,
+          port: LOCAL_MCP_PORT_ENV,
+        },
+      },
     },
     supported_clients: getSupportedClientIds(content.install_targets),
     clients: content.install_targets.map((target) => ({
@@ -87,8 +103,10 @@ export function loadInstallContract(): InstallContract {
     verification: {
       method: "tools/list",
       server_name: "judgmentkit",
+      endpoint: createLocalMcpUrl(),
+      start_command: LOCAL_JUDGMENTKIT_MCP_LOCAL_COMMAND,
       instructions:
-        `After configuring the local "judgmentkit" MCP server, call MCP tools/list against that local server to confirm the install is reachable. Then use ${createCommandReferenceUrl(
+        `Start the local loopback server with ${LOCAL_JUDGMENTKIT_MCP_LOCAL_COMMAND}, then call MCP tools/list against ${createLocalMcpUrl()} to confirm the install is reachable. Then use ${createCommandReferenceUrl(
           CANONICAL_SITE_URL,
         )} to attach docs URLs to the returned command names.`,
       expected_tools: listTools().map((tool) => tool.name),

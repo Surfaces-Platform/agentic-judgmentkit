@@ -1,0 +1,482 @@
+{
+  "id": "constraint-pack.ai-ui-no-design-system",
+  "type": "constraint_pack",
+  "version": "1.0.0",
+  "title": "Portable no-design-system implementation authority",
+  "summary": "A JudgmentKit-native implementation authority for UI generation when no external design system is present, with concrete primitives, React+Tailwind recipes, accessibility rules, state coverage, and handoff requirements.",
+  "status": "active",
+  "workflows": ["workflow.ai-ui-generation"],
+  "guardrail_ids": [
+    "guardrail.design-system-integrity",
+    "guardrail.spec-completeness",
+    "guardrail.control-proximity",
+    "guardrail.surface-theme-parity"
+  ],
+  "guideline_profile_ids": [
+    "guideline-profile.ai-ui-generation-authority",
+    "guideline-profile.ai-ui-review-checks"
+  ],
+  "authority": {
+    "when_to_use": "Use this pack when the repo, prompt, and brief do not provide an authoritative external design system or when the task explicitly asks for a portable JudgmentKit-native UI authority.",
+    "priority_rules": [
+      "If a referenced external design system exists and has a confirmed accessibility baseline or owner-approved review status, that system takes precedence.",
+      "If no external design system exists, this pack becomes the source of truth for primitives, tokens, layout archetypes, required states, light-dark theme parity, reusable recipes, and handoff depth.",
+      "If the pack, vendored guideline profiles, and brief are all silent about a requirement, escalate instead of inventing a new primitive, vague token, or unsupported interaction."
+    ],
+    "output_contract_sections": [
+      "core_screens",
+      "token_spec",
+      "component_recipes",
+      "screen_composition",
+      "state_coverage",
+      "theme_contract",
+      "accessibility_contract",
+      "escalation_items"
+    ]
+  },
+  "implementation_model": {
+    "target_stack": "react-tailwind",
+    "recipe_format": "React+Tailwind snippets with explicit slots, variants, interaction rules, and accessibility API",
+    "preview_artifacts": [
+      "implementation-contract.json",
+      "preview-source.tsx",
+      "preview.html"
+    ]
+  },
+  "primitives": {
+    "inventory": [
+      {
+        "id": "layout-shell",
+        "label": "Layout shell",
+        "description": "Top-level application frame with optional rail, header, workspace body, and secondary inspector region.",
+        "usage": "Required for app workspace, dashboard, review, and export surfaces.",
+        "component_recipe": {
+          "slots": ["rail", "header", "main", "inspector"],
+          "variants": ["with-rail", "with-inspector", "centered-main"],
+          "interaction_rules": [
+            "Keep the primary task in main and secondary metadata in inspector.",
+            "Do not move local controls away from the surface they govern."
+          ],
+          "accessibility_contract": [
+            "Use main, nav, header, and aside landmarks where applicable.",
+            "Preserve heading order and skip-link destination."
+          ],
+          "react_tailwind": "<div className=\"grid min-h-screen grid-cols-[240px_minmax(0,1fr)_320px] gap-4 bg-[var(--jk-color-canvas)] text-[var(--jk-color-text-primary)]\">...</div>"
+        }
+      },
+      {
+        "id": "sidebar-rail",
+        "label": "Sidebar or rail",
+        "description": "Persistent navigation or collection switcher aligned to the main workspace frame.",
+        "usage": "Use for global navigation, queue switching, or mode changes.",
+        "component_recipe": {
+          "slots": ["label", "items", "footer"],
+          "variants": ["nav", "history", "queue"],
+          "interaction_rules": [
+            "Active item must be visually distinct and keyboard reachable.",
+            "Keep mode changes and run history grouped, not interleaved."
+          ],
+          "accessibility_contract": [
+            "Use nav with an accessible label.",
+            "Use links for navigation and buttons for actions."
+          ],
+          "react_tailwind": "<nav aria-label=\"Workspace navigation\" className=\"flex flex-col gap-2 rounded-[var(--jk-radius-2)] border border-[var(--jk-color-border-subtle)] bg-[var(--jk-color-surface)] p-4\">...</nav>"
+        }
+      },
+      {
+        "id": "header",
+        "label": "Header",
+        "description": "Surface-level title, status, and primary actions anchored to the region they govern.",
+        "usage": "Use for page title, collection metadata, and scoped actions.",
+        "component_recipe": {
+          "slots": ["title", "meta", "actions"],
+          "variants": ["workspace", "panel", "dialog"],
+          "interaction_rules": [
+            "Primary action stays in the same header as the governed surface.",
+            "Keep status and secondary metadata subordinate to the title."
+          ],
+          "accessibility_contract": [
+            "Use heading tags in hierarchy order.",
+            "If actions change nearby content, keep them adjacent in DOM order."
+          ],
+          "react_tailwind": "<header className=\"flex items-start justify-between gap-4 border-b border-[var(--jk-color-border-subtle)] px-5 py-4\">...</header>"
+        }
+      },
+      {
+        "id": "card",
+        "label": "Card",
+        "description": "Contained surface block with a single content responsibility and explicit header-content-footer structure when needed.",
+        "usage": "Use for summaries, settings groups, metrics, and review blocks.",
+        "component_recipe": {
+          "slots": ["header", "body", "footer"],
+          "variants": ["summary", "settings", "review", "muted"],
+          "interaction_rules": [
+            "Use cards to group meaning, not to add decorative nesting.",
+            "Promote content hierarchy before adding elevation."
+          ],
+          "accessibility_contract": [
+            "Keep heading and body text associated in reading order.",
+            "If footer actions exist, ensure they remain within the same card."
+          ],
+          "react_tailwind": "<section className=\"rounded-[var(--jk-radius-2)] border border-[var(--jk-color-border-subtle)] bg-[var(--jk-color-surface)] shadow-[var(--jk-elevation-1)]\">...</section>"
+        }
+      },
+      {
+        "id": "field",
+        "label": "Field",
+        "description": "Label, control, helper text, and validation message grouped as one primitive.",
+        "usage": "Use for text input, toggles, selects, and textarea entry.",
+        "component_recipe": {
+          "slots": ["label", "control", "helper", "error"],
+          "variants": ["text", "textarea", "select", "toggle"],
+          "interaction_rules": [
+            "Do not rely on placeholder text as the only label.",
+            "Validation copy must stay next to the affected control."
+          ],
+          "accessibility_contract": [
+            "Use label or aria-label on every control.",
+            "Use aria-describedby for helper and error text when present."
+          ],
+          "react_tailwind": "<label className=\"grid gap-2 text-sm\"><span className=\"font-medium\">Label</span><textarea className=\"min-h-40 rounded-[var(--jk-radius-2)] border border-[var(--jk-color-border-subtle)] bg-[var(--jk-color-surface-muted)] px-3 py-3\" /></label>"
+        }
+      },
+      {
+        "id": "button",
+        "label": "Button",
+        "description": "Primary, secondary, or ghost action with explicit hierarchy and nearby scope.",
+        "usage": "Use for create, save, continue, approve, and dismiss actions.",
+        "component_recipe": {
+          "slots": ["icon", "label"],
+          "variants": ["primary", "secondary", "ghost", "danger"],
+          "interaction_rules": [
+            "Specific labels beat generic labels.",
+            "Destructive actions require confirmation or undo language."
+          ],
+          "accessibility_contract": [
+            "Icon-only buttons need aria-label.",
+            "Focus-visible state must remain visible."
+          ],
+          "react_tailwind": "<button className=\"inline-flex min-h-10 items-center justify-center rounded-[var(--jk-radius-2)] px-4 font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--jk-color-accent)]\">Generate First Pass</button>"
+        }
+      },
+      {
+        "id": "tabs",
+        "label": "Tabs",
+        "description": "Mutually exclusive view switcher for peer content regions.",
+        "usage": "Use for switching between results, details, code, or history views.",
+        "component_recipe": {
+          "slots": ["list", "trigger", "panel"],
+          "variants": ["underline", "segmented"],
+          "interaction_rules": [
+            "Tabs are for peer views, not unrelated navigation.",
+            "Keep the active trigger visually obvious without decorative chrome."
+          ],
+          "accessibility_contract": [
+            "Use tablist, tab, and tabpanel semantics.",
+            "Support arrow-key navigation and active-state announcement."
+          ],
+          "react_tailwind": "<div><div role=\"tablist\" className=\"inline-flex gap-1 rounded-[var(--jk-radius-2)] bg-[var(--jk-color-surface-muted)] p-1\">...</div><div role=\"tabpanel\" className=\"mt-4\">...</div></div>"
+        }
+      },
+      {
+        "id": "table-list",
+        "label": "Table or list",
+        "description": "Structured repeated item presentation with sortable columns or grouped rows.",
+        "usage": "Use for queues, records, events, or artifact history.",
+        "component_recipe": {
+          "slots": ["header", "rows", "empty-state"],
+          "variants": ["table", "stacked-list", "checklist"],
+          "interaction_rules": [
+            "Use table semantics only when column relationships matter.",
+            "Long content needs wrap or truncation rules."
+          ],
+          "accessibility_contract": [
+            "Use table headers for true tabular relationships.",
+            "Lists and checklist rows should expose names and states clearly."
+          ],
+          "react_tailwind": "<div className=\"overflow-hidden rounded-[var(--jk-radius-2)] border border-[var(--jk-color-border-subtle)]\"><table className=\"w-full text-sm\">...</table></div>"
+        }
+      },
+      {
+        "id": "sheet-drawer",
+        "label": "Sheet or drawer",
+        "description": "Temporary side panel that preserves context while exposing secondary detail or editing.",
+        "usage": "Use for edit-in-place flows, review queues, and scoped secondary tasks.",
+        "component_recipe": {
+          "slots": ["overlay", "header", "body", "footer"],
+          "variants": ["right-sheet", "bottom-drawer"],
+          "interaction_rules": [
+            "Use sheets for secondary context, not the primary workflow.",
+            "On compact layouts, preserve overscroll containment."
+          ],
+          "accessibility_contract": [
+            "Use dialog semantics with labeled title and close action.",
+            "Trap focus while open and restore focus on close."
+          ],
+          "react_tailwind": "<div className=\"fixed inset-y-0 right-0 w-full max-w-md border-l border-[var(--jk-color-border-subtle)] bg-[var(--jk-color-surface)] p-5\">...</div>"
+        }
+      },
+      {
+        "id": "dialog",
+        "label": "Dialog",
+        "description": "Blocking confirmation or focused multi-step decision moment with explicit primary and cancel actions.",
+        "usage": "Use for destructive confirmation, escalation approval, or constrained review.",
+        "component_recipe": {
+          "slots": ["overlay", "title", "description", "actions"],
+          "variants": ["confirm", "danger", "review"],
+          "interaction_rules": [
+            "Use dialogs only when the decision should interrupt the current flow.",
+            "Keep action labels explicit about the consequence."
+          ],
+          "accessibility_contract": [
+            "Use alertdialog or dialog semantics as appropriate.",
+            "Provide keyboard dismissal and visible focus management."
+          ],
+          "react_tailwind": "<div className=\"fixed inset-0 grid place-items-center bg-black/50 p-4\"><div role=\"dialog\" aria-modal=\"true\" className=\"w-full max-w-lg rounded-[var(--jk-radius-2)] bg-[var(--jk-color-surface)] p-6\">...</div></div>"
+        }
+      },
+      {
+        "id": "inspector",
+        "label": "Inspector",
+        "description": "Persistent secondary panel for metadata, settings, evidence, or comments tied to the current selection.",
+        "usage": "Use when a workspace needs right-side supporting detail.",
+        "component_recipe": {
+          "slots": ["header", "sections", "footer"],
+          "variants": ["metadata", "review", "ownership"],
+          "interaction_rules": [
+            "Inspector content must support the current selection, not replace the main task.",
+            "Keep escalations and ownership next to the evidence they describe."
+          ],
+          "accessibility_contract": [
+            "Use aside when the panel is persistent.",
+            "Section headings must stay hierarchical and descriptive."
+          ],
+          "react_tailwind": "<aside className=\"grid gap-4 rounded-[var(--jk-radius-2)] border border-[var(--jk-color-border-subtle)] bg-[var(--jk-color-surface)] p-4\">...</aside>"
+        }
+      },
+      {
+        "id": "artifact-panel",
+        "label": "Artifact panel",
+        "description": "Inline panel for code, logs, generated artifacts, or previews using the same theme model as the surrounding interface.",
+        "usage": "Use for evidence viewers, output previews, and implementation handoff payloads.",
+        "component_recipe": {
+          "slots": ["header", "toolbar", "body", "footer"],
+          "variants": ["preview", "code", "handoff"],
+          "interaction_rules": [
+            "Local controls stay in or directly above the panel.",
+            "Artifact surfaces must not adopt a separate dark or light theme."
+          ],
+          "accessibility_contract": [
+            "Toolbar actions need clear names and focus order.",
+            "Code or preview regions need labels when multiple panels coexist."
+          ],
+          "react_tailwind": "<section className=\"overflow-hidden rounded-[var(--jk-radius-2)] border border-[var(--jk-color-border-subtle)] bg-[var(--jk-color-surface)]\"><div className=\"border-b border-[var(--jk-color-border-subtle)] px-4 py-3\">...</div><div className=\"bg-[var(--jk-color-surface-muted)] p-4\">...</div></section>"
+        }
+      }
+    ],
+    "composition_rules": [
+      "Compose only from the published primitive inventory unless the brief explicitly authorizes a new primitive and the change is escalated.",
+      "Keep local controls inside or directly adjacent to the surface they govern.",
+      "Use cards, fields, artifact panels, and inspectors to express hierarchy instead of decorative wrappers, glass treatments, or ornamental chrome.",
+      "Each generated screen must map back to reusable recipes rather than one-off markup fragments."
+    ]
+  },
+  "tokens": {
+    "spacing_scale": [
+      { "token": "--jk-space-1", "value": "4px", "usage": "tight icon-label or badge spacing" },
+      { "token": "--jk-space-2", "value": "8px", "usage": "compact control groups and small stack gaps" },
+      { "token": "--jk-space-3", "value": "12px", "usage": "field internals and dense panel spacing" },
+      { "token": "--jk-space-4", "value": "16px", "usage": "default card and section padding" },
+      { "token": "--jk-space-5", "value": "24px", "usage": "major section separation" },
+      { "token": "--jk-space-6", "value": "32px", "usage": "page-level rhythm and workspace gutters" }
+    ],
+    "radius_scale": [
+      { "token": "--jk-radius-1", "value": "4px", "usage": "small controls and chips" },
+      { "token": "--jk-radius-2", "value": "6px", "usage": "default cards, inputs, drawers, and panels" },
+      { "token": "--jk-radius-3", "value": "8px", "usage": "feature callouts or emphasized containers only" }
+    ],
+    "border_rules": [
+      "Default stroke is 1px solid var(--jk-color-border-subtle).",
+      "Use border emphasis before adding elevation.",
+      "Do not exceed the published radius scale or stack multiple ornamental borders."
+    ],
+    "elevation_scale": [
+      { "token": "--jk-elevation-0", "value": "none", "usage": "default workspace surfaces" },
+      { "token": "--jk-elevation-1", "value": "0 1px 2px rgba(15, 23, 42, 0.08)", "usage": "raised cards or sticky headers" },
+      { "token": "--jk-elevation-2", "value": "0 10px 24px rgba(15, 23, 42, 0.12)", "usage": "dialogs and transient sheets only" }
+    ],
+    "typography_roles": [
+      { "token": "--jk-type-title", "value": "600 1.125rem/1.4 var(--jk-font-sans)", "usage": "page titles and panel titles" },
+      { "token": "--jk-type-section", "value": "600 1rem/1.5 var(--jk-font-sans)", "usage": "card headers and subsection labels" },
+      { "token": "--jk-type-body", "value": "400 0.9375rem/1.6 var(--jk-font-sans)", "usage": "default body copy and helper text" },
+      { "token": "--jk-type-meta", "value": "500 0.8125rem/1.4 var(--jk-font-sans)", "usage": "eyebrows, labels, and status metadata" },
+      { "token": "--jk-type-code", "value": "500 0.8125rem/1.6 var(--jk-font-mono)", "usage": "artifact rows, code, and logs" }
+    ],
+    "color_roles": [
+      { "role": "canvas", "binding": "--jk-color-canvas", "light_value": "#f6f5f2", "dark_value": "#121315", "usage": "page and app background" },
+      { "role": "surface", "binding": "--jk-color-surface", "light_value": "#ffffff", "dark_value": "#1b1d21", "usage": "cards, sheets, drawers, and dialogs" },
+      { "role": "surface-muted", "binding": "--jk-color-surface-muted", "light_value": "#efede8", "dark_value": "#23262b", "usage": "secondary panels and inactive tabs" },
+      { "role": "border-subtle", "binding": "--jk-color-border-subtle", "light_value": "#d7d3ca", "dark_value": "#353941", "usage": "default strokes and dividers" },
+      { "role": "text-primary", "binding": "--jk-color-text-primary", "light_value": "#171717", "dark_value": "#f3f4f6", "usage": "primary copy and labels" },
+      { "role": "text-secondary", "binding": "--jk-color-text-secondary", "light_value": "#57534e", "dark_value": "#c7cad1", "usage": "helper text and metadata" },
+      { "role": "accent", "binding": "--jk-color-accent", "light_value": "#1d4ed8", "dark_value": "#7cb3ff", "usage": "primary actions and active states" },
+      { "role": "success", "binding": "--jk-color-success", "light_value": "#0f8a4b", "dark_value": "#5fd59a", "usage": "success status and confirmations" },
+      { "role": "warning", "binding": "--jk-color-warning", "light_value": "#a16207", "dark_value": "#f6c65b", "usage": "review-needed or caution states" },
+      { "role": "danger", "binding": "--jk-color-danger", "light_value": "#b42318", "dark_value": "#ff8f84", "usage": "destructive actions and errors" }
+    ],
+    "required_theme_pairs": [
+      { "binding": "--jk-color-canvas", "purpose": "page background", "light_value": "#f6f5f2", "dark_value": "#121315" },
+      { "binding": "--jk-color-surface", "purpose": "cards and modal surfaces", "light_value": "#ffffff", "dark_value": "#1b1d21" },
+      { "binding": "--jk-color-surface-muted", "purpose": "inactive or secondary surfaces", "light_value": "#efede8", "dark_value": "#23262b" },
+      { "binding": "--jk-color-border-subtle", "purpose": "surface delineation", "light_value": "#d7d3ca", "dark_value": "#353941" },
+      { "binding": "--jk-color-text-primary", "purpose": "primary readable text", "light_value": "#171717", "dark_value": "#f3f4f6" },
+      { "binding": "--jk-color-text-secondary", "purpose": "supporting copy", "light_value": "#57534e", "dark_value": "#c7cad1" },
+      { "binding": "--jk-color-accent", "purpose": "interactive emphasis", "light_value": "#1d4ed8", "dark_value": "#7cb3ff" }
+    ]
+  },
+  "layout_archetypes": [
+    {
+      "surface_type": "app-workspace",
+      "required_regions": ["sidebar-rail", "header", "workspace-body", "inspector-or-artifact-panel"],
+      "rules": [
+        "Keep the primary task in the center workspace and secondary metadata in the inspector.",
+        "Do not move local controls out of the workspace header or governed panel."
+      ]
+    },
+    {
+      "surface_type": "settings-form",
+      "required_regions": ["header", "form-stack", "action-row"],
+      "rules": [
+        "Group fields into logical cards or sections.",
+        "Keep save or continue actions at the end of the affected form region."
+      ]
+    },
+    {
+      "surface_type": "dashboard",
+      "required_regions": ["header", "summary-row", "detail-region"],
+      "rules": [
+        "Lead with summary signal, then expand into tables, lists, or detail cards.",
+        "Limit ornamental variation between cards."
+      ]
+    },
+    {
+      "surface_type": "review-flow",
+      "required_regions": ["queue-or-list", "artifact-panel", "decision-actions", "inspector"],
+      "rules": [
+        "Evidence and decision controls must stay visually connected.",
+        "Decision actions should remain adjacent to the artifact or record being reviewed."
+      ]
+    },
+    {
+      "surface_type": "handoff-export-flow",
+      "required_regions": ["summary-card", "artifact-panel", "token-and-component-map", "escalation-list"],
+      "rules": [
+        "Show fixed implementation commitments before open questions.",
+        "Keep export and copy actions next to the payload they affect."
+      ]
+    }
+  ],
+  "composition_patterns": [
+    {
+      "id": "app-workspace-default",
+      "surface_type": "app-workspace",
+      "recipe_ids": ["layout-shell", "sidebar-rail", "header", "field", "artifact-panel", "inspector", "button"],
+      "rules": [
+        "Lead with a single main workspace plus persistent secondary context.",
+        "Keep generation, review, and handoff visible in one frame before escalating to extra modes."
+      ]
+    },
+    {
+      "id": "review-board-default",
+      "surface_type": "review-flow",
+      "recipe_ids": ["header", "artifact-panel", "table-list", "inspector", "button", "sheet-drawer"],
+      "rules": [
+        "Checklist and decision actions stay adjacent to the artifact being reviewed.",
+        "Use sheets only for secondary context on compact layouts."
+      ]
+    },
+    {
+      "id": "handoff-package-default",
+      "surface_type": "handoff-export-flow",
+      "recipe_ids": ["card", "artifact-panel", "table-list", "button", "dialog"],
+      "rules": [
+        "Show implementation commitments before open questions.",
+        "Keep export actions next to the payload they affect."
+      ]
+    }
+  ],
+  "state_matrix": [
+    {
+      "state": "loading",
+      "expectations": [
+        "Show structure-preserving placeholders instead of empty white space.",
+        "Keep primary navigation and section labels visible."
+      ]
+    },
+    {
+      "state": "empty",
+      "expectations": [
+        "Explain what is missing in plain language.",
+        "Provide one clear next action in the same region."
+      ]
+    },
+    {
+      "state": "ready",
+      "expectations": [
+        "Present the main task path without forcing secondary metadata first.",
+        "Keep the default state implementation-ready and theme-complete."
+      ]
+    },
+    {
+      "state": "error",
+      "expectations": [
+        "Expose the failure clearly without collapsing the rest of the layout.",
+        "Provide recovery actions close to the failed region."
+      ]
+    },
+    {
+      "state": "review-needed",
+      "expectations": [
+        "Call out the unresolved decision and the owner required.",
+        "Keep the escalation signal near the affected surface."
+      ]
+    },
+    {
+      "state": "disabled",
+      "expectations": [
+        "Explain why the action is unavailable.",
+        "Do not rely on color alone to communicate the disabled status."
+      ]
+    }
+  ],
+  "handoff_contract": {
+    "required_sections": [
+      "core_screens",
+      "token_spec",
+      "component_recipes",
+      "screen_composition",
+      "state_coverage",
+      "theme_contract",
+      "accessibility_contract",
+      "escalation_items"
+    ],
+    "accessibility_notes": [
+      "Name focus order and keyboard expectations for interactive regions.",
+      "Name status semantics for warning, error, and success states.",
+      "Name motion-reduction behavior and any assumptions that still need review.",
+      "Name any label, aria-live, or dialog semantics required by the recipes."
+    ],
+    "escalation_triggers": [
+      "A requested primitive is not in the published inventory.",
+      "The brief requires a token, interaction, or state not covered by the pack.",
+      "Theme parity cannot be maintained across artifact panels or code surfaces.",
+      "The handoff cannot stay concrete without product or design review."
+    ]
+  },
+  "links": {
+    "docs_url": "https://judgmentkit.ai/docs/reference/portable-no-design-system-pack",
+    "markdown_url": "https://judgmentkit.ai/docs/reference/portable-no-design-system-pack.md",
+    "schema_url": "https://judgmentkit.ai/schemas/constraint_pack.schema.json"
+  },
+  "last_reviewed": "2026-04-14"
+}

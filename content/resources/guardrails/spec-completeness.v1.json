@@ -1,0 +1,85 @@
+{
+  "id": "guardrail.spec-completeness",
+  "type": "guardrail",
+  "version": "1.0.0",
+  "title": "Spec completeness",
+  "summary": "Require generated UI output to name concrete primitives, tokens, theme bindings, state coverage, and handoff details instead of vague implementation language.",
+  "status": "active",
+  "audiences": [
+    "design-leaders",
+    "product-managers",
+    "platform-engineering",
+    "ai-application-developers"
+  ],
+  "applies_to": {
+    "workflows": ["workflow.ai-ui-generation"],
+    "surfaces": ["web", "mobile"]
+  },
+  "decision": "Whether a generated UI spec is concrete enough to implement, evaluate, or compare without manual backfilling of tokens, states, or handoff details.",
+  "intent": {
+    "purpose": "Prevent AI-generated UI output from sounding disciplined while still leaving critical implementation details implicit.",
+    "who_it_protects": ["frontend teams", "design systems", "reviewers"],
+    "failure_mode": "The output gestures at restraint or theme quality, but it never names the actual primitives, token bindings, light-dark pairs, state coverage, or escalation boundaries required to build the surface.",
+    "good_judgment": "Name the concrete primitive inventory, exact token bindings or values, required state coverage, explicit light and dark theme pairs, accessibility notes, and an escalation list before calling the spec complete.",
+    "acceptable_variation": [
+      "compact specs when every surface still maps to explicit primitives and tokens",
+      "project-specific token names when they stay concrete and machine-checkable",
+      "short handoff packets when all required sections are still present"
+    ],
+    "non_negotiables": [
+      "no vague adjectives like clean, neutral, slightly raised, or roomy in place of actual token values or bindings",
+      "no unnamed custom primitives or component groups",
+      "no missing loading, empty, error, review-needed, or disabled states when the surface can encounter them",
+      "no theme-complete claim without explicit light and dark token pairs",
+      "if no external design system exists, the spec must map back to the published JudgmentKit constraint pack or escalate the gap"
+    ]
+  },
+  "detection": {
+    "decision_question": "Does the UI output specify enough concrete structure, token detail, state coverage, and handoff depth to build or judge it without hidden assumptions?",
+    "signals": [
+      "vague token language",
+      "unnamed primitives or layout wrappers",
+      "missing light-dark token bindings",
+      "implicit or partial state coverage",
+      "missing handoff sections",
+      "unowned open questions hidden in implementation notes"
+    ],
+    "thresholds": {
+      "pass": "the output names concrete primitives, token bindings or values, required states, theme pairs, and escalation items",
+      "warn": "the output is directionally useful but leaves one or two concrete sections underspecified",
+      "fail": "the output mostly relies on stylistic language, implicit states, or missing handoff structure"
+    }
+  },
+  "response": {
+    "low": {
+      "action": "auto_normalize",
+      "description": "Rewrite vague phrases into explicit primitive and token references."
+    },
+    "medium": {
+      "action": "rewrite_to_complete_spec",
+      "description": "Return the output to the required contract before it is used or judged."
+    },
+    "high": {
+      "action": "block_until_complete",
+      "description": "Block the spec from review or implementation until the missing sections are completed."
+    }
+  },
+  "ownership": {
+    "decision_owner": "Frontend Platform",
+    "risk_owner": "Design Systems",
+    "operational_owner": "AI Application Developers",
+    "review_cadence": "monthly"
+  },
+  "links": {
+    "docs_url": "https://judgmentkit.ai/docs/guardrails/spec-completeness",
+    "markdown_url": "https://judgmentkit.ai/docs/guardrails/spec-completeness.md",
+    "schema_url": "https://judgmentkit.ai/schemas/guardrail.schema.json",
+    "example_ids": [
+      "example.ui-generation.token-vagueness-drift",
+      "example.ui-generation.primitive-sprawl-drift",
+      "example.ui-generation.shallow-handoff-drift",
+      "example.ui-generation.state-coverage-drift"
+    ]
+  },
+  "last_reviewed": "2026-04-14"
+}

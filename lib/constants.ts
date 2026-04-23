@@ -9,7 +9,14 @@ export const JUDGMENTKIT_REPOSITORY_CLONE_URL =
 export const DEFAULT_LOCAL_JUDGMENTKIT_CHECKOUT_PATH = "$HOME/judgmentkit";
 export const LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER =
   "<ABSOLUTE_PATH_TO_LOCAL_JUDGMENTKIT_CHECKOUT>";
+export const LOCAL_MCP_DEFAULT_HOST = "127.0.0.1";
+export const LOCAL_MCP_DEFAULT_PORT = 8765;
+export const LOCAL_MCP_ENDPOINT_PATH = "/mcp";
+export const LOCAL_MCP_HOST_ENV = "JUDGMENTKIT_MCP_HOST";
+export const LOCAL_MCP_PORT_ENV = "JUDGMENTKIT_MCP_PORT";
+export const LOCAL_MCP_DEFAULT_URL = `http://${LOCAL_MCP_DEFAULT_HOST}:${LOCAL_MCP_DEFAULT_PORT}${LOCAL_MCP_ENDPOINT_PATH}`;
 export const LOCAL_JUDGMENTKIT_INSTALL_COMMAND = `npm --prefix ${LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER} install`;
+export const LOCAL_JUDGMENTKIT_MCP_LOCAL_COMMAND = `npm --prefix ${LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER} run mcp:local`;
 export const LOCAL_JUDGMENTKIT_STDIO_ARGS = [
   "--prefix",
   LOCAL_JUDGMENTKIT_CHECKOUT_PLACEHOLDER,
@@ -20,6 +27,13 @@ export const LOCAL_JUDGMENTKIT_STDIO_COMMAND = `npm --prefix ${LOCAL_JUDGMENTKIT
 export const LOCAL_JUDGMENTKIT_INSTALLER_COMMAND =
   "node --import tsx ./scripts/install-mcp.ts";
 export const HOSTED_JUDGMENTKIT_BOOTSTRAP_COMMAND = `curl -fsSL ${CANONICAL_INSTALL_URL} | bash -s -- --client <codex|claude|cursor>`;
+
+export function createLocalMcpUrl(
+  host = LOCAL_MCP_DEFAULT_HOST,
+  port: number | string = LOCAL_MCP_DEFAULT_PORT,
+) {
+  return `http://${host}:${port}${LOCAL_MCP_ENDPOINT_PATH}`;
+}
 
 function normalizeSiteUrl(value: string) {
   const trimmed = value.trim();

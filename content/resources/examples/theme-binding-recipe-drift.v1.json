@@ -1,0 +1,47 @@
+{
+  "id": "example.ui-generation.theme-binding-recipe-drift",
+  "type": "example",
+  "version": "1.0.0",
+  "title": "Theme contract without recipe bindings rewritten into explicit usage",
+  "summary": "A draft names theme bindings globally but never ties them to recipes or surfaces, then gets rewritten into recipe-level theme usage.",
+  "status": "active",
+  "workflow_id": "workflow.ai-ui-generation",
+  "guardrail_ids": [
+    "guardrail.spec-completeness",
+    "guardrail.surface-theme-parity"
+  ],
+  "scenario": "A response includes a theme section, but artifact panels, cards, and action states do not show how those bindings are actually used in the component recipes.",
+  "raw_output": "Use the same light and dark theme model across the workspace. Background, card, border, and primary tokens are shared.",
+  "verdict": {
+    "verdict_id": "ver_016",
+    "decision_id": "dec_016",
+    "evaluated_at": "2026-04-14T00:00:00Z",
+    "status": "warn",
+    "severity": "medium",
+    "guardrails_triggered": [
+      "guardrail.spec-completeness",
+      "guardrail.surface-theme-parity"
+    ],
+    "reasons": [
+      "token names are listed but not applied to actual recipes or surfaces",
+      "theme parity still depends on implementer interpretation"
+    ],
+    "drift_score": 0.39,
+    "recommended_action": "rewrite",
+    "rewrite_hint": "Bind theme tokens directly inside component_recipes and screen_composition notes so every surface proves how parity is maintained.",
+    "ownership": {
+      "decision_owner": "Design Systems",
+      "risk_owner": "Frontend Platform",
+      "operational_owner": "AI Application Developers"
+    },
+    "incident_required": false
+  },
+  "corrected_output": "ArtifactPanel recipe uses --jk-color-surface-muted for body background, --jk-color-border-subtle for frame, and --jk-color-text-primary for payload text in both light and dark mode. Button primary variant binds --jk-color-accent and focus-visible ring token. Screen composition names where those recipes appear.",
+  "lesson": "Theme completeness is only real when bindings are attached to recipes, not listed as abstract tokens.",
+  "links": {
+    "docs_url": "https://judgmentkit.ai/docs/workflows/ai-ui-generation",
+    "markdown_url": "https://judgmentkit.ai/docs/workflows/ai-ui-generation.md",
+    "schema_url": "https://judgmentkit.ai/schemas/example.schema.json"
+  },
+  "last_reviewed": "2026-04-14"
+}

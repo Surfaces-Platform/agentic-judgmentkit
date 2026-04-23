@@ -1,0 +1,66 @@
+---
+title: Primitive sprawl drift
+slug: /docs/examples/primitive-sprawl-drift
+page_type: example
+summary: A no-design-system workspace draft invents bespoke modules, then gets rewritten into the portable JudgmentKit primitive inventory.
+agent_summary: >
+  This example shows how JudgmentKit rewrites bespoke visual modules into the
+  published primitive vocabulary when no external design system exists.
+audiences:
+  - design-leaders
+  - product-managers
+  - platform-engineering
+  - ai-application-developers
+workflows:
+  - workflow.ai-ui-generation
+guardrails:
+  - guardrail.design-system-integrity
+  - guardrail.spec-completeness
+owners:
+  primary: Design Systems
+  risk: Accessibility
+  operational: Frontend Platform
+status: active
+last_reviewed: 2026-04-14
+related_pages:
+  - /docs/workflows/ai-ui-generation
+  - /docs/reference/portable-no-design-system-pack
+  - /docs/guardrails/design-system-integrity
+  - /docs/guardrails/spec-completeness
+related_resources:
+  - /resources/examples/primitive-sprawl-drift.v1.json
+related_schemas:
+  - /schemas/example.schema.json
+  - /schemas/verdict.schema.json
+toc: true
+---
+
+## Scenario
+
+A model tries to make a review workspace feel premium in one pass without a real design system.
+
+## Raw decision or output
+
+`Build a floating insight ribbon, a holographic evidence capsule, a decision dock, and a metadata halo around the selected artifact.`
+
+## What JudgmentKit detected
+
+- bespoke primitives without authority
+- visual modules that cannot be compared against a stable component vocabulary
+
+## What action was taken
+
+JudgmentKit rewrote the surface using the published layout shell, artifact panel, inspector, card, and button primitives.
+
+## Corrected result
+
+`Use a layout shell with a queue list on the left, a header plus artifact panel in the workspace center, and a persistent inspector on the right. Represent decision actions with buttons inside the artifact panel header instead of inventing a new decision dock primitive.`
+
+## Why the correction matters
+
+Portable governance depends on a closed primitive vocabulary. Recomposition is allowed. Primitive invention is not.
+
+## JSON artifact links
+
+- Example resource: `/resources/examples/primitive-sprawl-drift.v1.json`
+- Schema: `/schemas/example.schema.json`

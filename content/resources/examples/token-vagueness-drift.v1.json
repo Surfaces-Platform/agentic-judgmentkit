@@ -1,0 +1,47 @@
+{
+  "id": "example.ui-generation.token-vagueness-drift",
+  "type": "example",
+  "version": "1.0.0",
+  "title": "Vague token language rewritten into concrete portable bindings",
+  "summary": "A no-design-system UI draft uses stylistic adjectives instead of actual tokens, then gets rewritten into the JudgmentKit portable token contract.",
+  "status": "active",
+  "workflow_id": "workflow.ai-ui-generation",
+  "guardrail_ids": [
+    "guardrail.design-system-integrity",
+    "guardrail.spec-completeness"
+  ],
+  "scenario": "A product team asks for a new workspace UI without an established design system and wants something restrained and implementation-ready.",
+  "raw_output": "Use soft neutral surfaces, slightly darker side panels, roomy spacing, and modest rounding so the interface feels calm and premium.",
+  "verdict": {
+    "verdict_id": "ver_009",
+    "decision_id": "dec_009",
+    "evaluated_at": "2026-04-14T00:00:00Z",
+    "status": "warn",
+    "severity": "medium",
+    "guardrails_triggered": [
+      "guardrail.design-system-integrity",
+      "guardrail.spec-completeness"
+    ],
+    "reasons": [
+      "token language is descriptive but not implementable",
+      "theme discipline is implied instead of bound to explicit light-dark pairs"
+    ],
+    "drift_score": 0.39,
+    "recommended_action": "rewrite",
+    "rewrite_hint": "Map the surface to the JudgmentKit portable token contract and name the required light-dark bindings.",
+    "ownership": {
+      "decision_owner": "Frontend Platform",
+      "risk_owner": "Design Systems",
+      "operational_owner": "AI Application Developers"
+    },
+    "incident_required": false
+  },
+  "corrected_output": "Use --jk-color-canvas (#f6f5f2 / #121315) for the page background, --jk-color-surface (#ffffff / #1b1d21) for cards and drawers, --jk-space-4 (16px) for section padding, --jk-space-5 (24px) for inter-section gaps, and --jk-radius-2 (6px) for cards, inputs, and drawers.",
+  "lesson": "A portable UI authority only works when token guidance is concrete enough to build, review, and compare without stylistic interpretation.",
+  "links": {
+    "docs_url": "https://judgmentkit.ai/docs/examples/token-vagueness-drift",
+    "markdown_url": "https://judgmentkit.ai/docs/examples/token-vagueness-drift.md",
+    "schema_url": "https://judgmentkit.ai/schemas/example.schema.json"
+  },
+  "last_reviewed": "2026-04-14"
+}

@@ -1,0 +1,42 @@
+{
+  "id": "example.ui-generation.output-contract-gap",
+  "type": "example",
+  "version": "1.0.0",
+  "title": "Visual implementation response completed with contract evidence",
+  "summary": "A visually led implementation returns only a generic change summary, then gets completed with the required visual thesis, mode, motion plan, and disclosed downgrade.",
+  "status": "active",
+  "workflow_id": "workflow.ai-ui-generation",
+  "guardrail_ids": ["guardrail.frontend-output-contract"],
+  "scenario": "An agent updates a product UI to feel calmer and more deliberate, but the final response omits the visual contract evidence.",
+  "raw_output": "Updated the page styling, improved spacing, and made the interface feel more polished. Tests passed.",
+  "verdict": {
+    "verdict_id": "ver_020",
+    "decision_id": "dec_020",
+    "evaluated_at": "2026-04-23T00:00:00Z",
+    "status": "warn",
+    "severity": "low",
+    "guardrails_triggered": ["guardrail.frontend-output-contract"],
+    "reasons": [
+      "the final response does not state the selected mode",
+      "the final response omits the visual thesis and motion plan",
+      "a visual-direction implementation is not auditable from the response"
+    ],
+    "drift_score": 0.28,
+    "recommended_action": "rewrite",
+    "rewrite_hint": "Complete the final response with a short change summary plus Visual Thesis, Mode, Motion Plan, and any downgrade or failed check.",
+    "ownership": {
+      "decision_owner": "Design Systems",
+      "risk_owner": "Product",
+      "operational_owner": "AI Application Developers"
+    },
+    "incident_required": false
+  },
+  "corrected_output": "Updated the actual product surface to lead with the workspace, reduce card chrome, and tighten copy. Visual Thesis: calm operational clarity with strong typography and low-chrome structure. Mode: product surface. Motion Plan: hover affordance on primary actions and reduced-motion-safe opacity transitions; richer scroll motion was intentionally skipped to preserve runtime budget.",
+  "lesson": "For visually led implementation, the final answer is part of the contract. It must carry enough evidence for review without forcing the user to infer the mode, thesis, or motion downgrade.",
+  "links": {
+    "docs_url": "https://judgmentkit.ai/docs/examples/output-contract-gap",
+    "markdown_url": "https://judgmentkit.ai/docs/examples/output-contract-gap.md",
+    "schema_url": "https://judgmentkit.ai/schemas/example.schema.json"
+  },
+  "last_reviewed": "2026-04-23"
+}

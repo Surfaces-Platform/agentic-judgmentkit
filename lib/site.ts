@@ -15,6 +15,14 @@ import {
   RESOURCES_DIR,
   ROOT_URL,
   SCHEMAS_DIR,
+  HOSTED_MCP_REFERENCE_URL,
+  LOCAL_JUDGMENTKIT_MCP_LOCAL_COMMAND,
+  LOCAL_MCP_DEFAULT_HOST,
+  LOCAL_MCP_DEFAULT_PORT,
+  LOCAL_MCP_DEFAULT_URL,
+  LOCAL_MCP_ENDPOINT_PATH,
+  LOCAL_MCP_HOST_ENV,
+  LOCAL_MCP_PORT_ENV,
 } from "@/lib/constants";
 import { loadChangelogEntries, loadDocPages, loadResources, loadSchemas } from "@/lib/content";
 import { createMirrorContent } from "@/lib/markdown";
@@ -65,6 +73,7 @@ function collectResourceTags(resource: Record<string, unknown>) {
     ...(Array.isArray(resource.guardrail_ids) ? resource.guardrail_ids : []),
     ...(Array.isArray(resource.common_guardrails) ? resource.common_guardrails : []),
     ...(Array.isArray(resource.workflows) ? resource.workflows : []),
+    ...(typeof resource.workflow_id === "string" ? [resource.workflow_id] : []),
   ]
     .map((value) => String(value))
     .filter(Boolean);
@@ -180,7 +189,7 @@ function createLlmsText(pages: DocPage[], resourceIndex: ResourceIndex) {
 
 JudgmentKit makes AI decisions visible, measurable, and usable at runtime.
 
-JudgmentKit is an MCP-first product. Humans use the run surface and inspect surface to connect and verify the system. Agents install the local JudgmentKit server over stdio, then use the published Markdown mirrors, JSON resources, schemas, examples, and hosted reference surfaces.
+JudgmentKit is an MCP-first product. Humans use the run surface and inspect surface to connect and verify the system. Agents install the local JudgmentKit server over loopback HTTP, then use the published Markdown mirrors, JSON resources, schemas, examples, and hosted reference surfaces.
 
 ## Overview
 - ${ROOT_URL}/
@@ -205,7 +214,7 @@ ${schemaUrls.map((url) => `- ${url}`).join("\n")}
 ${examplePages.map((url) => `- ${url}`).join("\n")}
 
 ## MCP
-Install uses a local stdio checkout. The hosted endpoint below is for reference, debug, and parity with the published inventory.
+Install uses a local loopback HTTP checkout at ${LOCAL_MCP_DEFAULT_URL}. The hosted endpoint below is for reference, debug, and parity with the published inventory.
 
 - ${ROOT_URL}/mcp
 - ${ROOT_URL}/mcp-inventory.json
@@ -221,10 +230,21 @@ function createMcpInventory(resourceIndex: ResourceIndex) {
 
   return {
     version: "1.0.0",
-    endpoint: `${ROOT_URL}/mcp`,
-    install_transport: "stdio",
+    endpoint: LOCAL_MCP_DEFAULT_URL,
+    hosted_reference_endpoint: HOSTED_MCP_REFERENCE_URL,
+    install_transport: "http",
+    local_loopback_runtime: {
+      start_command: LOCAL_JUDGMENTKIT_MCP_LOCAL_COMMAND,
+      host: LOCAL_MCP_DEFAULT_HOST,
+      port: LOCAL_MCP_DEFAULT_PORT,
+      endpoint: LOCAL_MCP_ENDPOINT_PATH,
+      env_overrides: {
+        host: LOCAL_MCP_HOST_ENV,
+        port: LOCAL_MCP_PORT_ENV,
+      },
+    },
     warning:
-      "Install JudgmentKit from a local checkout over stdio. The hosted /mcp endpoint is for reference/debug only.",
+      "Install JudgmentKit from a local checkout over loopback HTTP. The hosted /mcp endpoint is for reference/debug only.",
     command_reference_url: createCommandReferenceUrl(ROOT_URL),
     tools: toolReference.map((entry) => entry.name),
     prompts: promptReference.map((entry) => entry.name),

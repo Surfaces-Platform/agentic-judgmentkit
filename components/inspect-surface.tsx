@@ -24,7 +24,13 @@ type InspectDocumentState =
 
 const HASH_PREFIX = "#resource-";
 const INSPECT_RESOURCE_RAIL_ID = "inspect-resource-rail";
-const INSPECT_CATEGORY_ORDER = ["Examples", "Workflows", "Guardrails"] as const;
+const INSPECT_CATEGORY_ORDER = [
+  "Examples",
+  "Workflows",
+  "Constraint packs",
+  "Guideline profiles",
+  "Guardrails",
+] as const;
 
 const VIEWER_MODE_LABELS: Record<ProductSurfaceInspectViewerMode, string> = {
   prompt: "Prompt",
@@ -115,6 +121,10 @@ function getItemEyebrow(item: ProductSurfaceInspectItem) {
       return "Workflow";
     case "guardrail":
       return "Guardrail";
+    case "constraint_pack":
+      return "Constraint pack";
+    case "guideline_profile":
+      return "Guideline profile";
     case "example":
       return "Example";
     default:

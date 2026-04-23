@@ -1,0 +1,47 @@
+{
+  "id": "example.ui-generation.component-mapping-name-only-drift",
+  "type": "example",
+  "version": "1.0.0",
+  "title": "Name-only component mapping rewritten into real recipes",
+  "summary": "A draft lists component names without proving composition, then gets rewritten into reusable component recipes with slots and interaction rules.",
+  "status": "active",
+  "workflow_id": "workflow.ai-ui-generation",
+  "guardrail_ids": [
+    "guardrail.design-system-integrity",
+    "guardrail.spec-completeness"
+  ],
+  "scenario": "A model claims to use a design system by listing Button, Card, Tabs, and Sheet, but never shows how those components are composed or reused.",
+  "raw_output": "Use Sidebar, Card, Tabs, Textarea, Accordion, Sheet, Dialog, and Table for the workspace. Keep the result implementation ready.",
+  "verdict": {
+    "verdict_id": "ver_012",
+    "decision_id": "dec_012",
+    "evaluated_at": "2026-04-14T00:00:00Z",
+    "status": "warn",
+    "severity": "medium",
+    "guardrails_triggered": [
+      "guardrail.design-system-integrity",
+      "guardrail.spec-completeness"
+    ],
+    "reasons": [
+      "component names are present but no reusable composition evidence exists",
+      "the handoff still depends on downstream interpretation of slots, variants, and interaction rules"
+    ],
+    "drift_score": 0.38,
+    "recommended_action": "rewrite",
+    "rewrite_hint": "Replace name-only mapping with component_recipes and screen_composition that prove how the system is actually used.",
+    "ownership": {
+      "decision_owner": "Design Systems",
+      "risk_owner": "Frontend Platform",
+      "operational_owner": "AI Application Developers"
+    },
+    "incident_required": false
+  },
+  "corrected_output": "Return component_recipes for SidebarShell, ReviewArtifactPanel, and HandoffTable with slot structure, allowed variants, accessibility API, and concrete React+Tailwind composition snippets. Then map each screen to those recipes under screen_composition.",
+  "lesson": "Naming components is not the same as proving component authority. First-pass output needs reusable recipe evidence.",
+  "links": {
+    "docs_url": "https://judgmentkit.ai/docs/workflows/ai-ui-generation",
+    "markdown_url": "https://judgmentkit.ai/docs/workflows/ai-ui-generation.md",
+    "schema_url": "https://judgmentkit.ai/schemas/example.schema.json"
+  },
+  "last_reviewed": "2026-04-14"
+}
