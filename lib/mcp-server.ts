@@ -172,6 +172,17 @@ export function createJudgmentKitMcpServer() {
   );
 
   server.registerPrompt(
+    "start_no_design_system_workflow",
+    {
+      description: PROMPT_DEFINITIONS.start_no_design_system_workflow.description,
+      argsSchema: {
+        feature_intent: z.string().optional(),
+      },
+    },
+    async (args) => createPromptResult("start_no_design_system_workflow", args),
+  );
+
+  server.registerPrompt(
     "refine_design_first_pass",
     {
       description: PROMPT_DEFINITIONS.refine_design_first_pass.description,
@@ -189,7 +200,9 @@ export function createJudgmentKitMcpServer() {
   return server;
 }
 
-export function getMcpMetadata(transport: "stdio" | "streamable-http") {
+export function getMcpMetadata(
+  transport: "stdio" | "streamable-http" | "local-loopback-http",
+) {
   return {
     name: MCP_SERVER_NAME,
     version: MCP_SERVER_VERSION,

@@ -64,6 +64,8 @@ const workflowArtifactSchema = z.object({
   common_guardrails: z.array(z.string()),
   links: z.object({
     example_ids: z.array(z.string()),
+    constraint_pack_ids: z.array(z.string()).default([]),
+    guideline_profile_ids: z.array(z.string()).default([]),
   }),
 });
 
@@ -86,6 +88,8 @@ const resourceIndexSchema = z.object({
 const INSPECT_CATEGORY_LABELS = {
   workflow: "Workflows",
   example: "Examples",
+  constraint_pack: "Constraint packs",
+  guideline_profile: "Guideline profiles",
   guardrail: "Guardrails",
 } as const;
 
@@ -105,7 +109,7 @@ function createHomepageInstallCommand() {
 }
 
 function createHomepageVerifyPrompt() {
-  return "Call MCP tools/list against the local judgmentkit server";
+  return "Start the local JudgmentKit loopback server, then call MCP tools/list against http://127.0.0.1:8765/mcp";
 }
 
 function createPublishedInspectId(url: string) {
@@ -135,7 +139,7 @@ function createResourcePromptText(resource: {
   switch (resource.type) {
     case "workflow":
       return `Use JudgmentKit workflow "${resource.title}" for this task.
-Retrieve the linked guardrails and examples, then guide the first pass.
+Retrieve the linked guardrails, constraint packs, guideline profiles, and examples, then guide the first pass.
 
 Task:
 [paste your request here]`;
@@ -145,6 +149,18 @@ Point out where it drifts, explain why, then rewrite it inside the guardrail.
 
 Draft:
 [paste your draft here]`;
+    case "constraint_pack":
+      return `Use JudgmentKit constraint pack "${resource.title}" as the authority for this task.
+Map the surface to the published primitives, tokens, states, and handoff contract before drafting output.
+
+Task:
+[paste your request here]`;
+    case "guideline_profile":
+      return `Use JudgmentKit guideline profile "${resource.title}" as normative rules for this task.
+Apply the published rules directly and do not exceed the profile's intended scope.
+
+Task:
+[paste your request here]`;
     case "example":
       return `Use JudgmentKit example "${resource.title}" as calibration for this task.
 Compare the raw output to the corrected output, then help me prompt the next pass.
@@ -162,15 +178,15 @@ Task:
 function createPublishedPromptText(link: ProductSurfaceReferenceLink) {
   switch (link.url) {
     case "/install":
-      return "Use this when you want the hosted bootstrap script that clones JudgmentKit, installs dependencies, and delegates to the repo-local installer.";
+      return "Use this when you want the hosted bootstrap script that clones JudgmentKit, installs dependencies, and configures the client for the local loopback MCP endpoint.";
     case "/mcp-inventory.json":
       return "Use this when you want the published command inventory and inspect anchors. It is the fastest way to verify which tools and prompts the deployed JudgmentKit surface exposes.";
     case "/llms.txt":
       return "Use this when you want the machine-readable discovery listing for the public site and its published artifacts.";
     case "/resources/index.json":
-      return "Use this when you want the canonical published index of workflows, guardrails, examples, and schemas before drilling into a specific artifact.";
+      return "Use this when you want the canonical published index of workflows, guardrails, constraint packs, guideline profiles, examples, and schemas before drilling into a specific artifact.";
     case "/mcp":
-      return "Use this when you need the hosted MCP metadata/debug surface, not the local install target. It is for inspecting the published route contract and parity with the inventory.";
+      return "Use this when you need the hosted MCP metadata/debug surface, not the local loopback install target. It is for inspecting the published route contract and parity with the inventory.";
     default:
       break;
   }
@@ -245,6 +261,48 @@ function createInspectPrimaryItems(
       raw_format: "json",
     }));
 
+  const constraintPacks = resources
+    .filter((resource) => resource.type === "constraint_pack")
+    .sort((left, right) => left.title.localeCompare(right.title))
+    .map<ProductSurfaceInspectItem>((resource) => ({
+      id: resource.id,
+      category: INSPECT_CATEGORY_LABELS.constraint_pack,
+      type: resource.type,
+      version: resource.version,
+      title: resource.title,
+      summary: resource.summary,
+      subtitle: resource.id,
+      url: toRelativeUrl(resource.url),
+      schema_url: toRelativeUrl(resource.schema_url),
+      last_reviewed: resource.last_reviewed,
+      tags: resource.tags,
+      available_view_modes: ["prompt", "json", "schema"],
+      default_view_mode: "prompt",
+      prompt_text: createResourcePromptText(resource),
+      raw_format: "json",
+    }));
+
+  const guidelineProfiles = resources
+    .filter((resource) => resource.type === "guideline_profile")
+    .sort((left, right) => left.title.localeCompare(right.title))
+    .map<ProductSurfaceInspectItem>((resource) => ({
+      id: resource.id,
+      category: INSPECT_CATEGORY_LABELS.guideline_profile,
+      type: resource.type,
+      version: resource.version,
+      title: resource.title,
+      summary: resource.summary,
+      subtitle: resource.id,
+      url: toRelativeUrl(resource.url),
+      schema_url: toRelativeUrl(resource.schema_url),
+      last_reviewed: resource.last_reviewed,
+      tags: resource.tags,
+      available_view_modes: ["prompt", "json", "schema"],
+      default_view_mode: "prompt",
+      prompt_text: createResourcePromptText(resource),
+      raw_format: "json",
+    }));
+
   const guardrails = resources
     .filter((resource) => resource.type === "guardrail")
     .sort((left, right) => left.title.localeCompare(right.title))
@@ -266,7 +324,13 @@ function createInspectPrimaryItems(
       raw_format: "json",
     }));
 
-  return [...examples, ...workflows, ...guardrails];
+  return [
+    ...examples,
+    ...workflows,
+    ...constraintPacks,
+    ...guidelineProfiles,
+    ...guardrails,
+  ];
 }
 
 function createInspectReferenceItems(referenceLinks: ProductSurfaceReferenceLink[]) {
@@ -295,6 +359,8 @@ export function loadProductSurface(): ProductSurfaceContent {
 
   const loadedContextIds = [
     workflowArtifact.id,
+    ...workflowArtifact.links.constraint_pack_ids,
+    ...workflowArtifact.links.guideline_profile_ids,
     ...workflowArtifact.common_guardrails,
     ...workflowArtifact.links.example_ids,
   ];

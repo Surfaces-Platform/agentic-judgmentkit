@@ -139,10 +139,32 @@ export type InstallContractRepository = {
   install_command: string;
 };
 
-export type InstallContractConnection = {
+export type InstallContractLoopbackRuntime = {
+  start_command: string;
+  host: string;
+  port: number;
+  endpoint: string;
+  env_overrides: {
+    host: string;
+    port: string;
+  };
+};
+
+export type InstallContractHttpConnection = {
+  transport: "http";
+  url: string;
+  loopback_runtime: InstallContractLoopbackRuntime;
+};
+
+export type InstallContractStdioConnection = {
+  transport: "stdio";
   command: string;
   args: string[];
 };
+
+export type InstallContractConnection =
+  | InstallContractHttpConnection
+  | InstallContractStdioConnection;
 
 export type InstallContractCommandReference = {
   name: string;
@@ -155,6 +177,8 @@ export type InstallContractCommandReference = {
 export type InstallContractVerification = {
   method: "tools/list";
   server_name: string;
+  endpoint: string;
+  start_command: string;
   instructions: string;
   expected_tools: string[];
   expected_prompts: string[];
